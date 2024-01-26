@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { TouchableOpacity, StyleSheet, View } from 'react-native'
+import { TouchableOpacity, StyleSheet, View, Alert } from 'react-native'
 import { Text } from 'react-native-paper'
 import Background from '../components/Background'
 import Logo from '../components/Logo'
@@ -17,6 +17,7 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState({ value: '', error: '' })
   const [serverResponse, setServerResponse] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const apiUrl = 'http://10.100.102.25:3000';
 
   let credentials = {
     email: '',
@@ -29,15 +30,22 @@ export default function LoginScreen({ navigation }) {
         email,
         password,
       };
+      console.log("pass:", credentials.password ,"email", credentials.email)
       setIsAuthenticated(false);
-      // eslint-disable-next-line max-len
-      const responseFromServer = await axios.post('https://backend-app-jbun.onrender.com/post_signin', { credentials });
+      const responseFromServer = await axios.post(`${apiUrl}/post_signin`, { credentials });
+      console.log("enter 2");
       setServerResponse(responseFromServer.data);
+      console.log("res:", responseFromServer.data);
       if (responseFromServer.data === 'Welcome !') {
+        navigation.replace('Dashboard')
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
       }
+      if (responseFromServer.data === 'You need to verify your email'){
+        Alert.alert(responseFromServer.data);
+      }
+      
     } catch (error) {
       console.log(error);
     }

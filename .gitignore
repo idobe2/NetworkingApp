@@ -1,1 +1,17 @@
-node_modules
+node_modules/**/*
+.expo/*
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+src/core/config.js
+config.js
+
+# macOS
+.DS_Store
+yarn.lock
+.expo-shared

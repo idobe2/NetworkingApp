@@ -11,6 +11,8 @@ import { theme } from '../core/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
 import axios from 'axios';
+import Toast from '../components/Toast'
+import SocialLogins from '../components/SocialLogins'
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: '', error: '' })
@@ -32,12 +34,12 @@ export default function LoginScreen({ navigation }) {
       };
       console.log("pass:", credentials.password ,"email", credentials.email)
       setIsAuthenticated(false);
-      const responseFromServer = await axios.post(`${apiUrl}/post_signin`, { credentials });
+      const responseFromServer = await axios.post(`https://backend-app-jbun.onrender.com/post_signin`, { credentials });
       console.log("enter 2");
       setServerResponse(responseFromServer.data);
       console.log("res:", responseFromServer.data);
       if (responseFromServer.data === 'Welcome !') {
-        navigation.replace('Dashboard')
+        navigation.replace('HomeScreen')
         setIsAuthenticated(true);
       } else {
         setIsAuthenticated(false);
@@ -58,12 +60,12 @@ export default function LoginScreen({ navigation }) {
       <Header>Welcome back.</Header>
       <TextInput
                 placeholder="Email"
-                value={email}
+                TextInput={email}
                 onChangeText={(text) => setEmail(text)}
             />
             <TextInput
                 placeholder="Password"
-                value={password}
+                TextInput={password}
                 onChangeText={(text) => setPassword(text)}
                 secureTextEntry
             />
@@ -82,6 +84,7 @@ export default function LoginScreen({ navigation }) {
         <TouchableOpacity onPress={() => navigation.replace('RegisterScreen')}>
           <Text style={styles.link}>Sign up</Text>
         </TouchableOpacity>
+       
       </View>
     </Background>
   )

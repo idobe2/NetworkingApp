@@ -12,6 +12,9 @@ import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
 import { nameValidator } from '../helpers/nameValidator'
 import axios from 'axios';
+import { signUpUser } from '../api/auth-api'
+import Toast from '../components/Toast'
+import SocialLogins from '../components/SocialLogins'
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState({ value: '', error: '' })
@@ -42,9 +45,9 @@ export default function RegisterScreen({ navigation }) {
 
   const handleSignup = async () => {
     try {
-        const response_mail = await axios.post(`${apiUrl}/post_email`, { email });
+        const response_mail = await axios.post('https://backend-app-jbun.onrender.com/post_email', { email });
         const response_password = await axios.post(
-            `${apiUrl}/post_password`,
+            'https://backend-app-jbun.onrender.com/post_password',
             { password },
         );
         setEmailResponse(response_mail.data);
@@ -58,7 +61,7 @@ export default function RegisterScreen({ navigation }) {
             console.log('check2');
         }
         if (response_mail.data === 'Email is available' && response_password.data === 'Password received' ){
-            const post_response = await axios.post(`${apiUrl}/signup`, {
+            const post_response = await axios.post('https://backend-app-jbun.onrender.com/signup', {
             email,
             password,
         });
@@ -90,12 +93,12 @@ export default function RegisterScreen({ navigation }) {
       /> */}
        <TextInput
                 placeholder="Email"
-                value={email}
+                TextInput={email}
                 onChangeText={(text) => setEmail(text)}
             />
             <TextInput
                 placeholder="Password"
-                value={password}
+                TextInput={password}
                 onChangeText={(text) => setPassword(text)}
                 secureTextEntry
             />

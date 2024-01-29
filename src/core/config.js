@@ -13,7 +13,7 @@ export const FIREBASE_CONFIG = {
 // Replace with your own IDs! follow the guides here:
 // https://docs.expo.io/versions/latest/sdk/google/#using-it-inside-of-the-expo-app
 export const ANDROID_GOOGLE_CLIENT_ID =
-  '826066565685-lj072iilquvn7o2rsk44qh509v87kien.apps.googleusercontent.com'
+'826066565685-0srmijr4j8oba7gasdqnsprmsfgmp9i7.apps.googleusercontent.com'
 export const IOS_GOOGLE_CLIENT_ID =
   '878215484396-5hiqfjetgvbdck03l0jepdgku6u64erm.apps.googleusercontent.com'
 

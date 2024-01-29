@@ -1,41 +1,46 @@
-import React from 'react'
-import { TouchableOpacity, StyleSheet, Platform } from 'react-native'
-import * as WebBrowser from 'expo-web-browser'
-import firebase from 'firebase/app'
+import React, { useEffect } from 'react';
+import { TouchableOpacity, StyleSheet } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import firebase from 'firebase/app';
 import {
-  FacebookAuthProvider,
   GoogleAuthProvider,
-  onAuthStateChanged,
   signInWithCredential,
-} from "firebase/auth";
-import * as Google from "expo-auth-session/providers/google"
-import { GoogleLogo } from '../assets/icons'
-import { theme } from '../core/theme'
-import { ANDROID_GOOGLE_CLIENT_ID, IOS_GOOGLE_CLIENT_ID } from '../core/config'
-import { StartScreen } from '../screens';
+  signInWithPopup
+} from 'firebase/auth';
+import * as Google from 'expo-auth-session/providers/google';
+import { GoogleLogo } from '../assets/icons';
+import { theme } from '../core/theme';
+import { ANDROID_GOOGLE_CLIENT_ID } from '../core/config';
+import { auth } from '../core/firebaseConfig';
 
 WebBrowser.maybeCompleteAuthSession();
 
-
 export default function GoogleLogin() {
-  const [request, response,promptAsync] = Google.useIdTokenAuthRequest({
-    androidClientId: ANDROID_GOOGLE_CLIENT_ID,
-});
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
+    androidClientId: ANDROID_GOOGLE_CLIENT_ID
+  });
 
-React.useEffect(() => {
-  console.log("enter effect", response);
-  if (response?.type === "success") {
-      const {id_token} = response.params;
+  React.useEffect(() => {
+    console.log('response', response);
+    if (response?.type === 'success') {
+      const { id_token } = response.params;
       const credential = GoogleAuthProvider.credential(id_token);
-      signInWithCredential(auth, credential);
-  }
- }, [response]);
+      signInWithCredential(auth, credential)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          console.log('Successfully signed in with Google', user);
+        })
+        .catch((error) => {
+          console.error('Error signing in with Google', error);
+        });
+    }
+  }, [response]);
 
   return (
     <TouchableOpacity style={styles.container} onPress={() => promptAsync()}>
       <GoogleLogo />
     </TouchableOpacity>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -52,4 +57,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     margin: 8,
   },
-})
+});

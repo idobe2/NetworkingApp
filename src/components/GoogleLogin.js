@@ -16,8 +16,10 @@ import { auth } from '../core/firebaseConfig';
 WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleLogin() {
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    androidClientId: ANDROID_GOOGLE_CLIENT_ID
+  const [userinfo, setUserinfo] = React.useState();
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    androidClientId: ANDROID_GOOGLE_CLIENT_ID,
+    webClientId: '826066565685-qoiplj4jcnc0pudaqkhm7aqk6t4qflr2.apps.googleusercontent.com'
   });
 
   React.useEffect(() => {

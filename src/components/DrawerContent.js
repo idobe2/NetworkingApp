@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
-import { DrawerItem, DrawerContentScrollView } from '@react-navigation/drawer'
+import { DrawerItem, DrawerContentScrollView } from '@react-navigation/drawer';
 import {
   Avatar,
   Title,
@@ -13,7 +13,7 @@ import {
 } from 'react-native-paper'
 import { SettingsIcon } from '../assets/icons'
 
-export default function DrawerContent() {
+export default function DrawerContent({ navigation }) {
   return (
     <DrawerContentScrollView>
       <View style={styles.drawerContent}>

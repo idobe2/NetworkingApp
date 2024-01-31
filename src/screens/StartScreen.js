@@ -6,6 +6,7 @@ import Button from '../components/Button'
 import Paragraph from '../components/Paragraph'
 import GoogleLogin from '../components/GoogleLogin'
 import FacebookLogin from '../components/FacebookLogin'
+import SocialLogins from '../components/SocialLogins'
 
 export default function StartScreen({ navigation }) {
   return (
@@ -15,11 +16,11 @@ export default function StartScreen({ navigation }) {
       <Paragraph>
         The easiest way to start with your amazing trip.
       </Paragraph>
-      <GoogleLogin GoogleLogin={navigation.GoogleLogin}/>
-      <FacebookLogin FacebookLogin={navigation.FacebookLogin} />
+      {/* <GoogleLogin GoogleLogin={navigation.GoogleLogin}/>
+      <FacebookLogin FacebookLogin={navigation.FacebookLogin} /> */}
       <Button
         mode="contained"
-        onPress={() => navigation.navigate('LoginScreen')}
+        onPress={() => navigation.navigate('HomeScreen')}
       >
         Login
       </Button>
@@ -29,6 +30,7 @@ export default function StartScreen({ navigation }) {
       >
         Sign Up
       </Button>
+      <SocialLogins SocialLogins={navigation.SocialLogins}/>
     </Background>
   )
 }

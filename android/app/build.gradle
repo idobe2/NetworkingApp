@@ -83,10 +83,10 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.bar3668.Tripy'
+    namespace 'com.bar3668.tripy'
     defaultConfig {
-        manifestPlaceholders = [appAuthRedirectScheme: 'dev.expo.app']
-        applicationId 'com.bar3668.Tripy'
+        manifestPlaceholders = [appAuthRedirectScheme: 'com.bar3668.tripy']
+        applicationId 'com.bar3668.tripy'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

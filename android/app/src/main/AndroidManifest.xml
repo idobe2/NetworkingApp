@@ -25,7 +25,12 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="com.bar3668.Tripy"/>
+        <data android:scheme="com.bar3668.tripy"/>
+        <data android:scheme="simple Login Template"/>
+        <data android:scheme="exp+simple-login-template"/>
+        <data android:scheme="tripy"/>
+        <data android:scheme="com.bar3668.tripy"/>
+        <data android:scheme="exp+tripy"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>

@@ -4,33 +4,41 @@ import * as WebBrowser from 'expo-web-browser';
 import firebase from 'firebase/app';
 import {
   GoogleAuthProvider,
-  signInWithCredential,
-  signInWithPopup
+  signInWithPopup,
+  signOut
 } from 'firebase/auth';
 import * as Google from 'expo-auth-session/providers/google';
 import { GoogleLogo } from '../assets/icons';
 import { theme } from '../core/theme';
-import { ANDROID_GOOGLE_CLIENT_ID } from '../core/config';
+import { ANDROID_GOOGLE_CLIENT_ID, WEB_GOOGLE_CLIENT_ID} from '../core/config';
 import { auth } from '../core/firebaseConfig';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function GoogleLogin() {
   const [userinfo, setUserinfo] = React.useState();
-  const [request, response, promptAsync] = Google.useAuthRequest({
+  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     androidClientId: ANDROID_GOOGLE_CLIENT_ID,
-    webClientId: '826066565685-qoiplj4jcnc0pudaqkhm7aqk6t4qflr2.apps.googleusercontent.com'
+    native: "com.bar3668.tripy",
+    //androidClientId: ANDROID_GOOGLE_CLIENT_ID,
+    webClientId: WEB_GOOGLE_CLIENT_ID,
   });
+
+  const navigationr = useNavigation();
 
   React.useEffect(() => {
     console.log('response', response);
     if (response?.type === 'success') {
+      console.log('response2', response);
       const { id_token } = response.params;
-      const credential = GoogleAuthProvider.credential(id_token);
-      signInWithCredential(auth, credential)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          console.log('Successfully signed in with Google', user);
+      signInWithPopup(auth, new GoogleAuthProvider())
+        .then((result) => {
+          const user = result.user;
+          console.log('Successfully signed in with Google', user, user.uid);
+          axios.post('https://backend-app-jbun.onrender.com/signInGoogle', { user });
+          navigationr.navigate('HomeScreen');
         })
         .catch((error) => {
           console.error('Error signing in with Google', error);
@@ -38,8 +46,17 @@ export default function GoogleLogin() {
     }
   }, [response]);
 
+  const handleGoogleSignIn = async () => {
+    // Clear Firebase session before signing in
+    await signOut(auth);
+
+    // Initiate Google sign-in
+    promptAsync();
+    
+  };
+
   return (
-    <TouchableOpacity style={styles.container} onPress={() => promptAsync()}>
+    <TouchableOpacity style={styles.container} onPress={handleGoogleSignIn}>
       <GoogleLogo />
     </TouchableOpacity>
   );
@@ -52,7 +69,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 1,
     borderRadius: 8,
-    width: 300,
+    width: 50,
     marginVertical: 10,
     height: 48,
     alignItems: 'center',

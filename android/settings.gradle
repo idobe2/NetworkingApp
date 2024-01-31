@@ -1,4 +1,4 @@
-rootProject.name = 'Simple Login Template'
+rootProject.name = 'tripy'
 
 dependencyResolutionManagement {
   versionCatalogs {

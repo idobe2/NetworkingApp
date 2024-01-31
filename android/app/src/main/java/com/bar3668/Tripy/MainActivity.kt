@@ -1,4 +1,4 @@
-package com.bar3668.Tripy
+package com.bar3668.tripy
 
 import android.os.Build
 import android.os.Bundle

@@ -23,7 +23,7 @@ export default function RegisterScreen({ navigation }) {
   const [emailResponse, setEmailResponse] = useState('');
   const [passwordResponse, setPasswordResponse] = useState('');
   const [response, setResponse] = useState('');
-  const apiUrl = 'http://10.100.102.25:3000';
+  const apiUrl = 'https://backend-app-jbun.onrender.com/signup';
 
   // const onSignUpPressed = () => {
   //   const nameError = nameValidator(name.value)
@@ -45,9 +45,9 @@ export default function RegisterScreen({ navigation }) {
 
   const handleSignup = async () => {
     try {
-        const response_mail = await axios.post('https://backend-app-jbun.onrender.com/post_email', { email });
+        const response_mail = await axios.post(apiUrl +'/post_email', { email });
         const response_password = await axios.post(
-            'https://backend-app-jbun.onrender.com/post_password',
+            apiUrl + '/post_password',
             { password },
         );
         setEmailResponse(response_mail.data);
@@ -61,7 +61,7 @@ export default function RegisterScreen({ navigation }) {
             console.log('check2');
         }
         if (response_mail.data === 'Email is available' && response_password.data === 'Password received' ){
-            const post_response = await axios.post('https://backend-app-jbun.onrender.com/signup', {
+            const post_response = await axios.post( apiUrl + '/signup', {
             email,
             password,
         });

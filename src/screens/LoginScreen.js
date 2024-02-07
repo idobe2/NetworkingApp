@@ -19,7 +19,7 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState({ value: '', error: '' })
   const [serverResponse, setServerResponse] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const apiUrl = 'http://10.100.102.25:3000';
+  const apiUrl = 'https://backend-app-jbun.onrender.com';
 
   let credentials = {
     email: '',
@@ -28,13 +28,8 @@ export default function LoginScreen({ navigation }) {
 
   const onLoginPressed = async () => {
     try {
-      credentials = {
-        email,
-        password,
-      };
-      console.log("pass:", credentials.password ,"email", credentials.email)
       setIsAuthenticated(false);
-      const responseFromServer = await axios.post(`https://backend-app-jbun.onrender.com/post_signin`, { credentials });
+      const responseFromServer = await axios.post(apiUrl + '/login', { email, password });
       console.log("enter 2");
       setServerResponse(responseFromServer.data);
       console.log("res:", responseFromServer.data);

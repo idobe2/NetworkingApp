@@ -23,7 +23,7 @@ export default function RegisterScreen({ navigation }) {
   const [emailResponse, setEmailResponse] = useState('');
   const [passwordResponse, setPasswordResponse] = useState('');
   const [response, setResponse] = useState('');
-  const apiUrl = 'https://backend-app-jbun.onrender.com/signup';
+  const apiUrl = 'https://backend-app-jbun.onrender.com';
 
   // const onSignUpPressed = () => {
   //   const nameError = nameValidator(name.value)

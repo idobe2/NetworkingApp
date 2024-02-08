@@ -1,6 +1,6 @@
 export function emailValidator(email) {
-  const re = /\S+@\S+\.\S+/
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!email) return "Email can't be empty."
-  if (!re.test(email)) return 'Ooops! We need a valid email address.'
+  if (!emailPattern.test(email)) return 'Ooops! We need a valid email address.'
   return ''
 }

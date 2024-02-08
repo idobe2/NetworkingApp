@@ -1,23 +1,36 @@
-import React, { useState } from 'react'
-import Background from '../components/Background'
-import BackButton from '../components/BackButton'
-import Logo from '../components/Logo'
-import Header from '../components/Header'
+import React, { useState } from 'react';
+import { Alert } from 'react-native';
+import Background from '../components/Background';
+import BackButton from '../components/BackButton';
+import Logo from '../components/Logo';
+import Header from '../components/Header';
 import TextInput from '../components/TextInput'
 import Button from '../components/Button'
-import { emailValidator } from '../helpers/emailValidator'
+import { emailValidator } from '../helpers/emailValidator';
+import axios from 'axios';
 
 export default function ResetPasswordScreen({ navigation }) {
-  const [email, setEmail] = useState({ value: '', error: '' })
+  const [email, setEmail] = useState('');
+  const apiUrl = 'https://backend-app-jbun.onrender.com';
+  const [response, setResponse] = useState('');
 
-  const sendResetPasswordEmail = () => {
-    const emailError = emailValidator(email.value)
-    if (emailError) {
-      setEmail({ ...email, error: emailError })
-      return
+  const sendResetPasswordEmail = async () => {
+    console.log('email', email);
+    const emailError = emailValidator(email);
+    if (!emailError) {
+      try {
+        console.log('email2', email);
+        const response_mail = await axios.post(apiUrl + '/resetPass', { email });
+        setResponse(response_mail.data);
+        Alert.alert(response);
+        console.log(response_mail.data);
+        navigation.navigate('LoginScreen')
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Error', 'An error occurred. Please try again.');
+      }
     }
-    navigation.navigate('LoginScreen')
-  }
+  };
 
   return (
     <Background>
@@ -25,17 +38,9 @@ export default function ResetPasswordScreen({ navigation }) {
       <Logo />
       <Header>Restore Password</Header>
       <TextInput
-        label="E-mail address"
-        returnKeyType="done"
-        value={email.value}
-        onChangeText={(text) => setEmail({ value: text, error: '' })}
-        error={!!email.error}
-        errorText={email.error}
-        autoCapitalize="none"
-        autoCompleteType="email"
-        textContentType="emailAddress"
-        keyboardType="email-address"
-        description="You will receive email with password reset link."
+        placeholder="Email"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
       />
       <Button
         mode="contained"
@@ -45,5 +50,5 @@ export default function ResetPasswordScreen({ navigation }) {
         Send Instructions
       </Button>
     </Background>
-  )
+  );
 }

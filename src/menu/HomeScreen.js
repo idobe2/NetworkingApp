@@ -1,18 +1,14 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
-import Button from '../components/Button'
-import TopBar from '../components/TopBar'
-import DrawerContent from '../components/DrawerContent'; // Update the import path
-
-import Constants from 'expo-constants';
+import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 
-import Home from '../components/Home'
-import Planner from '../components/Planner';
-import About from '../components/About';
-import { NavigationContainer } from '@react-navigation/native';
-import { StatusBar } from 'expo-status-bar';
+// import TopBar from '../components/TopBar'
+
+import Explore from './ExploreScreen';
+import Planner from './PlannerScreen';
+import About from './AboutScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -20,7 +16,7 @@ export default function HomeScreen({ navigation }) {
   return (
     <>
       <NavigationContainer independent={true}>
-      <TopBar title="Tripy" />
+      {/* <TopBar title="Tripy" /> */}
       <Tab.Navigator
         tabBarOptions={{
           activeTintColor: 'blue',
@@ -28,11 +24,11 @@ export default function HomeScreen({ navigation }) {
         }}
       >
         <Tab.Screen
-          name="Home"
-          component={Home}
+          name="Explore"
+          component={Explore}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" color={color} size={size} />
+              <Ionicons name="search-outline" color={color} size={size} />
             ),
           }}
         />

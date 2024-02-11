@@ -4,7 +4,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import HomeScreen from '../menu/HomeScreen'
 import SettingsScreen from '../menu/SettingsScreen';
-// import DrawerContent from '../components/DrawerContent';
+import DrawerContent from '../components/DrawerContent';
 
 const Drawer = createDrawerNavigator();
 
@@ -13,6 +13,7 @@ export default function MainScreen() {
     <>
     <Drawer.Navigator initialRouteName='Home' >
           <Drawer.Screen name="Home" component={HomeScreen} />
+          <Drawer.Screen name="Profile" component={DrawerContent} />
           <Drawer.Screen name="Settings" component={SettingsScreen} />
         </Drawer.Navigator>
     </>

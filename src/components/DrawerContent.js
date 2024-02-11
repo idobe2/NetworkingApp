@@ -13,7 +13,7 @@ import {
 } from 'react-native-paper'
 import { SettingsIcon } from '../assets/icons'
 
-export default function DrawerContent({ navigation }) {
+export default function DrawerContent() {
   return (
     <DrawerContentScrollView>
       <View style={styles.drawerContent}>
@@ -22,11 +22,11 @@ export default function DrawerContent({ navigation }) {
             size={80}
             source={{
               uri:
-                'https://pbs.twimg.com/profile_images/1195087399661056019/pYAaQSJS_400x400.jpg',
+                'https://instagram.ftlv1-1.fna.fbcdn.net/v/t51.2885-19/359979335_318139347307470_1230971796262779820_n.jpg?stp=dst-jpg_s150x150&_nc_ht=instagram.ftlv1-1.fna.fbcdn.net&_nc_cat=106&_nc_ohc=Dygs56mUqEgAX_eZJOh&edm=ABmJApABAAAA&ccb=7-5&oh=00_AfDHvJbjs-hzF76KVYZT47OZHmHfuNf-6OQyN2eBWx4XiA&oe=65CEFA46&_nc_sid=b41fef',
             }}
           />
-          <Title style={styles.title}>Tony Hook</Title>
-          <Caption style={styles.caption}>@tony_venits</Caption>
+          <Title style={styles.title}>YaDoo</Title>
+          <Caption style={styles.caption}>@ido_bennoun</Caption>
           <View style={styles.row}>
             <View style={styles.section}>
               <Paragraph style={[styles.paragraph, styles.caption]}>

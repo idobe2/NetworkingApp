@@ -15,7 +15,7 @@ export const FIREBASE_CONFIG = {
 export const ANDROID_GOOGLE_CLIENT_ID =
 '826066565685-4sbe7k7c0jfd9uqatovp79vjtcecnq23.apps.googleusercontent.com'
 export const IOS_GOOGLE_CLIENT_ID =
-  '878215484396-5hiqfjetgvbdck03l0jepdgku6u64erm.apps.googleusercontent.com'
+  '826066565685-t63uo6nniv485th5r427p2c6r6lvggdm.apps.googleusercontent.com'
 export const WEB_GOOGLE_CLIENT_ID =
   '826066565685-qoiplj4jcnc0pudaqkhm7aqk6t4qflr2.apps.googleusercontent.com'
 // Replace with your own facebook app ID.

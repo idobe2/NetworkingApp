@@ -22,7 +22,7 @@ export default function ResetPasswordScreen({ navigation }) {
         console.log('email2', email);
         const response_mail = await axios.post(apiUrl + '/resetPass', { email });
         setResponse(response_mail.data);
-        Alert.alert(response);
+        Alert.alert(response_mail.data);
         console.log(response_mail.data);
         navigation.navigate('LoginScreen')
       } catch (error) {

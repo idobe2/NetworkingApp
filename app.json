@@ -2,7 +2,7 @@
   "expo": {
     "name": "tripy",
     "slug": "tripy",
-    "scheme": "com.bar3668.tripy",
+    "scheme": "facebooklogin",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,8 +19,16 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.bar3668.tripy",
       "supportsTablet": true,
       "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.826066565685-t63uo6nniv485th5r427p2c6r6lvggdm"
+            ]
+          }
+        ],
         "NSUserTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you.",
         "SKAdNetworkItems": [
           {

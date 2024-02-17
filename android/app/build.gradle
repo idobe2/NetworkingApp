@@ -85,7 +85,7 @@ android {
 
     namespace 'com.bar3668.tripy'
     defaultConfig {
-        manifestPlaceholders = [appAuthRedirectScheme: 'com.bar3668.tripy']
+        manifestPlaceholders = [appAuthRedirectScheme: 'com.bar3668.tripy:/oauth2redirect/google']
         applicationId 'com.bar3668.tripy'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -113,6 +113,11 @@ android {
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging (findProperty('expo.useLegacyPackaging')?.toBoolean() ?: false)
         }
     }
 }

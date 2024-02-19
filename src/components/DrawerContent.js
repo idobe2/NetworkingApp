@@ -49,6 +49,7 @@ export default function DrawerContent() {
             onPress={() => {}}
           />
         </Drawer.Section>
+        
         <Drawer.Section title="Preferences">
           <TouchableRipple onPress={() => {}}>
             <View style={styles.preference}>
@@ -58,6 +59,7 @@ export default function DrawerContent() {
               </View>
             </View>
           </TouchableRipple>
+          
         </Drawer.Section>
       </View>
     </DrawerContentScrollView>

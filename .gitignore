@@ -10,9 +10,10 @@ npm-debug.*
 web-build/
 src/core/config.js
 config.js
-src/core/
+src/core/**/*
 
 # macOS
 .DS_Store
 yarn.lock
 .expo-shared
+src/core/config.js

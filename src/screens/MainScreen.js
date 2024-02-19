@@ -2,9 +2,11 @@ import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
+
+import DrawerContent from '../components/DrawerContent';
 import HomeScreen from '../menu/HomeScreen'
 import SettingsScreen from '../menu/SettingsScreen';
-import DrawerContent from '../components/DrawerContent';
+import PreferencesScreen from '../menu/PreferencesScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -15,6 +17,7 @@ export default function MainScreen() {
           <Drawer.Screen name="Home" component={HomeScreen} />
           <Drawer.Screen name="Profile" component={DrawerContent} />
           <Drawer.Screen name="Settings" component={SettingsScreen} />
+          <Drawer.Screen name="Preferences" component={PreferencesScreen} />
         </Drawer.Navigator>
     </>
   )

@@ -11,6 +11,9 @@ import {
   Dashboard,
 } from './src/screens';
 import MainScreen from './src/screens/MainScreen';
+import {enableLatestRenderer} from 'react-native-maps';
+
+enableLatestRenderer();
 
 const Stack = createStackNavigator();
 

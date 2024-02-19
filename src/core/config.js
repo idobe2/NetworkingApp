@@ -23,3 +23,4 @@ export const WEB_GOOGLE_CLIENT_ID =
 // https://docs.expo.io/versions/latest/sdk/facebook/#registering-your-app-with-facebook
 export const FACEBOOK_APP_ID = '873805167813153'
 //https://com.bar3668.tripy/ybvt0vy-bar3668-8081.exp.direct
+export const API_KEY = 'AIzaSyA6FaegFk2ZRbiu-ecDlDZIRBZAhdEmMwU'

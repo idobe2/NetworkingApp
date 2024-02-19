@@ -3,17 +3,23 @@
     "version": ">= 7.1.2"
   },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "npmClient": "yarn"
-    },
     "preview": {
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    },
+    "preview3": {
+      "developmentClient": true
+    },
+    "preview4": {
       "distribution": "internal"
     },
     "production": {}
-  },
-  "submit": {
-    "production": {}
   }
 }
+

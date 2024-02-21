@@ -8,10 +8,12 @@ import {
   LoginScreen,
   RegisterScreen,
   ResetPasswordScreen,
-  Dashboard,
+  Dashboard
 } from './src/screens';
 import MainScreen from './src/screens/MainScreen';
 import {enableLatestRenderer} from 'react-native-maps';
+import DetailsScreen from './src/screens/DetailsScreen';
+import Preferences from './src/menu/PreferencesScreen';
 
 enableLatestRenderer();
 
@@ -36,6 +38,9 @@ export default function App() {
             name="ResetPasswordScreen"
             component={ResetPasswordScreen}
           />
+          <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
+          <Stack.Screen name="Preferences" component={Preferences} />
+
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

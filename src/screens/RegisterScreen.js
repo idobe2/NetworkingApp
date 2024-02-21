@@ -20,61 +20,56 @@ export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState({ value: '', error: '' })
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
+  const [confirmPassword, setConfirmPassword] = useState({ value: '', error: '' })
   const [emailResponse, setEmailResponse] = useState('');
   const [passwordResponse, setPasswordResponse] = useState('');
   const [response, setResponse] = useState('');
   const apiUrl = 'https://backend-app-jbun.onrender.com';
 
-  // const onSignUpPressed = () => {
-  //   const nameError = nameValidator(name.value)
-  //   const emailError = emailValidator(email.value)
-  //   const passwordError = passwordValidator(password.value)
-  //   if (emailError || passwordError || nameError) {
-  //     setName({ ...name, error: nameError })
-  //     setEmail({ ...email, error: emailError })
-  //     setPassword({ ...password, error: passwordError })
-  //     return
-  //   }
-  //   navigation.reset({
-  //     index: 0,
-  //     routes: [{ name: 'Dashboard' }],
-  //   })
-  // }
-
 
 
   const handleSignup = async () => {
-    try {
-        const response_mail = await axios.post(apiUrl +'/post_email', { email });
-        const response_password = await axios.post(
-            apiUrl + '/post_password',
-            { password },
-        );
-        setEmailResponse(response_mail.data);
-        setPasswordResponse(response_password.data);
-        if (response_mail.data !== 'Email is available') {
-            Alert.alert(response_mail.data);
-            console.log('check1');
+    if (password !== confirmPassword) {
+        Alert.alert('Error', 'Passwords do not match, please try again');
+        return;
+    } else {
+        try {
+            const response_mail = await axios.post(apiUrl +'/post_email', { email });
+            const response_password = await axios.post(
+                apiUrl + '/post_password',
+                { password },
+            );
+            setEmailResponse(response_mail.data);
+            setPasswordResponse(response_password.data);
+            if (response_mail.data !== 'Email is available') {
+                Alert.alert(response_mail.data);
+                console.log('check1');
+            } else if (response_password.data !== 'Password received') {
+                Alert.alert(response_password.data);
+                console.log('check2');
+            }
+            if (response_mail.data === 'Email is available' && response_password.data === 'Password received' ){
+                console.log('check3, enter res');
+                const post_response = await axios.post(apiUrl + '/signup', {
+                    email,
+                    password,
+                });
+                setResponse(post_response.data)
+                console.log('post_response:', post_response.data.success);
+                console.log('post_response:', post_response.data.userId);
+                if (post_response.data.success) {
+                  console.log('check3');
+                    Alert.alert('Success', 'Email verification sent');
+                    
+                    // Navigate to DetailsScreen with UID as parameter
+                    navigation.navigate('DetailsScreen', { userId: post_response.data.userId });
+                }
+                console.log('response:', response);
+            }
+        } catch (error) {
+            console.error(error);
+            Alert.alert('Error',  'Error signing up');
         }
-        else if (response_password.data !== 'Password received') {
-            Alert.alert(response_password.data);
-            console.log('check2');
-        }
-        if (response_mail.data === 'Email is available' && response_password.data === 'Password received' ){
-            const post_response = await axios.post( apiUrl + '/signup', {
-            email,
-            password,
-        });
-            setResponse(post_response.data)
-            if (post_response.data  === 'yes')
-                Alert.alert('Success', 'Email verification sent');
-            console.log(response);
-        }
-
-
-    } catch (error) {
-        console.error(error);
-        Alert.alert('Error',  'Error signing up');
     }
 };
 
@@ -100,6 +95,12 @@ export default function RegisterScreen({ navigation }) {
                 placeholder="Password"
                 TextInput={password}
                 onChangeText={(text) => setPassword(text)}
+                secureTextEntry
+            />
+            <TextInput
+                placeholder="Confirm password"
+                TextInput={confirmPassword}
+                onChangeText={(text) => setConfirmPassword(text)}
                 secureTextEntry
             />
       <Button

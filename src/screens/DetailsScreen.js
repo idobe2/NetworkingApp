@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Modal, Button as RNButton, TouchableWithoutFeedback   } from 'react-native';
 import TextInput from '../components/TextInput';
-import Button from '../components/Button'
+import Button from '../components/Button';
 import { Text } from 'react-native-paper';
 import Background from '../components/Background';
 import Logo from '../components/Logo';
@@ -12,24 +12,23 @@ import CalendarPicker from 'react-native-calendar-picker';
 import RNPickerSelect from 'react-native-picker-select';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
 
 export default function DetailsScreen({ navigation }) {
   const route = useRoute(); // Hook to get the route object
   const { userId } = route.params;
   const [name, setName] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
-  const [dateOfBirth, setDateOfBirth] = useState('');
-  const [showCalendar, setShowCalendar] = useState(false);
   const [gender, setGender] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const apiUrl = 'https://backend-app-jbun.onrender.com';
-
 
   const onDateChange = (date) => {
     setSelectedDate(date);
-    setShowCalendar(false); // Close calendar after date selection
+    setShowModal(false);
   };
 
-  // Function to format date to MM/DD/YYYY
   const formatDate = (date) => {
     if (!date) return '';
     const formattedDate = new Date(date);
@@ -39,30 +38,21 @@ export default function DetailsScreen({ navigation }) {
     return `${day}/${month}/${year}`;
   };
 
-  // Array of gender options
   const genderOptions = [
     { label: 'Male', value: 'male' },
     { label: 'Female', value: 'female' },
     { label: 'Other', value: 'other' },
   ];
 
-
   const handleDetails = async () => {
-    console.log('Name:', name);
     const formattedDateString = formatDate(selectedDate);
-    const day = formattedDateString.split('/')[0];
-    console.log('Day of birth:', selectedDate);
-    console.log('Gender:', gender );
-    console.log('uid',userId);
-
     response = await axios.post(apiUrl + '/addDetails', {
       uid: userId,
       name: name,
       birthday: formattedDateString,
-      gender: gender
-  })
-  navigation.navigate('Preferences', { userId: userId });
-
+      gender: gender,
+    });
+    navigation.navigate('LoginScreen');
   };
 
   return (
@@ -76,47 +66,72 @@ export default function DetailsScreen({ navigation }) {
         value={name}
         onChangeText={(text) => setName(text)}
       />
-      {/* Gender selection */}
       <View style={styles.input}>
         <RNPickerSelect
           onValueChange={(value) => setGender(value)}
-          placeholder={{ label: 'Select gender', value: null }}
+          placeholder={{ label: 'Gender', value: null }}
           items={genderOptions}
         />
       </View>
-      <TouchableOpacity onPress={() => setShowCalendar(true)} style={styles.input}>
+      <TouchableOpacity onPress={() => setShowModal(true)} style={styles.input}>
         <Text style={styles.inputText}>
-          {selectedDate ? formatDate(selectedDate) : 'Select birth date'}
+          {selectedDate ? formatDate(selectedDate) : 'Birth date' }
         </Text>
+        <FontAwesome name="calendar" size={24} color={theme.colors.primary} style={styles.icon} />
       </TouchableOpacity>
-      <Button
-        mode="contained"
-        onPress={handleDetails}
-        style={{ marginTop: 24 }}
-        title="Sign Up"
-      >
+      <Button mode="contained" onPress={handleDetails} style={{ marginTop: 24 }} title="Details">
         Send
       </Button>
-      {showCalendar && (
-        <View style={styles.calendarContainer}>
-          <CalendarPicker
-            onDateChange={onDateChange}
-            selectedStartDate={selectedDate}
-            previousTitle="Previous"
-            nextTitle="Next"
-          />
+      
+      <Modal
+        visible={showModal}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowModal(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
+            <View style={styles.overlay} />
+          </TouchableWithoutFeedback>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+          
+          
+            <CalendarPicker
+              onDateChange={onDateChange}
+              selectedStartDate={selectedDate}
+              previousTitle="Previous"
+              nextTitle="Next"
+              selectedDayTextColor={theme.colors.primary}
+              selectedDayBackgroundColor={theme.colors.accent}
+              todayBackgroundColor={theme.colors.background}
+              selectedDayStyle={styles.selectedDayStyle}
+              selectedDayTextStyles={styles.selectedDayText}
+            />
+            <RNButton title="Close" onPress={() => setShowModal(false)} color={theme.colors.primary} />
+          </View>
         </View>
-      )}
-      <View style={styles.eventsContainer}>
-        {/* Display events here based on selectedDate */}
-      </View>
+      </Modal>
+      <View style={styles.eventsContainer}></View>
     </Background>
   );
 }
 
 const styles = StyleSheet.create({
-  calendarContainer: {
+  overlay: {
     flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
   },
   eventsContainer: {
     flex: 1,
@@ -130,11 +145,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.primary,
     borderRadius: theme.roundness,
-    paddingVertical: 10,
+    paddingVertical: 20,
     paddingHorizontal: 12,
+    flexDirection: 'row', // Align icon and text in a row
+    alignItems: 'center', // Center items vertically
   },
   inputText: {
     fontSize: 16,
     color: theme.colors.text,
+    flex: 1, // Allow text to take remaining space
+  },
+  icon: {
+    marginLeft: 10, // Add some spacing between text and icon
+  },
+  selectedDayStyle: {
+    backgroundColor: theme.colors.accent,
+    borderRadius: 16,
+  },
+  selectedDayText: {
+    color: theme.colors.primary,
+    fontWeight: 'bold',
   },
 });

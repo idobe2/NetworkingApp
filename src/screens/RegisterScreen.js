@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { View, StyleSheet, TouchableOpacity, Alert } from 'react-native'
-import { Text } from 'react-native-paper'
+import { Text, IconButton } from 'react-native-paper' // Import IconButton from react-native-paper
 import Background from '../components/Background'
 import Logo from '../components/Logo'
 import Header from '../components/Header'
@@ -17,16 +17,24 @@ import Toast from '../components/Toast'
 import SocialLogins from '../components/SocialLogins'
 
 export default function RegisterScreen({ navigation }) {
-  const [name, setName] = useState({ value: '', error: '' })
-  const [email, setEmail] = useState({ value: '', error: '' })
-  const [password, setPassword] = useState({ value: '', error: '' })
-  const [confirmPassword, setConfirmPassword] = useState({ value: '', error: '' })
+  const [name, setName] = useState({ value: '', error: '' });
+  const [email, setEmail] = useState({ value: '', error: '' });
+  const [password, setPassword] = useState({ value: '', error: '' });
+  const [confirmPassword, setConfirmPassword] = useState({ value: '', error: '' });
+  const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State to manage confirm password visibility
   const [emailResponse, setEmailResponse] = useState('');
   const [passwordResponse, setPasswordResponse] = useState('');
   const [response, setResponse] = useState('');
   const apiUrl = 'https://backend-app-jbun.onrender.com';
 
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
+  const handleToggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   const handleSignup = async () => {
     if (password !== confirmPassword) {
@@ -73,52 +81,60 @@ export default function RegisterScreen({ navigation }) {
     }
 };
 
-  return (
-    <Background>
-      <BackButton goBack={navigation.goBack} />
-      <Logo />
-      <Header>Create Account</Header>
-      {/* <TextInput
-        label="Name"
-        returnKeyType="next"
-        value={name.value}
-        onChangeText={(text) => setName({ value: text, error: '' })}
-        error={!!name.error}
-        errorText={name.error}
-      /> */}
-       <TextInput
-                placeholder="Email"
-                TextInput={email}
-                onChangeText={(text) => setEmail(text)}
-            />
-            <TextInput
-                placeholder="Password"
-                TextInput={password}
-                onChangeText={(text) => setPassword(text)}
-                secureTextEntry
-            />
-            <TextInput
-                placeholder="Confirm password"
-                TextInput={confirmPassword}
-                onChangeText={(text) => setConfirmPassword(text)}
-                secureTextEntry
-            />
-      <Button
-        mode="contained"
-        onPress={handleSignup}
-        style={{ marginTop: 24 }}
-        title="Sign Up"
-      >
-        Sign Up
-      </Button>
-      <View style={styles.row}>
-        <Text>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.replace('LoginScreen')}>
-          <Text style={styles.link}>Login</Text>
-        </TouchableOpacity>
-      </View>
-    </Background>
-  )
+return (
+  <Background>
+    <BackButton goBack={navigation.goBack} />
+    <Logo />
+    <Header>Create Account</Header>
+    <TextInput
+      placeholder="Email"
+      value={email.value}
+      onChangeText={(text) => setEmail(text)}
+    />
+    <View style={styles.passwordContainer}>
+  <TextInput
+    placeholder="Password"
+    value={password.value}
+    onChangeText={(text) => setPassword(text)}
+    secureTextEntry={!showPassword} // Toggle secureTextEntry based on showPassword state
+    style={styles.input}
+  />
+  <IconButton // Eye icon button to toggle password visibility
+    icon={showPassword ? 'eye-off' : 'eye'}
+    onPress={handleTogglePasswordVisibility}
+    style={styles.iconButton}
+  />
+</View>
+<View style={styles.passwordContainer}>
+  <TextInput
+    placeholder="Confirm password"
+    value={confirmPassword.value}
+    onChangeText={(text) => setConfirmPassword(text)}
+    secureTextEntry={!showConfirmPassword} // Toggle secureTextEntry based on showConfirmPassword state
+    style={styles.input}
+  />
+  <IconButton // Eye icon button to toggle password visibility
+    icon={showConfirmPassword ? 'eye-off' : 'eye'}
+    onPress={handleToggleConfirmPasswordVisibility}
+    style={styles.iconButton}
+  />
+</View>
+    <Button
+      mode="contained"
+      onPress={handleSignup}
+      style={{ marginTop: 24 }}
+      title="Sign Up"
+    >
+      Sign Up
+    </Button>
+    <View style={styles.row}>
+      <Text>Already have an account? </Text>
+      <TouchableOpacity onPress={() => navigation.replace('LoginScreen')}>
+        <Text style={styles.link}>Login</Text>
+      </TouchableOpacity>
+    </View>
+  </Background>
+);
 }
 
 const styles = StyleSheet.create({
@@ -130,4 +146,26 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: theme.colors.primary,
   },
-})
+  passwordContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface, // Background color to match TextInput style
+    borderColor: theme.colors.surface,
+    borderWidth: 1,
+    borderRadius: 10,
+    height: 80, // Adjust height to match TextInput style
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    backgroundColor: theme.colors.surface,
+  },
+  iconButton: {
+    margin: -40, // Adjust position of icon
+  },
+});
+
+
+
+

@@ -12,7 +12,7 @@ export default function StartScreen({ navigation }) {
   return (
     <Background>
       <Logo />
-      <Header>Tripy</Header>
+      {/* <Header>Tripy</Header> */}
       <Paragraph>
         The easiest way to start with your amazing trip.
       </Paragraph>

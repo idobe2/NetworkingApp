@@ -85,7 +85,7 @@ android {
 
     namespace 'com.bar3668.tripy'
     defaultConfig {
-        manifestPlaceholders = [appAuthRedirectScheme: 'com.bar3668.tripy:/oauth2redirect/google']
+        manifestPlaceholders = [appAuthRedirectScheme: 'tripy']
         applicationId 'com.bar3668.tripy'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion

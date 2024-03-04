@@ -2,11 +2,10 @@
   "expo": {
     "name": "tripy",
     "slug": "tripy",
-    "scheme": "facebooklogin",
+    "scheme": "tripy",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "npmClient": "yarn",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -50,9 +49,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-facebook"
-    ],
     "extra": {
       "eas": {
         "projectId": "0f318e3d-91a2-43f0-8f41-ea20ad138059"

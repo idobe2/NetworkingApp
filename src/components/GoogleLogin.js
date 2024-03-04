@@ -22,7 +22,6 @@ export default function GoogleLogin() {
   const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
     androidClientId: ANDROID_GOOGLE_CLIENT_ID,
     iosClientId: IOS_GOOGLE_CLIENT_ID,
-    redirectUri: 'com.bar3668.tripy:/oauth2redirect/com.googleusercontent.apps.826066565685-t63uo6nniv485th5r427p2c6r6lvggdm',
     webClientId: WEB_GOOGLE_CLIENT_ID,
   });
 

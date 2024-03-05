@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import Explore from './ExploreScreen';
 import Planner from './PlannerScreen';
-import About from './AboutScreen';
+import PreviousPlans from './PreviousPlansScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -42,11 +42,11 @@ export default function HomeScreen({ navigation }) {
           }}
         />
         <Tab.Screen
-          name="About"
-          component={About}
+          name="Previous Plans"
+          component={PreviousPlans}
           options={{
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="information-circle" color={color} size={size} />
+              <Ionicons name="briefcase-outline" color={color} size={size} />
             ),
           }}
         />

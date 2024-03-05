@@ -14,6 +14,8 @@ import MainScreen from './src/screens/MainScreen';
 import {enableLatestRenderer} from 'react-native-maps';
 import DetailsScreen from './src/screens/DetailsScreen';
 import Preferences from './src/menu/PreferencesScreen';
+import Planner from './src/menu/PlannerScreen';
+import Schedule from './src/menu/ScheduleScreen';
 
 enableLatestRenderer();
 
@@ -34,13 +36,11 @@ export default function App() {
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="Dashboard" component={Dashboard} />
           <Stack.Screen name="HomeScreen" component={MainScreen} />
-          <Stack.Screen
-            name="ResetPasswordScreen"
-            component={ResetPasswordScreen}
-          />
+          <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
           <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
           <Stack.Screen name="Preferences" component={Preferences} />
-
+          <Stack.Screen name="Planner" component={Planner} />
+          <Stack.Screen name="Schedule" component={Schedule} />
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>

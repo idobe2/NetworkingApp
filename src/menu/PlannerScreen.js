@@ -4,7 +4,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import Button from '../components/Button'
 
-
 const Planner = ({ navigation }) => {
     
     const [destination, setDestination] = useState('');
@@ -13,7 +12,6 @@ const Planner = ({ navigation }) => {
     const [showArrivalPicker, setShowArrivalPicker] = useState(false);
     const [showDeparturePicker, setShowDeparturePicker] = useState(false);
 
-    
     const handleArrivalChange = (event, selectedDate) => {
         const currentDate = selectedDate || arrivalDate;
         setShowArrivalPicker(false);
@@ -43,6 +41,7 @@ const Planner = ({ navigation }) => {
         console.log('destination:', destination, '\narrivalDate:', arrivalDate, '\ndepartureDate:', departureDate);
         // Proceed to the next screen with collected data
         navigation.navigate('Previous Plans', { destination, arrivalDate, departureDate });
+
     };
 
     return (

@@ -15,7 +15,7 @@ export default function HomeScreen({ navigation }) {
     <>
       <NavigationContainer independent={true}>
       <Tab.Navigator
-        tabBarOptions={{
+        screenOptions={{
           activeTintColor: 'blue',
           inactiveTintColor: 'gray',
         }}

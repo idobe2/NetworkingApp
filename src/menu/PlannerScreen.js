@@ -13,6 +13,7 @@ const Planner = ({ navigation }) => {
     const [showArrivalPicker, setShowArrivalPicker] = useState(false);
     const [showDeparturePicker, setShowDeparturePicker] = useState(false);
 
+    
     const handleArrivalChange = (event, selectedDate) => {
         const currentDate = selectedDate || arrivalDate;
         setShowArrivalPicker(false);
@@ -41,7 +42,7 @@ const Planner = ({ navigation }) => {
         }
         console.log('destination:', destination, '\narrivalDate:', arrivalDate, '\ndepartureDate:', departureDate);
         // Proceed to the next screen with collected data
-        navigation.navigate('Schedule');
+        navigation.navigate('Previous Plans', { destination, arrivalDate, departureDate });
     };
 
     return (

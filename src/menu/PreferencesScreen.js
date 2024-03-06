@@ -19,7 +19,7 @@ const Preferences = () => {
   const handleContinuePress = () => {
     console.log('selectedPreferences:', selectedPreferences);
     // Here you can calculate the decision tree based on selectedPreferences
-    navigation.replace('HomeScreen');
+    navigation.replace('Root');
   };
 
   return (

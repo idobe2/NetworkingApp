@@ -20,7 +20,7 @@ export default function StartScreen({ navigation }) {
       <FacebookLogin FacebookLogin={navigation.FacebookLogin} /> */}
       <Button
         mode="contained"
-        onPress={() => navigation.navigate('HomeScreen')}
+        onPress={() => navigation.navigate('Root' ,{ screen: 'Home' })}
       >
         Login
       </Button>

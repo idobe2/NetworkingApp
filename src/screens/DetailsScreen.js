@@ -13,11 +13,13 @@ import RNPickerSelect from 'react-native-picker-select';
 import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { Picker } from '@react-native-picker/picker';
+
 
 
 export default function DetailsScreen({ navigation }) {
   const route = useRoute(); // Hook to get the route object
-  const { userId } = route.params;
+  // const { userId } = route.params;
   const [name, setName] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
   const [gender, setGender] = useState(null);
@@ -67,11 +69,14 @@ export default function DetailsScreen({ navigation }) {
         onChangeText={(text) => setName(text)}
       />
       <View style={styles.input}>
-        <RNPickerSelect
-          onValueChange={(value) => setGender(value)}
-          placeholder={{ label: 'Gender', value: null }}
-          items={genderOptions}
-        />
+        <Picker
+                selectedValue={gender}
+                style={styles.picker}
+                onValueChange={(itemValue) => setGender(itemValue)}>
+                <Picker.Item label="Select gender" value="" />
+                <Picker.Item label="Male" value="Male" />
+                <Picker.Item label="Female" value="Female" />
+            </Picker>
       </View>
       <TouchableOpacity onPress={() => setShowModal(true)} style={styles.input}>
         <Text style={styles.inputText}>
@@ -145,7 +150,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.primary,
     borderRadius: theme.roundness,
-    paddingVertical: 20,
     paddingHorizontal: 12,
     flexDirection: 'row', // Align icon and text in a row
     alignItems: 'center', // Center items vertically
@@ -166,4 +170,8 @@ const styles = StyleSheet.create({
     color: theme.colors.primary,
     fontWeight: 'bold',
   },
+  picker: {
+    marginBottom: 10,
+    width: '100%',
+},
 });

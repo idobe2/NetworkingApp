@@ -55,7 +55,6 @@ export default function Explore() {
     return (
         <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.container}>
-                <Text>Search</Text>
                 <GooglePlacesAutocomplete
                     placeholder='Search'
                     onPress={(data, details = null) => {

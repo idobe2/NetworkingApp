@@ -39,7 +39,7 @@ export default function GoogleLogin() {
           console.log('Successfully signed in with Google', user.email);
           axios.post('https://backend-app-jbun.onrender.com/signInGoogle', { user });
           Alert.alert('Logged in!', `You are now logged in as ${user.email}`);
-          navigationr.navigate('HomeScreen');
+          navigationr.navigate('Root' ,{ screen: 'Home' });
         })
         .catch((error) => {
           console.error('Error signing in with Google', error);

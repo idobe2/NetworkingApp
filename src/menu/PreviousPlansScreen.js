@@ -12,6 +12,7 @@ let previousPlansData = [
 
 export default function PreviousPlans() {
   const [destinationImages, setDestinationImages] = useState({});
+  const [plans, setPlans] = useState(previousPlansData);
 
   useEffect(() => {
     fetchImages();
@@ -47,7 +48,6 @@ export default function PreviousPlans() {
               onPress: () => {
                 const updatedPlans = plans.filter(plan => plan.id !== id);
                 setPlans(updatedPlans);
-
               },
             },
           ],
@@ -89,7 +89,7 @@ export default function PreviousPlans() {
     <View style={styles.container}>
       <Text style={styles.title}>Previous Plans</Text>
       <FlatList
-        data={previousPlansData}
+        data={plans} // Updated here
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
       />
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#E6E6FA',
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,

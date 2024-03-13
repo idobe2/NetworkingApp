@@ -8,10 +8,11 @@ import TextInput from '../components/TextInput'
 import Button from '../components/Button'
 import { emailValidator } from '../helpers/emailValidator';
 import axios from 'axios';
+import { SERVER_URL } from '../core/config';
 
 export default function ResetPasswordScreen({ navigation }) {
   const [email, setEmail] = useState('');
-  const apiUrl = 'https://backend-app-jbun.onrender.com';
+  const apiUrl = SERVER_URL;
   const [response, setResponse] = useState('');
 
   const sendResetPasswordEmail = async () => {

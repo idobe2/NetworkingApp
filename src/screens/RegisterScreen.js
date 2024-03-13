@@ -8,13 +8,9 @@ import Button from '../components/Button'
 import TextInput from '../components/TextInput'
 import BackButton from '../components/BackButton'
 import { theme } from '../core/theme'
-import { emailValidator } from '../helpers/emailValidator'
-import { passwordValidator } from '../helpers/passwordValidator'
-import { nameValidator } from '../helpers/nameValidator'
 import axios from 'axios';
-import { signUpUser } from '../api/auth-api'
-import Toast from '../components/Toast'
-import SocialLogins from '../components/SocialLogins'
+import { SERVER_URL } from '../core/config';
+
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState({ value: '', error: '' });
@@ -26,7 +22,7 @@ export default function RegisterScreen({ navigation }) {
   const [emailResponse, setEmailResponse] = useState('');
   const [passwordResponse, setPasswordResponse] = useState('');
   const [response, setResponse] = useState('');
-  const apiUrl = 'https://backend-app-jbun.onrender.com';
+  const apiUrl = SERVER_URL;
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -67,10 +63,10 @@ export default function RegisterScreen({ navigation }) {
                 console.log('post_response:', post_response.data.userId);
                 if (post_response.data.success) {
                   console.log('check3');
-                    Alert.alert('Success', 'Email verification sent');
+                    Alert.alert('You have successfully registered', 'Email verification sent');
                     
                     // Navigate to DetailsScreen with UID as parameter
-                    navigation.navigate('DetailsScreen', { userId: post_response.data.userId });
+                    navigation.navigate('LoginScreen');
                 }
                 console.log('response:', response);
             }

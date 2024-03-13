@@ -8,18 +8,17 @@ import Button from '../components/Button'
 import TextInput from '../components/TextInput'
 import BackButton from '../components/BackButton'
 import { theme } from '../core/theme'
-import { emailValidator } from '../helpers/emailValidator'
-import { passwordValidator } from '../helpers/passwordValidator'
 import axios from 'axios';
-import Toast from '../components/Toast'
-import SocialLogins from '../components/SocialLogins'
+import { SERVER_URL } from '../core/config';
+
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
   const [serverResponse, setServerResponse] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const apiUrl = 'https://backend-app-jbun.onrender.com';
+  const [isHaveDetails, setIsHaveDetails] = useState(false)
+  const apiUrl = SERVER_URL;
 
   let credentials = {
     email: '',
@@ -29,22 +28,28 @@ export default function LoginScreen({ navigation }) {
   const onLoginPressed = async () => {
     try {
       setIsAuthenticated(false);
-      const responseFromServer = await axios.post(apiUrl + '/login', { email, password });
-      console.log("enter 2");
+      const responseFromServer = await axios.post(SERVER_URL + '/login', { email, password });
       setServerResponse(responseFromServer.data);
-      console.log("res:", responseFromServer.data);
-      if (responseFromServer.data === 'Welcome !') {
-        navigation.replace('HomeScreen')
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
+      console.log("res:", responseFromServer.data); // TODO: remove this line
+      if (responseFromServer.data.success) {
+        navigation.navigate('Root' ,{ screen: 'Home' })
+      } else  {
+        console.log('responseFromServer.data:', responseFromServer.data.userId);
+        navigation.navigate('DetailsScreen', { userId: responseFromServer.data.userId });
       }
       if (responseFromServer.data === 'You need to verify your email'){
         Alert.alert(responseFromServer.data);
       }
-      
+      //TODO: fix the reponse from server
+      const responseToFix1 = 'Incorrect details ' +password;
+      const responseToFix2 = ' and url: ' +email;
+      const responseToFix = responseToFix1+responseToFix2;
+      if (responseFromServer.data === responseToFix){ 
+        Alert.alert('Invalid email or password. Please try again.');
+      }
     } catch (error) {
       console.log(error);
+      Alert.alert('Error', 'An error occurred. Please try again.');
     }
   }
 

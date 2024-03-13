@@ -14,17 +14,18 @@ import { useRoute } from '@react-navigation/native';
 import axios from 'axios';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Picker } from '@react-native-picker/picker';
-
+import { SERVER_URL } from '../core/config';
 
 
 export default function DetailsScreen({ navigation }) {
   const route = useRoute(); // Hook to get the route object
-  // const { userId } = route.params;
+  const { userId } = route.params;
   const [name, setName] = useState('');
   const [selectedDate, setSelectedDate] = useState(null);
   const [gender, setGender] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const apiUrl = 'https://backend-app-jbun.onrender.com';
+  const apiUrl = SERVER_URL;
+  
 
   const onDateChange = (date) => {
     setSelectedDate(date);
@@ -47,6 +48,7 @@ export default function DetailsScreen({ navigation }) {
   ];
 
   const handleDetails = async () => {
+    console.log(userId)
     const formattedDateString = formatDate(selectedDate);
     response = await axios.post(apiUrl + '/addDetails', {
       uid: userId,
@@ -54,7 +56,7 @@ export default function DetailsScreen({ navigation }) {
       birthday: formattedDateString,
       gender: gender,
     });
-    navigation.navigate('LoginScreen');
+    navigation.navigate('Root' ,{ screen: 'Home' })
   };
 
   return (

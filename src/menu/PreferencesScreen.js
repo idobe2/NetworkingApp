@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
+import { useRoute } from '@react-navigation/native';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Button from '../components/Button'
+import axios from 'axios';
+import { SERVER_URL } from '../core/config';
 
-const Preferences = () => {
-  const navigation = useNavigation();
-
+const Preferences = ({ navigation }) => {
+  // const navigation = useNavigation();
+  const route = useRoute(); // Hook to get the route object
+  const { userId } = route.params;
   const [selectedPreferences, setSelectedPreferences] = useState([]);
 
   const handlePreferencePress = (preference) => {
@@ -14,12 +18,17 @@ const Preferences = () => {
     } else {
       setSelectedPreferences([...selectedPreferences, preference]);
     }
+    console.log('selectedPreferences2:', selectedPreferences);
   };
 
-  const handleContinuePress = () => {
+  const handleContinuePress = async () => {
     console.log('selectedPreferences:', selectedPreferences);
+    response = await axios.post(SERVER_URL + '/addPreferences', {
+      uid: userId,
+      preferences: selectedPreferences,
+    });
     // Here you can calculate the decision tree based on selectedPreferences
-    navigation.replace('Root');
+    navigation.navigate('Root' ,{ screen: 'Tripy' });
   };
 
   return (

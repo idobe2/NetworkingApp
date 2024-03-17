@@ -28,14 +28,21 @@ export default function LoginScreen({ navigation }) {
   const onLoginPressed = async () => {
     try {
       setIsAuthenticated(false);
+      console.log('enter here:');
       const responseFromServer = await axios.post(SERVER_URL + '/login', { email, password });
+      console.log('enter here2');
       setServerResponse(responseFromServer.data);
       console.log("res:", responseFromServer.data); // TODO: remove this line
       if (responseFromServer.data.success) {
         navigation.navigate('Root' ,{ screen: 'Home' })
       } else  {
         console.log('responseFromServer.data:', responseFromServer.data.userId);
-        navigation.navigate('DetailsScreen', { userId: responseFromServer.data.userId });
+        if (responseFromServer.data.tranferTo === 'Preferences'){
+          navigation.navigate('Root', { screen: responseFromServer.data.tranferTo, params: { userId: responseFromServer.data.userId } });
+        }
+        else{
+          navigation.navigate(responseFromServer.data.tranferTo, { userId: responseFromServer.data.userId });
+        }
       }
       if (responseFromServer.data === 'You need to verify your email'){
         Alert.alert(responseFromServer.data);

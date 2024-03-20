@@ -1,64 +1,69 @@
-import React, { useState } from 'react'
-import { TouchableOpacity, StyleSheet, View, Alert } from 'react-native'
-import { Text } from 'react-native-paper'
-import Background from '../components/Background'
-import Logo from '../components/Logo'
-import Header from '../components/Header'
-import Button from '../components/Button'
-import TextInput from '../components/TextInput'
-import BackButton from '../components/BackButton'
-import { theme } from '../core/theme'
-import axios from 'axios';
-import { SERVER_URL } from '../core/config';
-
+import React, { useState } from "react";
+import { TouchableOpacity, StyleSheet, View, Alert } from "react-native";
+import { Text, IconButton } from "react-native-paper";
+import Background from "../components/Background";
+import Logo from "../components/Logo";
+import Header from "../components/Header";
+import Button from "../components/Button";
+import TextInput from "../components/TextInput";
+import BackButton from "../components/BackButton";
+import { theme } from "../core/theme";
+import axios from "axios";
+import { SERVER_URL } from "../core/config";
 
 export default function LoginScreen({ navigation }) {
-  const [email, setEmail] = useState({ value: '', error: '' })
-  const [password, setPassword] = useState({ value: '', error: '' })
-  const [serverResponse, setServerResponse] = useState('');
+  const [email, setEmail] = useState({ value: "", error: "" });
+  const [password, setPassword] = useState({ value: "", error: "" });
+  const [serverResponse, setServerResponse] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isHaveDetails, setIsHaveDetails] = useState(false)
+  const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
   const apiUrl = SERVER_URL;
 
-  let credentials = {
-    email: '',
-    password: '',
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const onLoginPressed = async () => {
     try {
       setIsAuthenticated(false);
-      console.log('enter here:');
-      const responseFromServer = await axios.post(SERVER_URL + '/login', { email, password });
-      console.log('enter here2');
+      console.log("enter here:");
+      const responseFromServer = await axios.post(SERVER_URL + "/login", {
+        email,
+        password,
+      });
+      console.log("enter here2");
       setServerResponse(responseFromServer.data);
       console.log("res:", responseFromServer.data); // TODO: remove this line
       if (responseFromServer.data.success) {
-        navigation.navigate('Root' ,{ screen: 'Home' })
-      } else  {
-        console.log('responseFromServer.data:', responseFromServer.data.userId);
-        if (responseFromServer.data.tranferTo === 'Preferences'){
-          navigation.navigate('Root', { screen: responseFromServer.data.tranferTo, params: { userId: responseFromServer.data.userId } });
-        }
-        else{
-          navigation.navigate(responseFromServer.data.tranferTo, { userId: responseFromServer.data.userId });
+        navigation.navigate("Root", { screen: "Home" });
+      } else {
+        console.log("responseFromServer.data:", responseFromServer.data.userId);
+        if (responseFromServer.data.tranferTo === "Preferences") {
+          navigation.navigate("Root", {
+            screen: responseFromServer.data.tranferTo,
+            params: { userId: responseFromServer.data.userId },
+          });
+        } else {
+          navigation.navigate(responseFromServer.data.tranferTo, {
+            userId: responseFromServer.data.userId,
+          });
         }
       }
-      if (responseFromServer.data === 'You need to verify your email'){
+      if (responseFromServer.data === "You need to verify your email") {
         Alert.alert(responseFromServer.data);
       }
       //TODO: fix the reponse from server
-      const responseToFix1 = 'Incorrect details ' +password;
-      const responseToFix2 = ' and url: ' +email;
-      const responseToFix = responseToFix1+responseToFix2;
-      if (responseFromServer.data === responseToFix){ 
-        Alert.alert('Invalid email or password. Please try again.');
+      const responseToFix1 = "Incorrect details " + password;
+      const responseToFix2 = " and url: " + email;
+      const responseToFix = responseToFix1 + responseToFix2;
+      if (responseFromServer.data === responseToFix) {
+        Alert.alert("Invalid email or password. Please try again.");
       }
     } catch (error) {
       console.log(error);
-      Alert.alert('Error', 'An error occurred. Please try again.');
+      Alert.alert("Error", "An error occurred. Please try again.");
     }
-  }
+  };
 
   return (
     <Background>
@@ -66,19 +71,30 @@ export default function LoginScreen({ navigation }) {
       <Logo />
       <Header>Welcome back.</Header>
       <TextInput
-                placeholder="Email"
-                TextInput={email}
-                onChangeText={(text) => setEmail(text)}
-            />
-            <TextInput
-                placeholder="Password"
-                TextInput={password}
-                onChangeText={(text) => setPassword(text)}
-                secureTextEntry
-            />
+        placeholder="Email"
+        TextInput={email}
+        onChangeText={(text) => setEmail(text)}
+      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          placeholder="Password"
+          value={password.value}
+          onChangeText={(text) => setPassword(text)}
+          secureTextEntry={!showPassword} // Toggle secureTextEntry based on showPassword state
+          style={[styles.input, { paddingRight: 40 }]} // Add padding to avoid text overlap with the icon
+        />
+        <IconButton
+          icon={showPassword ? "eye-off" : "eye"}
+          onPress={handleTogglePasswordVisibility}
+          style={[
+            styles.iconButton,
+            { position: "absolute", right: 10, bottom: 15 },
+          ]} // Adjust position as needed
+        />
+      </View>
       <View style={styles.forgotPassword}>
         <TouchableOpacity
-          onPress={() => navigation.navigate('ResetPasswordScreen')}
+          onPress={() => navigation.navigate("ResetPasswordScreen")}
         >
           <Text style={styles.forgot}>Forgot your password?</Text>
         </TouchableOpacity>
@@ -88,23 +104,22 @@ export default function LoginScreen({ navigation }) {
       </Button>
       <View style={styles.row}>
         <Text>Don’t have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.replace('RegisterScreen')}>
+        <TouchableOpacity onPress={() => navigation.replace("RegisterScreen")}>
           <Text style={styles.link}>Sign up</Text>
         </TouchableOpacity>
-       
       </View>
     </Background>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   forgotPassword: {
-    width: '100%',
-    alignItems: 'flex-end',
+    width: "100%",
+    alignItems: "flex-end",
     marginBottom: 24,
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 4,
   },
   forgot: {
@@ -112,7 +127,25 @@ const styles = StyleSheet.create({
     color: theme.colors.secondary,
   },
   link: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: theme.colors.primary,
   },
-})
+  passwordContainer: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: theme.colors.surface, // Background color to match TextInput style
+    borderColor: theme.colors.surface,
+    borderWidth: 1,
+    borderRadius: 10,
+    height: 80, // Adjust height to match TextInput style
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    backgroundColor: theme.colors.surface,
+  },
+  iconButton: {
+    margin: 0, // Adjust position of icon
+  },
+});

@@ -87,18 +87,18 @@ return (
       value={email.value}
       onChangeText={(text) => setEmail(text)}
     />
-    <View style={styles.passwordContainer}>
+  <View style={styles.passwordContainer}>
   <TextInput
     placeholder="Password"
     value={password.value}
     onChangeText={(text) => setPassword(text)}
     secureTextEntry={!showPassword} // Toggle secureTextEntry based on showPassword state
-    style={styles.input}
+    style={[styles.input, { paddingRight: 40 }]} // Add padding to avoid text overlap with the icon
   />
-  <IconButton // Eye icon button to toggle password visibility
+  <IconButton
     icon={showPassword ? 'eye-off' : 'eye'}
     onPress={handleTogglePasswordVisibility}
-    style={styles.iconButton}
+    style={[styles.iconButton, { position: 'absolute', right: 10, bottom:15}]} // Adjust position as needed
   />
 </View>
 <View style={styles.passwordContainer}>
@@ -106,15 +106,16 @@ return (
     placeholder="Confirm password"
     value={confirmPassword.value}
     onChangeText={(text) => setConfirmPassword(text)}
-    secureTextEntry={!showConfirmPassword} // Toggle secureTextEntry based on showConfirmPassword state
-    style={styles.input}
+    secureTextEntry={!showConfirmPassword}
+    style={[styles.input, { paddingRight: 40 }]} // Add padding to avoid text overlap with the icon
   />
-  <IconButton // Eye icon button to toggle password visibility
+  <IconButton
     icon={showConfirmPassword ? 'eye-off' : 'eye'}
     onPress={handleToggleConfirmPasswordVisibility}
-    style={styles.iconButton}
+    style={[styles.iconButton, { position: 'absolute', right: 10, bottom:15 }]} // Adjust position as needed
   />
 </View>
+
     <Button
       mode="contained"
       onPress={handleSignup}
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
   },
   iconButton: {
-    margin: -40, // Adjust position of icon
+    margin: 0, // Adjust position of icon
   },
 });
 

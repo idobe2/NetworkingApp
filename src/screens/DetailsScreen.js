@@ -56,7 +56,11 @@ export default function DetailsScreen({ navigation }) {
       birthday: formattedDateString,
       gender: gender,
     });
-    navigation.navigate('Root' ,{ screen: 'Preferences' }, { userId: userId  });
+    navigation.navigate('Root', {
+      screen: 'Preferences',
+      params: { userId: userId },
+    });
+    
   };
 
   return (

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Modal, TouchableOpacity } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import Button from "../components/Button"; // Adjust this import to your actual Button component path
 import { Calendar } from "react-native-calendars";
+import DropDownPicker from "react-native-dropdown-picker";
 
 const Planner = ({ navigation }) => {
   const [destination, setDestination] = useState("");
+  const [openDestinationPicker, setOpenDestinationPicker] = useState(false);
+  const [openSocialPicker, setOpenSocialPicker] = useState(false);
   const [social, setSocial] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
   const [dateRange, setDateRange] = useState({
@@ -98,7 +100,7 @@ const Planner = ({ navigation }) => {
       "destination:",
       destination,
       "dateRange:",
-      "socail:",
+      "social:",
       social,
       dateRange.startDate,
       dateRange.endDate
@@ -115,28 +117,37 @@ const Planner = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Create Plan</Text>
       <Text style={styles.label}>Destination:</Text>
-      <Picker
-        selectedValue={destination}
+      <DropDownPicker
         style={styles.picker}
-        onValueChange={(itemValue) => setDestination(itemValue)}
-      >
-        <Picker.Item label="I'm traveling to:" value="" />
-        <Picker.Item label="Paris" value="Paris" />
-        <Picker.Item label="London" value="London" />
-        <Picker.Item label="Dubai" value="Dubai" />
-      </Picker>
+        open={openDestinationPicker}
+        value={destination}
+        items={[
+          { label: "Paris", value: "Paris" },
+          { label: "London", value: "London" },
+          { label: "Dubai", value: "Dubai" },
+        ]}
+        setOpen={setOpenDestinationPicker}
+        setValue={setDestination}
+        setItems={() => {}}
+        zIndex={3000} // Ensure this dropdown is on top
+        zIndexInverse={1000}
+      />
+
       <Text style={styles.label}>Social:</Text>
-      <Picker
-        selectedValue={social}
-        style={styles.picker}
-        onValueChange={(itemValue) => setSocial(itemValue)}
-      >
-        <Picker.Item label="I'm traveling with:" value="" />
-        <Picker.Item label="Myself" value="Solo" />
-        <Picker.Item label="Partner" value="with partner" />
-        <Picker.Item label="Friends" value="with friends" />
-        <Picker.Item label="Family" value="with family" />
-      </Picker>
+      <DropDownPicker
+        open={openSocialPicker}
+        value={social}
+        items={[
+          { label: "Myself", value: "Solo" },
+          { label: "Partner", value: "with partner" },
+          { label: "Friends", value: "with friends" },
+          { label: "Family", value: "with family" },
+        ]}
+        setOpen={setOpenSocialPicker}
+        setValue={setSocial}
+        setItems={() => {}}
+        zIndex={2000} // Manage zIndex to prevent overlay issues
+      />
       <Button mode="contained" onPress={() => setShowCalendar(true)}>
         Select Dates
       </Button>

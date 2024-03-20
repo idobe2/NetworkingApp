@@ -1,34 +1,56 @@
-import React, { useState } from 'react';
-import { useRoute } from '@react-navigation/native';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Button from '../components/Button'
-import axios from 'axios';
-import { SERVER_URL } from '../core/config';
+import React, { useState } from "react";
+import { useRoute } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import Button from "../components/Button";
+import axios from "axios";
+import { SERVER_URL } from "../core/config";
+import { theme } from "../core/theme";
 
 const Preferences = ({ navigation }) => {
   // const navigation = useNavigation();
   const route = useRoute(); // Hook to get the route object
   const { userId } = route.params;
   const [selectedPreferences, setSelectedPreferences] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handlePreferencePress = (preference) => {
-    if (selectedPreferences.includes(preference)) {
-      setSelectedPreferences(selectedPreferences.filter((item) => item !== preference));
-    } else {
-      setSelectedPreferences([...selectedPreferences, preference]);
+    try {
+      if (selectedPreferences.includes(preference)) {
+        setSelectedPreferences(
+          selectedPreferences.filter((item) => item !== preference)
+        );
+      } else {
+        setSelectedPreferences([...selectedPreferences, preference]);
+      }
+      console.log("selectedPreferences2:", selectedPreferences);
+    } catch (err) {
+      console.log(err);
     }
-    console.log('selectedPreferences2:', selectedPreferences);
   };
 
   const handleContinuePress = async () => {
-    console.log('selectedPreferences:', selectedPreferences);
-    response = await axios.post(SERVER_URL + '/addPreferences', {
-      uid: userId,
-      preferences: selectedPreferences,
-    });
-    // Here you can calculate the decision tree based on selectedPreferences
-    navigation.navigate('Root' ,{ screen: 'Tripy' });
+    try {
+      setIsLoading(true);
+      console.log("selectedPreferences:", selectedPreferences);
+      response = await axios.post(SERVER_URL + "/addPreferences", {
+        uid: userId,
+        preferences: selectedPreferences,
+      });
+      // Here you can calculate the decision tree based on selectedPreferences
+      navigation.navigate("Root", { screen: "Tripy" });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -36,19 +58,42 @@ const Preferences = ({ navigation }) => {
       <Text style={styles.title}>Welcome to Tripy!</Text>
       <Text style={styles.instruction}>Please select your preferences:</Text>
       <ScrollView style={styles.scrollView}>
-        {['Beach', 'Mountains', 'City', 'Nature', 'History', 'Adventure', 'Relaxation', 'Food and Drinks'].map((preference, index) => (
+        {[
+          "Beach",
+          "Mountains",
+          "City",
+          "Nature",
+          "History",
+          "Adventure",
+          "Relaxation",
+          "Food and Drinks",
+        ].map((preference, index) => (
           <TouchableOpacity
             key={index}
-            style={[styles.button, selectedPreferences.includes(preference) && styles.selectedButton]}
-            onPress={() => handlePreferencePress(preference)}>
+            style={[
+              styles.button,
+              selectedPreferences.includes(preference) && styles.selectedButton,
+            ]}
+            onPress={() => handlePreferencePress(preference)}
+          >
             <Text>{preference}</Text>
-            {selectedPreferences.includes(preference) && <Text style={styles.checkmark}>✓</Text>}
+            {selectedPreferences.includes(preference) && (
+              <Text style={styles.checkmark}>✓</Text>
+            )}
           </TouchableOpacity>
         ))}
       </ScrollView>
-      <Button mode="outlined" style={styles.continueButton} onPress={handleContinuePress}>
-        Save Preferences
-      </Button>
+      {isLoading ? (
+        <ActivityIndicator size="large" color={theme.colors.primary} /> // Display the loading indicator
+      ) : (
+        <Button
+          mode="outlined"
+          style={styles.continueButton}
+          onPress={handleContinuePress}
+        >
+          Save Preferences
+        </Button>
+      )}
     </View>
   );
 };
@@ -60,7 +105,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   instruction: {
@@ -74,15 +119,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     marginBottom: 10,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   selectedButton: {
-    backgroundColor: '#69ABCE',
+    backgroundColor: "#69ABCE",
   },
   checkmark: {
-    marginLeft: 'auto',
-    color: 'blue',
-    fontWeight: 'bold',
+    marginLeft: "auto",
+    color: "blue",
+    fontWeight: "bold",
   },
 });
 

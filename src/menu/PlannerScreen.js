@@ -1,109 +1,217 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
-import Button from '../components/Button'
+import React, { useState } from "react";
+import { View, Text, StyleSheet, Modal, TouchableOpacity } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import Button from "../components/Button"; // Adjust this import to your actual Button component path
+import { Calendar } from "react-native-calendars";
 
 const Planner = ({ navigation }) => {
-    
-    const [destination, setDestination] = useState('');
-    const [arrivalDate, setArrivalDate] = useState(new Date());
-    const [departureDate, setDepartureDate] = useState(new Date());
-    const [showArrivalPicker, setShowArrivalPicker] = useState(false);
-    const [showDeparturePicker, setShowDeparturePicker] = useState(false);
+  const [destination, setDestination] = useState("");
+  const [social, setSocial] = useState("");
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [dateRange, setDateRange] = useState({
+    startDate: null,
+    endDate: null,
+    markedDates: {},
+  });
 
-    const handleArrivalChange = (event, selectedDate) => {
-        const currentDate = selectedDate || arrivalDate;
-        setShowArrivalPicker(false);
-        setArrivalDate(currentDate);
-    };
+  const handleDayPress = (day) => {
+    const { dateString } = day;
+    const { startDate, endDate } = dateRange;
 
-    const handleDepartureChange = (event, selectedDate) => {
-        const currentDate = selectedDate || departureDate;
-        setShowDeparturePicker(false);
-        setDepartureDate(currentDate);
-    };
+    // If we're starting fresh or already have both start and end dates, set new start
+    if (!startDate || (startDate && endDate)) {
+      const newMarkedDates = {
+        [dateString]: {
+          startingDay: true,
+          endingDay: true,
+          color: "blue",
+          textColor: "white",
+        },
+      };
+      setDateRange({
+        startDate: dateString,
+        endDate: null,
+        markedDates: newMarkedDates,
+      });
+    } else if (startDate && !endDate) {
+      // Completing the range
+      let newMarkedDates = { ...dateRange.markedDates };
+      const start = new Date(startDate);
+      const end = new Date(dateString);
 
-    const handleContinue = () => {
-        if (!destination) {
-            alert('Please select a destination');
-            return;
+      // Ensure correct order
+      if (end < start) {
+        newMarkedDates = {
+          [dateString]: {
+            startingDay: true,
+            endingDay: true,
+            color: "blue",
+            textColor: "white",
+          },
+        };
+        setDateRange({
+          startDate: dateString,
+          endDate: null,
+          markedDates: newMarkedDates,
+        });
+        return;
+      }
+
+      // Mark all days in range
+      for (let d = new Date(startDate); d <= end; d.setDate(d.getDate() + 1)) {
+        const key = d.toISOString().split("T")[0];
+        if (key === startDate) {
+          newMarkedDates[key] = {
+            startingDay: true,
+            color: "blue",
+            textColor: "white",
+          };
+        } else if (key === dateString) {
+          newMarkedDates[key] = {
+            endingDay: true,
+            color: "blue",
+            textColor: "white",
+          };
+        } else {
+          newMarkedDates[key] = { color: "blue", textColor: "white" };
         }
-        const now = new Date();
-        if (arrivalDate < now || departureDate < now) {
-            alert('Please select future dates');
-            return;
-        }
-        if (arrivalDate >= departureDate) {
-            alert('Departure date must be after arrival date');
-            return;
-        }
-        console.log('destination:', destination, '\narrivalDate:', arrivalDate, '\ndepartureDate:', departureDate);
-        // Proceed to the next screen with collected data
-        navigation.navigate('Previous Plans', { destination, arrivalDate, departureDate });
+      }
 
-    };
+      setDateRange({
+        startDate,
+        endDate: dateString,
+        markedDates: newMarkedDates,
+      });
+    }
+  };
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.label}>Destination:</Text>
-            <Picker
-                selectedValue={destination}
-                style={styles.picker}
-                onValueChange={(itemValue) => setDestination(itemValue)}>
-                <Picker.Item label="Select destination" value="" />
-                <Picker.Item label="Paris" value="Paris" />
-                <Picker.Item label="London" value="London" />
-                <Picker.Item label="Dubai" value="Dubai" />
-            </Picker>
-            <Button mode="contained" title={arrivalDate.toDateString()} onPress={() => setShowArrivalPicker(true)}>Arrival Date</Button>
-            {showArrivalPicker && (
-                <DateTimePicker
-                    value={arrivalDate}
-                    mode="date"
-                    display="default"
-                    onChange={handleArrivalChange}
-                />
-            )}
-            <Text style={styles.selectedDate}>
-                {arrivalDate.toDateString()}
-            </Text>
-            <Button mode="contained" title={departureDate.toDateString()} onPress={() => setShowDeparturePicker(true)}>Departure Date</Button>
-            {showDeparturePicker && (
-                <DateTimePicker
-                    value={departureDate}
-                    mode="date"
-                    display="default"
-                    onChange={handleDepartureChange}
-                />
-            )}
-            <Text style={styles.selectedDate}>
-                {departureDate.toDateString()}
-            </Text>
-            <Button mode="outlined" title="Continue" onPress={handleContinue}>Continue</Button>
-        </View>
+  const handleContinue = () => {
+    if (!destination) {
+      alert("Please select a destination");
+      return;
+    }
+    if (!dateRange.startDate || !dateRange.endDate) {
+      alert("Please select a date range");
+      return;
+    }
+    console.log(
+      "destination:",
+      destination,
+      "dateRange:",
+      "socail:",
+      social,
+      dateRange.startDate,
+      dateRange.endDate
     );
-}
+    // Proceed to the next screen with collected data
+    navigation.navigate("Previous Plans", {
+      destination,
+      arrivalDate: dateRange.startDate,
+      departureDate: dateRange.endDate,
+    });
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Create Plan</Text>
+      <Text style={styles.label}>Destination:</Text>
+      <Picker
+        selectedValue={destination}
+        style={styles.picker}
+        onValueChange={(itemValue) => setDestination(itemValue)}
+      >
+        <Picker.Item label="I'm traveling to:" value="" />
+        <Picker.Item label="Paris" value="Paris" />
+        <Picker.Item label="London" value="London" />
+        <Picker.Item label="Dubai" value="Dubai" />
+      </Picker>
+      <Text style={styles.label}>Social:</Text>
+      <Picker
+        selectedValue={social}
+        style={styles.picker}
+        onValueChange={(itemValue) => setSocial(itemValue)}
+      >
+        <Picker.Item label="I'm traveling with:" value="" />
+        <Picker.Item label="Myself" value="Solo" />
+        <Picker.Item label="Partner" value="with partner" />
+        <Picker.Item label="Friends" value="with friends" />
+        <Picker.Item label="Family" value="with family" />
+      </Picker>
+      <Button mode="contained" onPress={() => setShowCalendar(true)}>
+        Select Dates
+      </Button>
+      {/* Display the selected date range */}
+      {dateRange.startDate && dateRange.endDate && (
+        <Text style={styles.dateRangeText}>
+          Selected Dates: {dateRange.startDate} - {dateRange.endDate}
+        </Text>
+      )}
+      <Modal
+        transparent={true}
+        visible={showCalendar}
+        onRequestClose={() => setShowCalendar(false)}
+      >
+        <View style={styles.modalView}>
+          <Calendar
+            onDayPress={handleDayPress}
+            markingType={"period"}
+            markedDates={dateRange.markedDates}
+          />
+          <Button mode="contained" onPress={() => setShowCalendar(false)}>
+            OK
+          </Button>
+        </View>
+      </Modal>
+      <Button mode="outlined" onPress={handleContinue}>
+        Continue
+      </Button>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        paddingTop: 50,
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    marginTop: -30,
+  },
+  container: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 50,
+  },
+  label: {
+    fontSize: 18,
+    marginBottom: 5,
+  },
+  picker: {
+    marginBottom: 10,
+    width: "100%",
+  },
+  modalView: {
+    marginTop: 200,
+    marginHorizontal: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
     },
-    label: {
-        fontSize: 18,
-        marginBottom: 5,
-    },
-    picker: {
-        marginBottom: 10,
-        width: '100%',
-    },
-    selectedDate: {
-        fontSize: 16,
-        marginBottom: 25,
-        marginLeft: 115
-    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  dateRangeText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "grey",
+    marginLeft: 40,
+    marginBottom: 10,
+  },
 });
 
 export default Planner;

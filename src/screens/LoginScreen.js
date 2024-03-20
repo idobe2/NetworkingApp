@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { TouchableOpacity, StyleSheet, View, Alert } from "react-native";
+import {
+  TouchableOpacity,
+  StyleSheet,
+  View,
+  Alert,
+  ActivityIndicator,
+} from "react-native"; // 1. Import ActivityIndicator
 import { Text, IconButton } from "react-native-paper";
 import Background from "../components/Background";
 import Logo from "../components/Logo";
@@ -16,7 +22,8 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState({ value: "", error: "" });
   const [serverResponse, setServerResponse] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State to manage password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // 2. Add isLoading state
   const apiUrl = SERVER_URL;
 
   const handleTogglePasswordVisibility = () => {
@@ -25,6 +32,7 @@ export default function LoginScreen({ navigation }) {
 
   const onLoginPressed = async () => {
     try {
+      setIsLoading(true); // 3. Start loading
       setIsAuthenticated(false);
       console.log("enter here:");
       const responseFromServer = await axios.post(SERVER_URL + "/login", {
@@ -62,9 +70,10 @@ export default function LoginScreen({ navigation }) {
     } catch (error) {
       console.log(error);
       Alert.alert("Error", "An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false); // 4. Stop loading
     }
   };
-
   return (
     <Background>
       <BackButton goBack={navigation.goBack} />
@@ -80,8 +89,8 @@ export default function LoginScreen({ navigation }) {
           placeholder="Password"
           value={password.value}
           onChangeText={(text) => setPassword(text)}
-          secureTextEntry={!showPassword} // Toggle secureTextEntry based on showPassword state
-          style={[styles.input, { paddingRight: 40 }]} // Add padding to avoid text overlap with the icon
+          secureTextEntry={!showPassword}
+          style={[styles.input, { paddingRight: 40 }]}
         />
         <IconButton
           icon={showPassword ? "eye-off" : "eye"}
@@ -89,7 +98,7 @@ export default function LoginScreen({ navigation }) {
           style={[
             styles.iconButton,
             { position: "absolute", right: 10, bottom: 15 },
-          ]} // Adjust position as needed
+          ]}
         />
       </View>
       <View style={styles.forgotPassword}>
@@ -99,9 +108,13 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.forgot}>Forgot your password?</Text>
         </TouchableOpacity>
       </View>
-      <Button mode="contained" onPress={onLoginPressed}>
-        Login
-      </Button>
+      {isLoading ? (
+        <ActivityIndicator size="large" color={theme.colors.primary} /> // Display the loading indicator
+      ) : (
+        <Button mode="contained" onPress={onLoginPressed}>
+          Login
+        </Button>
+      )}
       <View style={styles.row}>
         <Text>Don’t have an account? </Text>
         <TouchableOpacity onPress={() => navigation.replace("RegisterScreen")}>

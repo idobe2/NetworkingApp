@@ -1,31 +1,38 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Modal, Button as RNButton, TouchableWithoutFeedback   } from 'react-native';
-import TextInput from '../components/TextInput';
-import Button from '../components/Button';
-import { Text } from 'react-native-paper';
-import Background from '../components/Background';
-import Logo from '../components/Logo';
-import Header from '../components/Header';
-import BackButton from '../components/BackButton';
-import { theme } from '../core/theme';
-import CalendarPicker from 'react-native-calendar-picker';
-import RNPickerSelect from 'react-native-picker-select';
-import { useRoute } from '@react-navigation/native';
-import axios from 'axios';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { Picker } from '@react-native-picker/picker';
-import { SERVER_URL } from '../core/config';
-
+import React, { useState } from "react";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Button as RNButton,
+  TouchableWithoutFeedback,
+  ActivityIndicator,
+} from "react-native";
+import TextInput from "../components/TextInput";
+import Button from "../components/Button";
+import { Text } from "react-native-paper";
+import Background from "../components/Background";
+import Logo from "../components/Logo";
+import Header from "../components/Header";
+import BackButton from "../components/BackButton";
+import { theme } from "../core/theme";
+import CalendarPicker from "react-native-calendar-picker";
+import RNPickerSelect from "react-native-picker-select";
+import { useRoute } from "@react-navigation/native";
+import axios from "axios";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { Picker } from "@react-native-picker/picker";
+import { SERVER_URL } from "../core/config";
 
 export default function DetailsScreen({ navigation }) {
   const route = useRoute(); // Hook to get the route object
   const { userId } = route.params;
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [gender, setGender] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const apiUrl = SERVER_URL;
-  
 
   const onDateChange = (date) => {
     setSelectedDate(date);
@@ -33,34 +40,40 @@ export default function DetailsScreen({ navigation }) {
   };
 
   const formatDate = (date) => {
-    if (!date) return '';
+    if (!date) return "";
     const formattedDate = new Date(date);
-    const day = formattedDate.getDate().toString().padStart(2, '0');
-    const month = (formattedDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = formattedDate.getDate().toString().padStart(2, "0");
+    const month = (formattedDate.getMonth() + 1).toString().padStart(2, "0");
     const year = formattedDate.getFullYear();
     return `${day}/${month}/${year}`;
   };
 
   const genderOptions = [
-    { label: 'Male', value: 'male' },
-    { label: 'Female', value: 'female' },
-    { label: 'Other', value: 'other' },
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
+    { label: "Other", value: "other" },
   ];
 
   const handleDetails = async () => {
-    console.log(userId)
-    const formattedDateString = formatDate(selectedDate);
-    response = await axios.post(apiUrl + '/addDetails', {
-      uid: userId,
-      name: name,
-      birthday: formattedDateString,
-      gender: gender,
-    });
-    navigation.navigate('Root', {
-      screen: 'Preferences',
-      params: { userId: userId },
-    });
-    
+    try {
+      setIsLoading(true);
+      console.log(userId);
+      const formattedDateString = formatDate(selectedDate);
+      response = await axios.post(apiUrl + "/addDetails", {
+        uid: userId,
+        name: name,
+        birthday: formattedDateString,
+        gender: gender,
+      });
+      navigation.navigate("Root", {
+        screen: "Preferences",
+        params: { userId: userId },
+      });
+    } catch (error) {
+      console.log("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -76,24 +89,38 @@ export default function DetailsScreen({ navigation }) {
       />
       <View style={styles.input}>
         <Picker
-                selectedValue={gender}
-                style={styles.picker}
-                onValueChange={(itemValue) => setGender(itemValue)}>
-                <Picker.Item label="Select gender" value="" />
-                <Picker.Item label="Male" value="Male" />
-                <Picker.Item label="Female" value="Female" />
-            </Picker>
+          selectedValue={gender}
+          style={styles.picker}
+          onValueChange={(itemValue) => setGender(itemValue)}
+        >
+          <Picker.Item label="Select gender" value="" />
+          <Picker.Item label="Male" value="Male" />
+          <Picker.Item label="Female" value="Female" />
+        </Picker>
       </View>
       <TouchableOpacity onPress={() => setShowModal(true)} style={styles.input}>
         <Text style={styles.inputText}>
-          {selectedDate ? formatDate(selectedDate) : 'Birth date' }
+          {selectedDate ? formatDate(selectedDate) : "Birth date"}
         </Text>
-        <FontAwesome name="calendar" size={24} color={theme.colors.primary} style={styles.icon} />
+        <FontAwesome
+          name="calendar"
+          size={24}
+          color={theme.colors.primary}
+          style={styles.icon}
+        />
       </TouchableOpacity>
-      <Button mode="contained" onPress={handleDetails} style={{ marginTop: 24 }} title="Details">
-        Send
-      </Button>
-      
+      {isLoading ? (
+        <ActivityIndicator size="large" color={theme.colors.primary} /> // Display the loading indicator
+      ) : (
+        <Button
+          mode="contained"
+          onPress={handleDetails}
+          style={{ marginTop: 24 }}
+          title="Details"
+        >
+          Send
+        </Button>
+      )}
       <Modal
         visible={showModal}
         animationType="slide"
@@ -101,12 +128,10 @@ export default function DetailsScreen({ navigation }) {
         onRequestClose={() => setShowModal(false)}
       >
         <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
-            <View style={styles.overlay} />
-          </TouchableWithoutFeedback>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-          
-          
             <CalendarPicker
               onDateChange={onDateChange}
               selectedStartDate={selectedDate}
@@ -118,7 +143,11 @@ export default function DetailsScreen({ navigation }) {
               selectedDayStyle={styles.selectedDayStyle}
               selectedDayTextStyles={styles.selectedDayText}
             />
-            <RNButton title="Close" onPress={() => setShowModal(false)} color={theme.colors.primary} />
+            <RNButton
+              title="Close"
+              onPress={() => setShowModal(false)}
+              color={theme.colors.primary}
+            />
           </View>
         </View>
       </Modal>
@@ -130,35 +159,35 @@ export default function DetailsScreen({ navigation }) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
     elevation: 5,
   },
   eventsContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   input: {
-    width: '100%',
+    width: "100%",
     marginVertical: 12,
     backgroundColor: theme.colors.surface,
     borderWidth: 1,
     borderColor: theme.colors.primary,
     borderRadius: theme.roundness,
     paddingHorizontal: 12,
-    flexDirection: 'row', // Align icon and text in a row
-    alignItems: 'center', // Center items vertically
+    flexDirection: "row", // Align icon and text in a row
+    alignItems: "center", // Center items vertically
   },
   inputText: {
     fontSize: 16,
@@ -174,10 +203,10 @@ const styles = StyleSheet.create({
   },
   selectedDayText: {
     color: theme.colors.primary,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   picker: {
     marginBottom: 10,
-    width: '100%',
-},
+    width: "100%",
+  },
 });

@@ -9,8 +9,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Button from "../components/Button";
-import axios from "axios";
-import { SERVER_URL } from "../core/config";
 import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
 
@@ -40,12 +38,10 @@ const Preferences = ({ navigation }) => {
     try {
       setIsLoading(true);
       console.log("selectedPreferences:", selectedPreferences);
-      response = await axios.post(SERVER_URL + "/addPreferences", {
-        uid: userId,
-        preferences: selectedPreferences,
-      });
-      // Here you can calculate the decision tree based on selectedPreferences
-      navigation.navigate("Root", { screen: "Tripy" });
+      response = await userApi.addUserPreferences(userId, selectedPreferences);
+      navigation.navigate("Root", { screen: "Tripy",
+        params: { userId: userId },
+       });
     } catch (err) {
       console.log(err);
     } finally {

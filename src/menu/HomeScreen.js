@@ -1,9 +1,8 @@
 import React from 'react'
-import { View, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-
 import Explore from './ExploreScreen';
 import Planner from './PlannerScreen';
 import PreviousPlans from './PreviousPlansScreen';

@@ -8,14 +8,29 @@ try {
     birthday: formattedDateString,
     gender: gender,
   });
-    console.log("Response:", response.data);
+    console.log("User added successfully");
     return response.data;
     } catch (error) {
-    console.log("Error api:", error);
+    console.log("Api error:", error);
     }
     return null;
 };
 
+const addUserPreferences = async (userId, preferences) => {
+  try {
+    const response = await clientApi.post("/addPreferences", {
+      uid: userId,
+      preferences: preferences,
+    });
+    console.log("Preferences added successfully");
+    return response.data;
+  } catch (error) {
+    console.log("Api error:", error);
+  }
+  return null;
+};
+
 export default {
   addUser,
+  addUserPreferences,
 };

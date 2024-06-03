@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity } from "react-native";
 import Button from "../components/Button"; // Adjust this import to your actual Button component path
 import { Calendar } from "react-native-calendars";
 import DropDownPicker from "react-native-dropdown-picker";
+import planApi from "../api/PlanApi";;
 
 const Planner = ({ navigation }) => {
   const [destination, setDestination] = useState("");
@@ -87,7 +88,7 @@ const Planner = ({ navigation }) => {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!destination) {
       alert("Please select a destination");
       return;
@@ -105,6 +106,8 @@ const Planner = ({ navigation }) => {
       dateRange.startDate,
       dateRange.endDate
     );
+    //TODO: User id should be passed here as well
+    response = await planApi.addPlan("userid", destination, social, dateRange.startDate, dateRange.endDate);
     // Proceed to the next screen with collected data
     navigation.navigate("Previous Plans", {
       destination,

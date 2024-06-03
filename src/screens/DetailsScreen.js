@@ -59,7 +59,7 @@ export default function DetailsScreen({ navigation }) {
       setIsLoading(true);
       console.log(userId);
       const formattedDateString = formatDate(selectedDate);
-      response = await UserApi.addUser(userId, name, formattedDateString,gender);
+      response = await UserApi.addUser(userId, name, formattedDateString, gender);
       navigation.navigate("Root", {
         screen: "Preferences",
         params: { userId: userId },

@@ -43,7 +43,10 @@ export default function LoginScreen({ navigation }) {
       setServerResponse(responseFromServer.data);
       console.log("res:", responseFromServer.data); // TODO: remove this line
       if (responseFromServer.data.success) {
-        navigation.navigate("Root", { screen: "Home" });
+        navigation.navigate("Root", { 
+          screen: "Home",
+          params: { userId: responseFromServer.data.userId },
+         });
       } else {
         console.log("responseFromServer.data:", responseFromServer.data.userId);
         if (responseFromServer.data.tranferTo === "Preferences") {

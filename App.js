@@ -1,10 +1,8 @@
 import React from "react";
-import { Provider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { NativeWindStyleSheet } from "nativewind";
-import { theme } from "./src/core/theme";
 import {
   StartScreen,
   LoginScreen,
@@ -14,8 +12,6 @@ import {
 } from "./src/screens";
 import { enableLatestRenderer } from "react-native-maps";
 import DetailsScreen from "./src/screens/DetailsScreen";
-import Preferences from "./src/menu/PreferencesScreen";
-import Planner from "./src/menu/PlannerScreen";
 import Schedule from "./src/menu/ScheduleScreen";
 import HomeScreen from "./src/menu/HomeScreen";
 import DrawerContent from "./src/components/DrawerContent";

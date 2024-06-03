@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image, Alert } from 'react-native';
-import { API_KEY } from '../core/config';
+import placesApi from '../api/PlacesApi';
 
 // Sample data of previous trip plans
 let previousPlansData = [
@@ -15,24 +15,15 @@ export default function PreviousPlans() {
   const [plans, setPlans] = useState(previousPlansData);
 
   useEffect(() => {
-    fetchImages();
+    const fetchData = async () => {
+      const destinationImages = await placesApi.fetchImages(previousPlansData);
+      if (destinationImages) {
+        setDestinationImages(destinationImages);
+      }
+    };
+    fetchData();
   }, []);
 
-  const fetchImages = async () => {
-    const apiKey = API_KEY;
-    const imageRequests = previousPlansData.map(async (item) => {
-      const response = await fetch(`https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${item.destination}&inputtype=textquery&fields=photos&key=${apiKey}`);
-      const data = await response.json();
-      if (data && data.candidates && data.candidates.length > 0) {
-        const photoReference = data.candidates[0].photos[0].photo_reference;
-        return { [item.destination]: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photoReference}&key=${apiKey}` };
-      }
-      return { [item.destination]: null };
-    });
-    const images = await Promise.all(imageRequests);
-    const destinationImagesObject = Object.assign({}, ...images);
-    setDestinationImages(destinationImagesObject);
-  };
 
   const handleDelete = (id) => {
         Alert.alert(

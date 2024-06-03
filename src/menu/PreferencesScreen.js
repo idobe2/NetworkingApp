@@ -8,11 +8,11 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import Button from "../components/Button";
 import axios from "axios";
 import { SERVER_URL } from "../core/config";
 import { theme } from "../core/theme";
+import userApi from "../api/UserApi";
 
 const Preferences = ({ navigation }) => {
   // const navigation = useNavigation();

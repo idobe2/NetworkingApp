@@ -17,12 +17,12 @@ import Header from "../components/Header";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import CalendarPicker from "react-native-calendar-picker";
-import RNPickerSelect from "react-native-picker-select";
 import { useRoute } from "@react-navigation/native";
-import axios from "axios";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
 import { SERVER_URL } from "../core/config";
+import UserApi from "../api/UserApi";
+
 
 export default function DetailsScreen({ navigation }) {
   const route = useRoute(); // Hook to get the route object
@@ -59,12 +59,7 @@ export default function DetailsScreen({ navigation }) {
       setIsLoading(true);
       console.log(userId);
       const formattedDateString = formatDate(selectedDate);
-      response = await axios.post(apiUrl + "/addDetails", {
-        uid: userId,
-        name: name,
-        birthday: formattedDateString,
-        gender: gender,
-      });
+      response = await UserApi.addUser(userId, name, formattedDateString,gender);
       navigation.navigate("Root", {
         screen: "Preferences",
         params: { userId: userId },

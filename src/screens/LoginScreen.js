@@ -39,26 +39,22 @@ export default function LoginScreen({ navigation }) {
   
       console.log("response from Api:", response);  
       if (response.success) {
-        console.log("Navigating to Home with userId:", response.userId);
+        // console.log("Navigating to Home with userId:", response.userId);
         navigation.navigate("Root", { 
           screen: "Home",
-          params: { userId: response.userId },
         });
       } else {
         const targetScreen = response.tranferTo;
         console.log("targetScreen:", targetScreen);
   
         if (targetScreen === "Preferences") {
-          console.log("Navigating to Preferences with userId:", response.userId);
+          // console.log("Navigating to Preferences with userId:", response.userId);
           navigation.navigate("Root", {
             screen: targetScreen,
-            params: { userId: response.userId },
           });
         } else {
-          console.log("Navigating to", targetScreen, "with userId:", response.userId);
-          navigation.navigate(targetScreen, {
-            userId: response.userId,
-          });
+          // console.log("Navigating to", targetScreen, "with userId:", response.userId);
+          navigation.navigate(targetScreen);
         }
       }
     } catch (error) {

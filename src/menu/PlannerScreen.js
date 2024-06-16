@@ -106,14 +106,11 @@ const Planner = ({ navigation }) => {
       dateRange.startDate,
       dateRange.endDate
     );
-    //TODO: User id should be passed here as well
-    response = await planApi.addPlan("userid", destination, social, dateRange.startDate, dateRange.endDate);
-    // Proceed to the next screen with collected data
-    navigation.navigate("Previous Plans", {
-      destination,
-      arrivalDate: dateRange.startDate,
-      departureDate: dateRange.endDate,
-    });
+    response = await planApi.addPlan(destination, dateRange.startDate, dateRange.endDate, social);
+    if (!response) {
+      alert("Failed to create plan");
+      return;
+    } else { navigation.navigate("Previous Plans"); }
   };
 
   return (

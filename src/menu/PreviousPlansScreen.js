@@ -1,58 +1,64 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image, Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
 import placesApi from '../api/PlacesApi';
+import plansApi from '../api/PlanApi';
 
-// Sample data of previous trip plans
-let previousPlansData = [
-    { id: 1, destination: 'Paris', arrivalDate: '2023-05-15', departureDate: '2023-05-20' },
-    { id: 2, destination: 'London', arrivalDate: '2023-07-10', departureDate: '2023-07-15' },
-    { id: 3, destination: 'New York', arrivalDate: '2023-09-20', departureDate: '2023-09-25' },
-    { id: 4, destination: 'Tokyo', arrivalDate: '2023-11-05', departureDate: '2023-11-10' },
-];
-
-export default function PreviousPlans() {
+export default function PreviousPlans({ navigation }) {
   const [destinationImages, setDestinationImages] = useState({});
-  const [plans, setPlans] = useState(previousPlansData);
+  const [plans, setPlans] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const destinationImages = await placesApi.fetchImages(previousPlansData);
-      if (destinationImages) {
-        setDestinationImages(destinationImages);
+  const fetchData = async () => {
+    const fetchedPlans = await plansApi.fetchPlans();
+    if (fetchedPlans && fetchedPlans.length > 0) {
+      // Add a unique identifier to each plan if not already present
+      const plansWithId = fetchedPlans.map((plan, index) => ({
+        ...plan,
+        id: plan.id || index.toString(), // Ensure each plan has a unique id
+      }));
+      setPlans(plansWithId);
+      const destination = await placesApi.fetchImages(plansWithId);
+      // console.log("destination", destination);
+      if (destination) {
+        setDestinationImages(destination);
       }
-    };
-    fetchData();
-  }, []);
-
-
-  const handleDelete = (id) => {
-        Alert.alert(
-          'Delete Plan',
-          'Are you sure you want to delete this plan?',
-          [
-            {
-              text: 'Cancel',
-              style: 'cancel',
-            },
-            {
-              text: 'Delete',
-              onPress: () => {
-                const updatedPlans = plans.filter(plan => plan.id !== id);
-                setPlans(updatedPlans);
-              },
-            },
-          ],
-          { cancelable: false }
-        );
+    }
   };
 
-  // Render each item in the list
+  useFocusEffect(
+    useCallback(() => {
+      fetchData();
+    }, [])
+  );
+
+  const handleDelete = (id) => {
+    Alert.alert(
+      'Delete Plan',
+      'Are you sure you want to delete this plan?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: () => {
+            const updatedPlans = plans.filter(plan => plan.id !== id);
+            setPlans(updatedPlans);
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   const renderItem = ({ item }) => (
     <TouchableOpacity style={styles.itemContainer} onPress={() => showOptions(item.id)}>
       <View style={{ flex: 1 }}>
         <Text style={styles.destination}>{item.destination}</Text>
         <Text>Arrival: {item.arrivalDate}</Text>
         <Text>Departure: {item.departureDate}</Text>
+        <Text>Social: {item.planId}</Text>
       </View>
       {destinationImages[item.destination] && (
         <Image
@@ -80,9 +86,9 @@ export default function PreviousPlans() {
     <View style={styles.container}>
       <Text style={styles.title}>Previous Plans</Text>
       <FlatList
-        data={plans} // Updated here
+        data={plans}
         renderItem={renderItem}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={item => item.id.toString()} // Ensure keyExtractor is using the correct property
       />
     </View>
   );

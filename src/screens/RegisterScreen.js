@@ -14,8 +14,7 @@ import Button from "../components/Button";
 import TextInput from "../components/TextInput";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
-import axios from "axios";
-import { SERVER_URL } from "../core/config";
+import userApi from "../api/UserApi";
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState({ value: "", error: "" });
@@ -27,7 +26,6 @@ export default function RegisterScreen({ navigation }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // 2. Add isLoading state
-  const apiUrl = SERVER_URL;
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -38,50 +36,20 @@ export default function RegisterScreen({ navigation }) {
   };
 
   const handleSignup = async () => {
-    setIsLoading(true); // Start loading
-    if (password.value !== confirmPassword.value) {
-      Alert.alert("Error", "Passwords do not match, please try again");
-      setIsLoading(false); // Stop loading
-      return;
+    setIsLoading(true); // 3. Start loading
+    const response = await userApi.userSignup(
+      email.value,
+      password.value,
+      confirmPassword.value
+    );
+
+    if (response.success) {
+      Alert.alert("Success", response.message);
+      navigation.navigate("LoginScreen");
     } else {
-      try {
-        const response_mail = await axios.post(apiUrl + "/post_email", {
-          email: email.value,
-        });
-        const response_password = await axios.post(apiUrl + "/post_password", {
-          password: password.value,
-        });
-        if (
-          response_mail.data !== "Email is available" ||
-          response_password.data !== "Password received"
-        ) {
-          Alert.alert("Error", response_mail.data || response_password.data);
-          setIsLoading(false); // Stop loading
-          return;
-        }
-        const post_response = await axios.post(apiUrl + "/signup", {
-          email: email.value,
-          password: password.value,
-        });
-        if (post_response.data.success) {
-          Alert.alert(
-            "Success",
-            "You have successfully registered. Email verification sent."
-          );
-          navigation.navigate("LoginScreen");
-        } else {
-          Alert.alert(
-            "Error",
-            post_response.data.message || "Error signing up"
-          );
-        }
-      } catch (error) {
-        console.error(error);
-        Alert.alert("Error", "Error signing up");
-      } finally {
-        setIsLoading(false); // Stop loading
-      }
+      Alert.alert("Error", response.message);
     }
+    setIsLoading(false); // 4. Stop loading
   };
 
   return (

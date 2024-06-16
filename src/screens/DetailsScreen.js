@@ -17,22 +17,16 @@ import Header from "../components/Header";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import CalendarPicker from "react-native-calendar-picker";
-import { useRoute } from "@react-navigation/native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Picker } from "@react-native-picker/picker";
-import { SERVER_URL } from "../core/config";
 import UserApi from "../api/UserApi";
 
-
 export default function DetailsScreen({ navigation }) {
-  const route = useRoute(); // Hook to get the route object
-  const { userId } = route.params;
   const [name, setName] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [gender, setGender] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const apiUrl = SERVER_URL;
 
   const onDateChange = (date) => {
     setSelectedDate(date);
@@ -48,21 +42,13 @@ export default function DetailsScreen({ navigation }) {
     return `${day}/${month}/${year}`;
   };
 
-  const genderOptions = [
-    { label: "Male", value: "male" },
-    { label: "Female", value: "female" },
-    { label: "Other", value: "other" },
-  ];
-
   const handleDetails = async () => {
     try {
       setIsLoading(true);
-      console.log(userId);
       const formattedDateString = formatDate(selectedDate);
-      response = await UserApi.addUser(userId, name, formattedDateString, gender);
+      response = await UserApi.addUser(name, formattedDateString, gender);
       navigation.navigate("Root", {
         screen: "Preferences",
-        params: { userId: userId },
       });
     } catch (error) {
       console.log("Error:", error);

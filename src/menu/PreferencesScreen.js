@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useRoute } from "@react-navigation/native";
 import {
   View,
   Text,
@@ -13,9 +12,6 @@ import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
 
 const Preferences = ({ navigation }) => {
-  // const navigation = useNavigation();
-  const route = useRoute(); // Hook to get the route object
-  const { userId } = route.params;
   const [selectedPreferences, setSelectedPreferences] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -38,9 +34,8 @@ const Preferences = ({ navigation }) => {
     try {
       setIsLoading(true);
       console.log("selectedPreferences:", selectedPreferences);
-      response = await userApi.addUserPreferences(userId, selectedPreferences);
+      response = await userApi.addUserPreferences(selectedPreferences);
       navigation.navigate("Root", { screen: "Tripy",
-        params: { userId: userId },
        });
     } catch (err) {
       console.log(err);

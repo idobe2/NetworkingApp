@@ -1,35 +1,32 @@
-import React, { useState } from 'react';
-import { Alert } from 'react-native';
-import Background from '../components/Background';
-import BackButton from '../components/BackButton';
-import Logo from '../components/Logo';
-import Header from '../components/Header';
-import TextInput from '../components/TextInput'
-import Button from '../components/Button'
-import { emailValidator } from '../helpers/emailValidator';
-import axios from 'axios';
-import { SERVER_URL } from '../core/config';
+import React, { useState } from "react";
+import { Alert } from "react-native";
+import Background from "../components/Background";
+import BackButton from "../components/BackButton";
+import Logo from "../components/Logo";
+import Header from "../components/Header";
+import TextInput from "../components/TextInput";
+import Button from "../components/Button";
+import { emailValidator } from "../helpers/emailValidator";
+import userApi from "../api/UserApi";
 
 export default function ResetPasswordScreen({ navigation }) {
-  const [email, setEmail] = useState('');
-  const apiUrl = SERVER_URL;
-  const [response, setResponse] = useState('');
+  const [email, setEmail] = useState("");
 
   const sendResetPasswordEmail = async () => {
-    console.log('email', email);
     const emailError = emailValidator(email);
     if (!emailError) {
       try {
-        console.log('email2', email);
-        const response_mail = await axios.post(apiUrl + '/resetPass', { email });
-        setResponse(response_mail.data);
-        Alert.alert(response_mail.data);
-        console.log(response_mail.data);
-        navigation.navigate('LoginScreen')
+        const response = await userApi.userResetPassword(email);
+        Alert.alert(response.message);
+        if (response.success) {
+          navigation.navigate("LoginScreen");
+        }
       } catch (error) {
         console.error(error);
-        Alert.alert('Error', 'An error occurred. Please try again.');
+        Alert.alert("Error", "An error occurred. Please try again.");
       }
+    } else {
+      Alert.alert("Error", emailError);
     }
   };
 

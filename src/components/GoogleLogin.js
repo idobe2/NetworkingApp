@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
   },
 }); */
 
-
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -92,24 +91,15 @@ import {
 } from "react-native";
 import { GoogleSignin, GoogleSigninButton, statusCodes } from "@react-native-google-signin/google-signin";
 import * as WebBrowser from "expo-web-browser";
-// import firebase from "firebase/app";
-import {
-  GoogleAuthProvider,
-  signInWithCredential,
-  signOut
-} from "firebase/auth";
 import { WEB_GOOGLE_CLIENT_ID } from "../core/config";
-// import UserModel from "../Model/UserModel";
 import { theme } from "../core/theme";
-// import { useAuth } from '../AuthContext';
-import { auth } from "../core/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
+import userApi from "../api/UserApi";
 
 WebBrowser.maybeCompleteAuthSession();
 
 const GoogleLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
-  // const { setIsAuthenticated } = useAuth();
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -123,51 +113,37 @@ const GoogleLogin = () => {
     setIsLoading(true);
     console.log("Sign in button pressed", WEB_GOOGLE_CLIENT_ID);
     try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      console.log("Sign-in successful");
-      const credentialResponse = userInfo.idToken;
-      console.log("credentialResponse:", credentialResponse);
-
-      // Sign in with Firebase using the Google credentials
-      const credential = GoogleAuthProvider.credential(credentialResponse);
-      await signInWithCredential(auth, credential);
-      
-
-      // const response = await UserModel.signInWithGoogle(credentialResponse);
-      // if (response?.data.message === "Login successful") {
-      //   // setIsAuthenticated(true); // Update authentication state
-      //   navigation.navigate("PostsListScreen");
-      //   ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
-      // }
-    navigation.navigate("Root", { screen: "Home" });
-    ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
-    } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        console.log("User cancelled the login flow");
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        console.log("Sign in is in progress");
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        console.log("Play services not available or outdated");
+      const response = await userApi.userGoogleLogin();
+      if (response.success) {
+        console.log("Navigating to Home with userId:", response.userId);
+        navigation.navigate("Root", { screen: "Home" });
+        ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
       } else {
-        console.log("Some other error happened", error);
+        console.log("Google login failed:", response.error);
       }
+    } catch (error) {
+      console.log("Error in Google login:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const signOut = async () => {
+    setIsLoading(true);
     try {
-      await GoogleSignin.revokeAccess();
-      await GoogleSignin.signOut();
-      await signOut(auth);
-      // setIsAuthenticated(false); // Update authentication state
-      console.log("Signed out successfully");
+      const response = await userApi.userGoogleSignOut();
+      if (response.success) {
+        console.log("Signed out successfully");
+        ToastAndroid.show("Signed Out", ToastAndroid.TOP);
+      } else {
+        console.log("Google sign out failed:", response.error);
+      }
     } catch (error) {
-      console.error("Error signing out", error);
+      console.error("Error signing out:", error);
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <View style={styles.container}>

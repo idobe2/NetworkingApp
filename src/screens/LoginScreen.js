@@ -14,17 +14,13 @@ import Button from "../components/Button";
 import TextInput from "../components/TextInput";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
-import axios from "axios";
-import { SERVER_URL } from "../core/config";
+import userApi from "../api/UserApi";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
-  const [serverResponse, setServerResponse] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // 2. Add isLoading state
-  const apiUrl = SERVER_URL;
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -32,51 +28,48 @@ export default function LoginScreen({ navigation }) {
 
   const onLoginPressed = async () => {
     try {
-      setIsLoading(true); // 3. Start loading
-      setIsAuthenticated(false);
-      console.log("enter here:");
-      const responseFromServer = await axios.post(SERVER_URL + "/login", {
-        email,
-        password,
-      });
-      console.log("enter here2");
-      setServerResponse(responseFromServer.data);
-      console.log("res:", responseFromServer.data); // TODO: remove this line
-      if (responseFromServer.data.success) {
+      setIsLoading(true); // Start loading
+      const response = await userApi.userLogin(email, password);
+  
+      if (response === null) {
+        console.log("response is null");
+        setIsLoading(false); // Stop loading
+        return;
+      }
+  
+      console.log("response from Api:", response);  
+      if (response.success) {
+        console.log("Navigating to Home with userId:", response.userId);
         navigation.navigate("Root", { 
           screen: "Home",
-          params: { userId: responseFromServer.data.userId },
-         });
+          params: { userId: response.userId },
+        });
       } else {
-        console.log("responseFromServer.data:", responseFromServer.data.userId);
-        if (responseFromServer.data.tranferTo === "Preferences") {
+        const targetScreen = response.tranferTo;
+        console.log("targetScreen:", targetScreen);
+  
+        if (targetScreen === "Preferences") {
+          console.log("Navigating to Preferences with userId:", response.userId);
           navigation.navigate("Root", {
-            screen: responseFromServer.data.tranferTo,
-            params: { userId: responseFromServer.data.userId },
+            screen: targetScreen,
+            params: { userId: response.userId },
           });
         } else {
-          navigation.navigate(responseFromServer.data.tranferTo, {
-            userId: responseFromServer.data.userId,
+          console.log("Navigating to", targetScreen, "with userId:", response.userId);
+          navigation.navigate(targetScreen, {
+            userId: response.userId,
           });
         }
       }
-      if (responseFromServer.data === "You need to verify your email") {
-        Alert.alert(responseFromServer.data);
-      }
-      //TODO: fix the reponse from server
-      const responseToFix1 = "Incorrect details " + password;
-      const responseToFix2 = " and url: " + email;
-      const responseToFix = responseToFix1 + responseToFix2;
-      if (responseFromServer.data === responseToFix) {
-        Alert.alert("Invalid email or password. Please try again.");
-      }
     } catch (error) {
-      console.log(error);
+      console.log("Error:", error);
       Alert.alert("Error", "An error occurred. Please try again.");
     } finally {
-      setIsLoading(false); // 4. Stop loading
+      setIsLoading(false); // Stop loading
     }
   };
+  
+  
   return (
     <Background>
       <BackButton goBack={navigation.goBack} />

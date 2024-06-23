@@ -3,9 +3,8 @@ import { StyleSheet } from 'react-native'
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import Explore from './ExploreScreen';
 import Planner from './PlannerScreen';
-import PreviousPlans from './PreviousPlansScreen';
+import Stack from './HomeStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,7 +20,7 @@ export default function HomeScreen({ navigation }) {
       >
         <Tab.Screen
           name="Explore"
-          component={Explore}
+          component={Stack.Explore}
           options={{headerShown: false,
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="search-outline" color={color} size={size} />
@@ -39,7 +38,7 @@ export default function HomeScreen({ navigation }) {
         />
         <Tab.Screen
           name="Previous Plans"
-          component={PreviousPlans}
+          component={Stack.Trip}
           options={{headerShown: false,
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="briefcase-outline" color={color} size={size} />

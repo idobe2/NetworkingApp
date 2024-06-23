@@ -49,14 +49,31 @@ const userGoogleLogin = async () => {
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
     console.log("Sign-in successful");
+
     const credentialResponse = userInfo.idToken;
+    let googleToken = userInfo.accessToken; // Use let instead of const for potential reassignment
     console.log("credentialResponse:", credentialResponse);
+    console.log("accessToken:", googleToken);
+
+    if (!googleToken) {
+      // If accessToken is still undefined, manually get the accessToken
+      const tokens = await GoogleSignin.getTokens();
+      googleToken = tokens.accessToken;
+      console.log("Manually obtained accessToken:", googleToken);
+    }
 
     // Sign in with Firebase using the Google credentials
     const credential = GoogleAuthProvider.credential(credentialResponse);
     await signInWithCredential(auth, credential);
 
-    return { success: true, userId: auth.currentUser.uid };
+    // Send credential and access token to the backend
+    const response = await clientApi.post("/googleSignIn", {
+      credentialResponse,
+      googleToken
+    });
+    await setToken(response.data.accessToken, response.data.refreshToken);
+    console.log("getToken", await getToken());
+    return response;
   } catch (error) {
     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
       console.log("User cancelled the login flow");

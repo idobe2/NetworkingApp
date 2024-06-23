@@ -40,15 +40,13 @@ const fetchPlans = async () => {
 const getPlans = async (planId) => {
   try {
     const response = await clientApi.post("/getPlanById", { planId });
-    // console.log("Plans fetched successfully");
+    // console.log("Plan fetched successfully");
     return response.data;
   } catch (error) {
     console.log("Api error get:", error);
   }
   return null;
 }
-
-
 
 export default {
   addPlan,

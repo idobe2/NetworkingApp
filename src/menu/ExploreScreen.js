@@ -10,8 +10,9 @@ import {
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { API_KEY } from "../core/config";
 import placesApi from "../api/PlacesApi";
+import Banners from "../components/Banners";
 
-export default function Explore() {
+export default function Explore({navigation}) {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [placePhoto, setPlacePhoto] = useState(null);
 
@@ -36,18 +37,28 @@ export default function Explore() {
     await placesApi.openInGoogleMaps(selectedPlace);
   };
 
+  const handleBannerPress = (bannerId) => {
+    console.log(`Banner ${bannerId} pressed`);
+    if (bannerId === 1) {
+      navigation.navigate('Welcome')
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <GooglePlacesAutocomplete
-          placeholder="Search"
-          onPress={handlePlaceSelect}
-          styles={{ textInput: styles.textInput }}
-          query={{
-            key: API_KEY,
-            language: "en",
-          }}
-        />
+        <View style={styles.searchContainer}>
+          <GooglePlacesAutocomplete
+            placeholder="Search"
+            onPress={handlePlaceSelect}
+            styles={{ textInput: styles.textInput }}
+            query={{
+              key: API_KEY,
+              language: "en",
+            }}
+          />
+        </View>
+        <Banners onBannerPress={handleBannerPress} />
         {selectedPlace && (
           <TouchableOpacity
             style={styles.detailsContainer}
@@ -73,6 +84,14 @@ export default function Explore() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 10,
+  },
+  searchContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
     padding: 10,
   },
   textInput: {

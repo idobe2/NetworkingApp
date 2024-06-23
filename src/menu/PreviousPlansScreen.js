@@ -1,35 +1,36 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image, Alert } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native'; // Import useFocusEffect
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image, Alert, RefreshControl } from 'react-native';
 import placesApi from '../api/PlacesApi';
 import plansApi from '../api/PlanApi';
 
 export default function PreviousPlans({ navigation }) {
   const [destinationImages, setDestinationImages] = useState({});
   const [plans, setPlans] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchData = async () => {
     const fetchedPlans = await plansApi.fetchPlans();
     if (fetchedPlans && fetchedPlans.length > 0) {
-      // Add a unique identifier to each plan if not already present
       const plansWithId = fetchedPlans.map((plan, index) => ({
         ...plan,
-        id: plan.id || index.toString(), // Ensure each plan has a unique id
+        id: plan.id || index.toString(),
       }));
       setPlans(plansWithId);
       const destination = await placesApi.fetchImages(plansWithId);
-      // console.log("destination", destination);
       if (destination) {
         setDestinationImages(destination);
       }
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      fetchData();
-    }, [])
-  );
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchData().then(() => setRefreshing(false));
+  };
 
   const handleDelete = (id) => {
     Alert.alert(
@@ -53,12 +54,18 @@ export default function PreviousPlans({ navigation }) {
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity style={styles.itemContainer} onPress={() => showOptions(item.id)}>
+    <TouchableOpacity
+      style={styles.itemContainer}
+      onPress={() => navigation.navigate('PlanDetails', {
+        trip: item,
+        image: destinationImages[item.destination]
+      })}
+    >
       <View style={{ flex: 1 }}>
         <Text style={styles.destination}>{item.destination}</Text>
         <Text>Arrival: {item.arrivalDate}</Text>
         <Text>Departure: {item.departureDate}</Text>
-        <Text>Social: {item.planId}</Text>
+        <Text>Social: {item.social}</Text>
       </View>
       {destinationImages[item.destination] && (
         <Image
@@ -69,26 +76,19 @@ export default function PreviousPlans({ navigation }) {
     </TouchableOpacity>
   );
 
-  const showOptions = (id) => {
-    Alert.alert(
-      "Options",
-      "",
-      [
-        { text: "Edit", onPress: () => Alert.alert("Pressed") },
-        { text: "Delete", onPress: () => handleDelete(id) },
-        { text: "Cancel", style: "cancel" }
-      ],
-      { cancelable: true }
-    );
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Previous Plans</Text>
       <FlatList
         data={plans}
         renderItem={renderItem}
-        keyExtractor={item => item.id.toString()} // Ensure keyExtractor is using the correct property
+        keyExtractor={item => item.id.toString()}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
       />
     </View>
   );

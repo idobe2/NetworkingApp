@@ -26,7 +26,7 @@ api.interceptors.response.use(response => response, async (error) => {
 
     try {
       const refreshToken = await getRefreshToken();
-      const res = await axios.get(`${SERVER_URL}/auth/refresh`, {
+      const res = await axios.get(`${SERVER_URL}/refresh`, {
         headers: { 'Authorization': `Bearer ${refreshToken}` }
       });
 

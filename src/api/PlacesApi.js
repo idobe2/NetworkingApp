@@ -26,7 +26,6 @@ const getPlaceDetails = async (place_id) => {
       `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place_id}&key=${API_KEY}`
     );
     if (response.ok) {
-      console.log("response:", response);
       const data = await response.json();
       const details = {
         name: data?.result?.name,

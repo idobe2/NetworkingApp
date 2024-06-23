@@ -40,7 +40,7 @@ export default function GoogleLogin() {
           console.log('Successfully signed in with Google', user.email);
           clientApi.post('/signInGoogle', { user });
           // axios.post('https://backend-app-jbun.onrender.com/signInGoogle', { user });
-          Alert.alert('Logged in!', `You are now logged in as ${user.email}`);
+          Alert.alert('Logged in!', You are now logged in as ${user.email});
           navigationr.navigate('Root' ,{ screen: 'Home' });
         })
         .catch((error) => {
@@ -106,19 +106,27 @@ const GoogleLogin = () => {
     GoogleSignin.configure({
       webClientId: WEB_GOOGLE_CLIENT_ID,
       offlineAccess: true,
+      scopes: [
+        "profile",
+        "email",
+        "https://www.googleapis.com/auth/user.birthday.read",
+        "https://www.googleapis.com/auth/user.gender.read",
+      ],
     });
   }, []);
-
+  
   const signIn = async () => {
     setIsLoading(true);
-    console.log("Sign in button pressed", WEB_GOOGLE_CLIENT_ID);
     try {
       const response = await userApi.userGoogleLogin();
-      if (response.success) {
-        console.log("Navigating to Home with userId:", response.userId);
+      if (response.data.success) {
         navigation.navigate("Root", { screen: "Home" });
         ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
-      } else {
+      }else if (!response.data.success){
+        navigation.navigate("Root", { screen: "Preferences" });
+        ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
+      }
+       else {
         console.log("Google login failed:", response.error);
       }
     } catch (error) {

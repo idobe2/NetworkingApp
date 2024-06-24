@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
     borderRadius: 5,
-    marginBottom: 10,  // Adjust margin to add space between banners
+    marginBottom: 20,  // Adjust margin to add space between banners
     padding: 10,
     position: 'relative',
   },

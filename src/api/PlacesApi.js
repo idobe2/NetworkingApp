@@ -28,6 +28,7 @@ const getPlaceDetails = async (place_id) => {
     if (response.ok) {
       const data = await response.json();
       const details = {
+        place_id: data?.result?.place_id,
         name: data?.result?.name,
         address: data?.result?.formatted_address,
         rank: data?.result?.rating,

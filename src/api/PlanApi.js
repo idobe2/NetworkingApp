@@ -32,7 +32,7 @@ const fetchPlans = async () => {
     // console.log("Plans:", plans);
     return plans;
   } catch (error) {
-    console.log("Api error:", error);
+    console.log("Api error fetch:", error);
   }
   return null;
 };
@@ -48,7 +48,47 @@ const getPlans = async (planId) => {
   return null;
 }
 
+const deletePlan = async (planId) => {
+  console.log("Delete Plan:", planId)
+  try {
+    const response = await clientApi.post("/deletePlan", { planId });
+    
+    // console.log("Plan deleted successfully");
+    return response.data;
+  } catch (error) {
+    console.log("Api delete error:", error);
+  }
+  return null;
+}
+
+const generateActivities = async (planId, day, activity) => {
+  try {
+    console.log("Generate Activities:", planId, day, activity);
+    const response = await clientApi.post("/editActivity", { planId, day: day.toString(), activity: activity.toString()
+  });
+  console.log("Activities generated successfully");
+  return response.data;
+} catch {
+  console.log("Api error:", error);
+}
+return null;
+};
+
+const replaceActivity = async (planId, day, activity, newActivity) => {
+  try {
+    const response = await clientApi.post("/replaceActivity", { planId, dayIndex: day.toString(), activityIndex: activity.toString(), newActivity: newActivity.toString()
+  });
+  console.log("Activity replaced successfully");
+  return response.data;
+} catch {
+  console.log("Api error:", error);
+}
+};
+
 export default {
   addPlan,
   fetchPlans,
+  deletePlan,
+  generateActivities,
+  replaceActivity,
 };

@@ -52,14 +52,14 @@ const userGoogleLogin = async () => {
 
     const credentialResponse = userInfo.idToken;
     let googleToken = userInfo.accessToken; // Use let instead of const for potential reassignment
-    console.log("credentialResponse:", credentialResponse);
-    console.log("accessToken:", googleToken);
+    // console.log("credentialResponse:", credentialResponse);
+    // console.log("accessToken:", googleToken);
 
     if (!googleToken) {
       // If accessToken is still undefined, manually get the accessToken
       const tokens = await GoogleSignin.getTokens();
       googleToken = tokens.accessToken;
-      console.log("Manually obtained accessToken:", googleToken);
+      // console.log("Manually obtained accessToken:", googleToken);
     }
 
     // Sign in with Firebase using the Google credentials

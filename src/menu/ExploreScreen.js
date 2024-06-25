@@ -11,10 +11,12 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import { API_KEY } from "../core/config";
 import placesApi from "../api/PlacesApi";
 import Banners from "../components/Banners";
+import InfoModal from "../components/InfoModal";
 
-export default function Explore({navigation}) {
+export default function Explore({ navigation }) {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [placePhoto, setPlacePhoto] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
 
   const handlePlaceSelect = async (data, details = null) => {
     try {
@@ -41,6 +43,8 @@ export default function Explore({navigation}) {
     console.log(`Banner ${bannerId} pressed`);
     if (bannerId === 1) {
       navigation.navigate('Welcome')
+    } else if (bannerId === 3) {
+      setModalVisible(true); // Show modal when bannerId is 3
     }
   };
 
@@ -77,6 +81,10 @@ export default function Explore({navigation}) {
           </TouchableOpacity>
         )}
       </View>
+      <InfoModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }

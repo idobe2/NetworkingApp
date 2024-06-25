@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Modal } from "react-native";
-import Button from "../components/Button"; // Adjust this import to your actual Button component path
+import { View, StyleSheet, Modal } from "react-native";
+import Button from "../components/Button";
+import Header from "../components/Header";
+import Paragraph from "../components/Paragraph";
 import { Calendar } from "react-native-calendars";
 import DropDownPicker from "react-native-dropdown-picker";
 import planApi from "../api/PlanApi";
@@ -122,16 +124,16 @@ const Planner = ({ navigation }) => {
   return (
     <ScrollView keyboardShouldPersistTaps={"always"}>
       <View style={styles.container}>
-        <Text style={styles.title}>Create Plan</Text>
-        <Text style={styles.label}>
-          The magic starts here. ✨{"\n"}
+        <Header>Create Plan</Header>
+        <Paragraph>
+          The magic starts here ✨{"\n"}
           Please select a city, who you are traveling with and dates of your
-          trip.
-        </Text>
+          trip.{"\n"}
+        </Paragraph>
+        {/* TODO: fix google places value not updating */}
         <GooglePlacesAutocomplete
           placeholder="Search"
           onPress={(data, details = null) => {
-            // 'details' is provided when fetchDetails = true
             setDestination(data.structured_formatting.main_text);
             console.log(data, details);
           }}
@@ -154,7 +156,7 @@ const Planner = ({ navigation }) => {
             setOpen={setOpenSocialPicker}
             setValue={setSocial}
             setItems={() => {}}
-            zIndex={2000} // Manage zIndex to prevent overlay issues
+            zIndex={2000} // Manage zIndex to prevent overlay issues
           />
         </View>
         <Button
@@ -162,12 +164,12 @@ const Planner = ({ navigation }) => {
           mode="contained"
           onPress={() => setShowCalendar(true)}
         >
-          <Text>Select Dates</Text>
+          Select Dates
         </Button>
         {dateRange.startDate && dateRange.endDate && (
-          <Text style={styles.dateRangeText}>
-            Selected Dates: {dateRange.startDate} - {dateRange.endDate}
-          </Text>
+          <Paragraph style={{textAlign: "center"}}>
+            {dateRange.startDate} - {dateRange.endDate}
+          </Paragraph>
         )}
         <Modal
           transparent={true}
@@ -181,12 +183,12 @@ const Planner = ({ navigation }) => {
               markedDates={dateRange.markedDates}
             />
             <Button mode="contained" onPress={() => setShowCalendar(false)}>
-              <Text>OK</Text>
+              OK
             </Button>
           </View>
         </Modal>
         <Button mode="outlined" onPress={handleContinue}>
-          <Text>Continue</Text>
+          Continue
         </Button>
       </View>
     </ScrollView>
@@ -194,19 +196,10 @@ const Planner = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 50,
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 30,
+    paddingTop: 10,
   },
   modalView: {
     marginTop: 200,
@@ -223,13 +216,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-  },
-  dateRangeText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: "grey",
-    marginLeft: 40,
-    marginBottom: 10,
   },
 });
 

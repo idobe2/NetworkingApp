@@ -13,7 +13,7 @@ export default function SocialLogins() {
       </View>
       <View style={styles.buttonsContainer}>
         <GoogleLogin />
-        <FacebookLogin />
+        {/* <FacebookLogin /> */}
       </View>
     </View>
   )
@@ -35,7 +35,8 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     position: 'absolute',
-    backgroundColor: theme.colors.tint,
+    // backgroundColor: theme.colors.tint,
+    backgroundColor: 'white',
     fontSize: 13,
     color: theme.colors.text,
     padding: 8,

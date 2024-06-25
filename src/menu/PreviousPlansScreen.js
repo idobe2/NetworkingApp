@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
-  Text,
+  StyleSheet,
   TouchableOpacity,
   FlatList,
-  StyleSheet,
   Image,
   Alert,
   RefreshControl,
 } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import CheckBox from "@react-native-community/checkbox";
+import Button from "../components/Button";
+import Header from "../components/Header";
+import Paragraph from "../components/Paragraph";
 import placesApi from "../api/PlacesApi";
 import plansApi from "../api/PlanApi";
+import { format, isSameYear } from 'date-fns';
 
 export default function PreviousPlans({ navigation }) {
   const [destinationImages, setDestinationImages] = useState({});
@@ -39,12 +43,14 @@ export default function PreviousPlans({ navigation }) {
         setDestinationImages(destination);
       }
     }
-    
+
     setLoading(false);
   }, [loading]);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener("focus", async () => { fetchData(); });
+    const unsubscribe = navigation.addListener("focus", async () => {
+      fetchData();
+    });
     return () => unsubscribe();
   }, [navigation, fetchData]);
 
@@ -112,6 +118,16 @@ export default function PreviousPlans({ navigation }) {
     );
   };
 
+  const formatDateRange = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (isSameYear(start, end)) {
+      return `${format(start, 'MMMM dd')} - ${format(end, 'MMMM dd, yyyy')}`;
+    } else {
+      return `${format(start, 'MMMM dd, yyyy')} - ${format(end, 'MMMM dd, yyyy')}`;
+    }
+  };
+
   const renderItem = ({ item }) => (
     <TouchableOpacity
       style={styles.itemContainer}
@@ -133,10 +149,9 @@ export default function PreviousPlans({ navigation }) {
         />
       )}
       <View style={{ flex: 1 }}>
-        <Text style={styles.destination}>{item.destination}</Text>
-        <Text>Arrival: {item.arrivalDate}</Text>
-        <Text>Departure: {item.departureDate}</Text>
-        <Text>Social: {item.social}</Text>
+        <Paragraph style={styles.destination}>{item.destination} <Paragraph style={styles.social}>{item.social}</Paragraph></Paragraph>
+        <Paragraph>{formatDateRange(item.arrivalDate, item.departureDate)}</Paragraph>
+        
       </View>
       {destinationImages[item.destination] && (
         <Image
@@ -149,25 +164,25 @@ export default function PreviousPlans({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Previous Plans</Text>
       <View style={styles.headerContainer}>
-        <TouchableOpacity
-          style={styles.selectButton}
-          onPress={() => setIsSelectionMode(!isSelectionMode)}
-        >
-          <Text style={styles.selectButtonText}>
-            {isSelectionMode ? "Cancel" : "Select"}
-          </Text>
+        <Header>Previous Plans</Header>
+        <TouchableOpacity onPress={() => setIsSelectionMode(!isSelectionMode)}>
+          <MaterialIcons
+            name={isSelectionMode ? "cancel" : "select-all"}
+            size={28}
+            color="black"
+          />
         </TouchableOpacity>
-        {isSelectionMode && selectedPlans.length > 0 && (
-          <TouchableOpacity
-            style={styles.deleteButton}
-            onPress={handleDeleteSelected}
-          >
-            <Text style={styles.deleteButtonText}>Delete Selected</Text>
-          </TouchableOpacity>
-        )}
       </View>
+      {isSelectionMode && selectedPlans.length > 0 && (
+        <Button
+          mode="contained"
+          onPress={handleDeleteSelected}
+          style={styles.deleteButton}
+        >
+          Delete Selected
+        </Button>
+      )}
       <FlatList
         data={plans}
         renderItem={renderItem}
@@ -185,47 +200,34 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 10,
   },
-  selectButton: {
-    padding: 10,
-    backgroundColor: "#007BFF",
-    borderRadius: 5,
-  },
-  selectButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
   deleteButton: {
     padding: 10,
     backgroundColor: "#FF0000",
     borderRadius: 5,
-  },
-  deleteButtonText: {
-    color: "white",
-    fontWeight: "bold",
+    marginVertical: 10,
   },
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#E6E6FA",
-    padding: 10,
+    padding: 15,
     marginBottom: 10,
     borderRadius: 5,
   },
   destination: {
     fontSize: 18,
     fontWeight: "bold",
+    marginBottom: 5,
+  },
+  social: {
+    fontSize: 18,
     marginBottom: 5,
   },
   destinationImage: {

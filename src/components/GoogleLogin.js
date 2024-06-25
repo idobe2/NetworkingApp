@@ -87,7 +87,6 @@ import {
   ToastAndroid,
   ActivityIndicator,
   StyleSheet,
-  Button,
 } from "react-native";
 import { GoogleSignin, GoogleSigninButton, statusCodes } from "@react-native-google-signin/google-signin";
 import * as WebBrowser from "expo-web-browser";
@@ -136,22 +135,22 @@ const GoogleLogin = () => {
     }
   };
 
-  const signOut = async () => {
-    setIsLoading(true);
-    try {
-      const response = await userApi.userGoogleSignOut();
-      if (response.success) {
-        console.log("Signed out successfully");
-        ToastAndroid.show("Signed Out", ToastAndroid.TOP);
-      } else {
-        console.log("Google sign out failed:", response.error);
-      }
-    } catch (error) {
-      console.error("Error signing out:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // const signOut = async () => {
+  //   setIsLoading(true);
+  //   try {
+  //     const response = await userApi.userGoogleSignOut();
+  //     if (response.success) {
+  //       console.log("Signed out successfully");
+  //       ToastAndroid.show("Signed Out", ToastAndroid.TOP);
+  //     } else {
+  //       console.log("Google sign out failed:", response.error);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error signing out:", error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <View style={styles.container}>
@@ -160,13 +159,13 @@ const GoogleLogin = () => {
           <ActivityIndicator size="large" color={theme.colors.primary} />
         ) : (
           <GoogleSigninButton
-            style={{ width: 192, height: 48 }}
+            style={{ width: 250, height: 48 }}
             size={GoogleSigninButton.Size.Wide}
             color={GoogleSigninButton.Color.Dark}
             onPress={signIn}
           />
         )}
-        <Button title="SignOut" onPress={signOut} />
+        {/* <Button title="SignOut" onPress={signOut} /> */}
       </View>
     </View>
   );
@@ -179,7 +178,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.colors.tint,
+    // backgroundColor: theme.colors.tint,
+    backgroundColor: "transparent",
   },
   text: {
     fontSize: 20,

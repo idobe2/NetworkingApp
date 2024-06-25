@@ -15,7 +15,7 @@ export default function StartScreen({ navigation }) {
       </Paragraph>
       {/* <GoogleLogin GoogleLogin={navigation.GoogleLogin}/>
       <FacebookLogin FacebookLogin={navigation.FacebookLogin} /> */}
-      <Button
+      <Button style={{bottom: -5}}
         mode="contained"
         onPress={() => navigation.navigate('Root' ,{ screen: 'Home' })}
       >

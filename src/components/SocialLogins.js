@@ -1,19 +1,19 @@
+// src/components/SocialLogins.js
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { Text } from 'react-native-paper'
 import { theme } from '../core/theme'
-import FacebookLogin from './FacebookLogin'
 import GoogleLogin from './GoogleLogin'
 
-export default function SocialLogins() {
+export default function SocialLogins({ setLoading }) {
   return (
     <View style={styles.container}>
       <View style={styles.divider}>
         <Text style={styles.dividerText}>Or connect using</Text>
       </View>
       <View style={styles.buttonsContainer}>
-        <GoogleLogin />
-        {/* <FacebookLogin /> */}
+        <GoogleLogin setLoading={setLoading} />
+        {/* <FacebookLogin setLoading={setLoading} /> */}
       </View>
     </View>
   )
@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
   },
   dividerText: {
     position: 'absolute',
-    // backgroundColor: theme.colors.tint,
     backgroundColor: 'white',
     fontSize: 13,
     color: theme.colors.text,

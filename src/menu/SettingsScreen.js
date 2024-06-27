@@ -6,29 +6,51 @@ import React from "react";
 import Button from '../components/Button';
 import userApi from "../api/UserApi";
 import { theme } from "../core/theme";
+import { useAuth } from "../../AuthContext";
 
 const Settings = ({ navigation }) => {
   const { colorScheme, toggleColorScheme } = useColorScheme();
   const [isLoading, setIsLoading] = useState(false);
+  const { setIsAuthenticated } = useAuth();
+
   console.log("colorScheme:", colorScheme);
 
   // TODO: handle different types of logout
+  // const handleLogout = async () => {
+  //     setIsLoading(true);
+  //     try {
+  //       const response = await userApi.userGoogleSignOut();
+  //       if (response.success) {
+  //         console.log("Signed out successfully");
+  //         ToastAndroid.show("Signed Out", ToastAndroid.TOP);
+  //       } else {
+  //         console.log("Google sign out failed:", response.error);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error signing out:", error);
+  //     } finally {
+  //       setIsLoading(false);
+  //   };
+  //   navigation.navigate("StartScreen"); // Navigate to StartScreen
+  // };
+
   const handleLogout = async () => {
+    console.log("Logout Button Pressed");
+    try {
       setIsLoading(true);
-      try {
-        const response = await userApi.userGoogleSignOut();
-        if (response.success) {
-          console.log("Signed out successfully");
-          ToastAndroid.show("Signed Out", ToastAndroid.TOP);
-        } else {
-          console.log("Google sign out failed:", response.error);
-        }
-      } catch (error) {
-        console.error("Error signing out:", error);
-      } finally {
-        setIsLoading(false);
-    };
-    navigation.navigate("StartScreen"); // Navigate to StartScreen
+      await userApi.check();
+      await userApi.userLogout();
+      setIsAuthenticated(false); // Update authentication state
+      navigation.navigate("StartScreen");
+      ToastAndroid.show(
+        "Goodbye 👋, See you again soon 😊",
+        ToastAndroid.SHORT
+      );
+    } catch (err) {
+      console.log("Logout failed " + err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Function to handle account deletion

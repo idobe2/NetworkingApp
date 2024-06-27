@@ -15,12 +15,15 @@ import TextInput from "../components/TextInput";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
+import { useAuth } from "../../AuthContext";
+
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false); // 2. Add isLoading state
+  const { setIsAuthenticated } = useAuth();
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -40,20 +43,24 @@ export default function LoginScreen({ navigation }) {
       console.log("response from Api:", response);  
       if (response.success) {
         // console.log("Navigating to Home with userId:", response.userId);
+        setIsAuthenticated(true);
         navigation.navigate("Root", { 
           screen: "Home",
         });
       } else {
         const targetScreen = response.tranferTo;
+        setIsAuthenticated(true);
         console.log("targetScreen:", targetScreen);
   
         if (targetScreen === "Preferences") {
           // console.log("Navigating to Preferences with userId:", response.userId);
+          setIsAuthenticated(true);
           navigation.navigate("Root", {
             screen: targetScreen,
           });
         } else {
           // console.log("Navigating to", targetScreen, "with userId:", response.userId);
+          setIsAuthenticated(true);
           navigation.navigate(targetScreen);
         }
       }

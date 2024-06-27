@@ -1,22 +1,24 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createDrawerNavigator } from "@react-navigation/drawer";
-import { NativeWindStyleSheet } from "nativewind";
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NativeWindStyleSheet } from 'nativewind';
 import {
   StartScreen,
   LoginScreen,
   RegisterScreen,
   ResetPasswordScreen,
   Dashboard,
-} from "./src/screens";
-import { enableLatestRenderer } from "react-native-maps";
-import DetailsScreen from "./src/screens/DetailsScreen";
-import Schedule from "./src/menu/ScheduleScreen";
-import HomeScreen from "./src/menu/HomeScreen";
-import DrawerContent from "./src/components/DrawerContent";
-import SettingsScreen from "./src/menu/SettingsScreen";
-import PreferencesScreen from "./src/menu/PreferencesScreen";
+} from './src/screens';
+import { enableLatestRenderer } from 'react-native-maps';
+import DetailsScreen from './src/screens/DetailsScreen';
+import Schedule from './src/menu/ScheduleScreen';
+import HomeScreen from './src/menu/HomeScreen';
+import DrawerContent from './src/components/DrawerContent';
+import SettingsScreen from './src/menu/SettingsScreen';
+import PreferencesScreen from './src/menu/PreferencesScreen';
+import LoadingScreen from './LoadingScreen'; // Ensure you have a LoadingScreen component
+import { AuthProvider, useAuth } from './AuthContext';
 
 enableLatestRenderer();
 
@@ -24,7 +26,7 @@ const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
 NativeWindStyleSheet.setOutput({
-  default: "native",
+  default: 'native',
 });
 
 function Root() {
@@ -39,33 +41,43 @@ function Root() {
   );
 }
 
+function AuthStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Root" component={Root} />
+      <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
+      <Stack.Screen name="Schedule" component={Schedule} />
+    </Stack.Navigator>
+  );
+}
+
+function UnauthStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="StartScreen" component={StartScreen} />
+      <Stack.Screen name="LoginScreen" component={LoginScreen} />
+      <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+      <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
+    </Stack.Navigator>
+  );
+}
+
 function App() {
+  const { loading, isAuthenticated } = useAuth();
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="StartScreen"
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen
-          name="Root"
-          component={Root}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen name="StartScreen" component={StartScreen} />
-        <Stack.Screen name="LoginScreen" component={LoginScreen} />
-        <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
-        <Stack.Screen name="Dashboard" component={Dashboard} />
-        <Stack.Screen
-          name="ResetPasswordScreen"
-          component={ResetPasswordScreen}
-        />
-        <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
-        <Stack.Screen name="Schedule" component={Schedule} />
-      </Stack.Navigator>
+      {isAuthenticated ? <AuthStack /> : <UnauthStack />}
     </NavigationContainer>
   );
 }
 
-export default App;
+export default () => (
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+);

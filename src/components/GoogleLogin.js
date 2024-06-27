@@ -85,21 +85,21 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   ToastAndroid,
-  ActivityIndicator,
   StyleSheet,
 } from "react-native";
 import { GoogleSignin, GoogleSigninButton, statusCodes } from "@react-native-google-signin/google-signin";
 import * as WebBrowser from "expo-web-browser";
 import { WEB_GOOGLE_CLIENT_ID } from "../core/config";
-import { theme } from "../core/theme";
 import { useNavigation } from "@react-navigation/native";
 import userApi from "../api/UserApi";
+import { useAuth } from "../../AuthContext";
+
 
 WebBrowser.maybeCompleteAuthSession();
 
-const GoogleLogin = () => {
-  const [isLoading, setIsLoading] = useState(false);
+const GoogleLogin = ({ setLoading }) => {
   const navigation = useNavigation();
+  const { setIsAuthenticated } = useAuth();
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -115,58 +115,34 @@ const GoogleLogin = () => {
   }, []);
   
   const signIn = async () => {
-    setIsLoading(true);
     try {
+      setLoading(true);
       const response = await userApi.userGoogleLogin();
       if (response.data.success) {
+        setIsAuthenticated(true);
         navigation.navigate("Root", { screen: "Home" });
         ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
-      }else if (!response.data.success){
+      } else if (!response.data.success) {
         navigation.navigate("Root", { screen: "Preferences" });
         ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
-      }
-       else {
+      } else {
         console.log("Google login failed:", response.error);
       }
     } catch (error) {
       console.log("Error in Google login:", error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  // const signOut = async () => {
-  //   setIsLoading(true);
-  //   try {
-  //     const response = await userApi.userGoogleSignOut();
-  //     if (response.success) {
-  //       console.log("Signed out successfully");
-  //       ToastAndroid.show("Signed Out", ToastAndroid.TOP);
-  //     } else {
-  //       console.log("Google sign out failed:", response.error);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error signing out:", error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-
   return (
     <View style={styles.container}>
-      <View>
-        {isLoading ? (
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        ) : (
-          <GoogleSigninButton
-            style={{ width: 250, height: 48 }}
-            size={GoogleSigninButton.Size.Wide}
-            color={GoogleSigninButton.Color.Dark}
-            onPress={signIn}
-          />
-        )}
-        {/* <Button title="SignOut" onPress={signOut} /> */}
-      </View>
+      <GoogleSigninButton
+        style={{ width: 250, height: 48 }}
+        size={GoogleSigninButton.Size.Wide}
+        color={GoogleSigninButton.Color.Dark}
+        onPress={signIn}
+      />
     </View>
   );
 };
@@ -175,24 +151,7 @@ export default GoogleLogin;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    // backgroundColor: theme.colors.tint,
-    backgroundColor: "transparent",
-  },
-  text: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  card: {
-    borderWidth: 1,
-    borderRadius: 15,
-    padding: 15,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
   },
 });

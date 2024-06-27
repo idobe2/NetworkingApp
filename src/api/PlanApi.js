@@ -1,6 +1,6 @@
 import clientApi from "./ClientApi";
 
-const addPlan = async (destination, arrivalDate, departureDate, social) => {
+const addPlan = async (destination, arrivalDate, departureDate, social, loadLevel) => {
   try {
     const response = await clientApi.post("/addPlan", {
       destination,

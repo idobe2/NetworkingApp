@@ -2,9 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { getToken } from './src/common/tokenStorage';
 import clientApi from './src/api/ClientApi';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { CLIENT_ID } from './src/core/config';
+import { WEB_GOOGLE_CLIENT_ID } from './src/core/config';
 
-const AuthContext = createContext();
+const AuthContext = createContext(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -27,20 +27,20 @@ export const AuthProvider = ({ children }) => {
           return;
         }
         console.log('Checking token...');
-        const valid = await clientApi.get('/auth/check');
+        const valid = await clientApi.get('/check');
         console.log('Valid:', valid?.data.message);
         if (valid?.data.message === 'Authenticated') {
           console.log('User is authenticated');
           setIsAuthenticated(true);
-
-        //   const isSignedInWithGoogle = await GoogleSignin.isSignedIn();
-        //   if (isSignedInWithGoogle) {
-        //     console.log('User is signed in with Google, reconfiguring...');
-        //     GoogleSignin.configure({
-        //       webClientId: CLIENT_ID,
-        //       offlineAccess: true,
-        //     });
-        //   }
+          
+          const isSignedInWithGoogle = await GoogleSignin.isSignedIn();
+          if (isSignedInWithGoogle) {
+            console.log('User is signed in with Google, reconfiguring...');
+            GoogleSignin.configure({
+              webClientId: WEB_GOOGLE_CLIENT_ID,
+              offlineAccess: true,
+            });
+          }
         }
       } catch (error) {
         console.error('Error checking token:', error);

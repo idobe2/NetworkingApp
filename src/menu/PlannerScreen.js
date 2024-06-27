@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Modal } from "react-native";
+import { View, StyleSheet } from "react-native";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
-import { Calendar } from "react-native-calendars";
 import DropDownPicker from "react-native-dropdown-picker";
 import planApi from "../api/PlanApi";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { API_KEY } from "../core/config";
-import { ScrollView } from "react-native-virtualized-view";
+import LoadLevelSlider from "../components/LoadLevelSlider";
+import SelectDatesModal from "../components/SelectDatesModal";
+import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 
 const Planner = ({ navigation }) => {
   const [destination, setDestination] = useState("");
-  const [openDestinationPicker, setOpenDestinationPicker] = useState(false);
   const [openSocialPicker, setOpenSocialPicker] = useState(false);
   const [social, setSocial] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
@@ -21,6 +21,7 @@ const Planner = ({ navigation }) => {
     endDate: null,
     markedDates: {},
   });
+  const [loadLevel, setLoadLevel] = useState(1);
 
   const handleDayPress = (day) => {
     const { dateString } = day;
@@ -105,13 +106,16 @@ const Planner = ({ navigation }) => {
       "social:",
       social,
       dateRange.startDate,
-      dateRange.endDate
+      dateRange.endDate,
+      "loadLevel:",
+      loadLevel
     );
     const response = await planApi.addPlan(
       destination,
       dateRange.startDate,
       dateRange.endDate,
-      social
+      social,
+      loadLevel
     );
     if (!response) {
       alert("Failed to create plan");
@@ -121,29 +125,51 @@ const Planner = ({ navigation }) => {
     }
   };
 
-  return (
-    <ScrollView keyboardShouldPersistTaps={"always"}>
-      <View style={styles.container}>
-        <Header>Create Plan</Header>
-        <Paragraph>
-          The magic starts here ✨{"\n"}
-          Please select a city, who you are traveling with and dates of your
-          trip.{"\n"}
-        </Paragraph>
-        {/* TODO: fix google places value not updating */}
-        <GooglePlacesAutocomplete
-          placeholder="Search"
-          onPress={(data, details = null) => {
-            setDestination(data.structured_formatting.main_text);
-            console.log(data, details);
-          }}
-          query={{
-            key: API_KEY,
-            language: "en",
-            types: "(cities)",
-          }}
-        />
-        <View style={{ marginTop: 20 }}>
+  const data = [
+    { key: 'header' },
+    { key: 'paragraph' },
+    { key: 'googlePlacesAutocomplete' },
+    { key: 'dropDownPicker' },
+    // { key: 'loadLevelSlider' },
+    { key: 'selectDatesButton' },
+    { key: 'dateRange' },
+    { key: 'continueButton' },
+    
+  ];
+
+  const renderItem = ({ item }) => {
+    switch (item.key) {
+      case 'header':
+        return <Header>Create Plan</Header>;
+      case 'paragraph':
+        return (
+          <Paragraph>
+            The magic starts here ✨{"\n"}
+            Please select a city, who you are traveling with and dates of your
+            trip.{"\n"}
+          </Paragraph>
+        );
+      case 'googlePlacesAutocomplete':
+        return (
+          <GooglePlacesAutocomplete
+            placeholder="Search"
+            onPress={(data, details = null) => {
+              setDestination(data.structured_formatting.main_text);
+              console.log(data, details);
+            }}
+            query={{
+              key: API_KEY,
+              language: "en",
+              types: "(cities)",
+            }}
+            styles={{
+              textInput: styles.googlePlacesInput,
+            }}
+          />
+        );
+      case 'dropDownPicker':
+        return (
+          <View style={{ marginTop: 20 }}>
           <DropDownPicker
             open={openSocialPicker}
             value={social}
@@ -156,66 +182,74 @@ const Planner = ({ navigation }) => {
             setOpen={setOpenSocialPicker}
             setValue={setSocial}
             setItems={() => {}}
-            zIndex={2000} // Manage zIndex to prevent overlay issues
+            zIndex={2000}
           />
+          <LoadLevelSlider value={loadLevel} onValueChange={setLoadLevel} />
         </View>
-        <Button
-          style={{ marginTop: 30 }}
-          mode="contained"
-          onPress={() => setShowCalendar(true)}
-        >
-          Select Dates
-        </Button>
-        {dateRange.startDate && dateRange.endDate && (
-          <Paragraph style={{textAlign: "center"}}>
+        
+        );
+  
+      case 'selectDatesButton':
+        return (
+          <Button mode="contained" onPress={() => setShowCalendar(true)}>
+            Select Dates
+          </Button>
+        );
+      case 'dateRange':
+        return dateRange.startDate && dateRange.endDate ? (
+          <Paragraph style={{ textAlign: "center" }}>
             {dateRange.startDate} - {dateRange.endDate}
           </Paragraph>
-        )}
-        <Modal
-          transparent={true}
-          visible={showCalendar}
-          onRequestClose={() => setShowCalendar(false)}
-        >
-          <View style={styles.modalView}>
-            <Calendar
-              onDayPress={handleDayPress}
-              markingType={"period"}
-              markedDates={dateRange.markedDates}
-            />
-            <Button mode="contained" onPress={() => setShowCalendar(false)}>
-              OK
-            </Button>
-          </View>
-        </Modal>
-        <Button mode="outlined" onPress={handleContinue}>
-          Continue
-        </Button>
-      </View>
-    </ScrollView>
+        ) : null;
+      case 'continueButton':
+        return (
+          <Button mode="outlined" onPress={handleContinue}>
+            Create Plan
+          </Button>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <>
+      <KeyboardAwareFlatList
+        data={data}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.key}
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+      />
+      <SelectDatesModal
+        visible={showCalendar}
+        onClose={() => setShowCalendar(false)}
+        onDayPress={handleDayPress}
+        markedDates={dateRange.markedDates}
+      />
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
-    paddingTop: 10,
+    backgroundColor: "#f0f0f0",
   },
-  modalView: {
-    marginTop: 200,
-    marginHorizontal: 20,
-    backgroundColor: "white",
-    borderRadius: 20,
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+  googlePlacesInput: {
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  pickerContainer: {
+    position: 'relative',
+    marginBottom: 20,
+    zIndex: 3000, // Ensure DropDownPicker has higher zIndex
+  },
+  dropDownPicker: {
+    zIndex: 3000,
+  },
+  dropDownContainerStyle: {
+    zIndex: 3000,
   },
 });
 

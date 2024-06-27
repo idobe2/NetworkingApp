@@ -1,9 +1,11 @@
 import clientApi from "./ClientApi";
 import { Alert } from "react-native";
-import { setToken, getToken } from "../common/tokenStorage";
+import { setToken, getToken, removeToken } from "../common/tokenStorage";
 import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "../core/firebaseConfig";
+import axios from "axios";
+
 
 const userResetPassword = async (email) => {
   try {
@@ -159,6 +161,39 @@ const addUserPreferences = async (preferences) => {
   return null;
 };
 
+
+const userLogout = async () => {
+  try {
+      const token = await getToken();
+      if (token) {
+          await clientApi.get('/logout', {
+              headers: {
+                  Authorization: `Bearer ${token}`
+              }
+          });
+
+          // await axios.get( "http://172.20.10.3:3000/logout", {
+          //   headers: {
+          //       Authorization: `Bearer ${token}`
+          //   }
+          // });
+          if (await GoogleSignin.isSignedIn()) {
+            console.log("Google sign out");
+              await GoogleSignin.signOut();
+          }
+          await removeToken();
+      }
+  } catch (err) {
+      console.log("Logout fail " + err);
+      throw err; // Rethrow the error to handle it in UserModel
+  }
+};
+
+const check = async () => {
+  return clientApi.get("/check");
+};
+
+
 export default {
   addUser,
   addUserPreferences,
@@ -167,4 +202,6 @@ export default {
   userGoogleSignOut,
   userSignup,
   userResetPassword,
+  userLogout,
+  check
 };

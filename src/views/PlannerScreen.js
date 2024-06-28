@@ -99,6 +99,10 @@ const Planner = ({ navigation }) => {
       alert("Please select a date range");
       return;
     }
+    if (await planApi.checkSelectedDates(dateRange.startDate, dateRange.endDate)) {
+      alert("Dates overlap with existing plan");
+      return;
+    }
     console.log(
       "destination:",
       destination,
@@ -169,7 +173,7 @@ const Planner = ({ navigation }) => {
         );
       case 'dropDownPicker':
         return (
-          <View style={{ marginTop: 20 }}>
+          <View>
           <DropDownPicker
             open={openSocialPicker}
             value={social}

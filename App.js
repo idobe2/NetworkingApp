@@ -12,11 +12,11 @@ import {
 } from './src/screens';
 import { enableLatestRenderer } from 'react-native-maps';
 import DetailsScreen from './src/screens/DetailsScreen';
-import Schedule from './src/menu/ScheduleScreen';
-import HomeScreen from './src/menu/HomeScreen';
+import Schedule from './src/views/ScheduleScreen';
+import HomeScreen from './src/views/HomeScreen';
 import DrawerContent from './src/components/DrawerContent';
-import SettingsScreen from './src/menu/SettingsScreen';
-import PreferencesScreen from './src/menu/PreferencesScreen';
+import SettingsScreen from './src/views/SettingsScreen';
+import PreferencesScreen from './src/views/PreferencesScreen';
 import LoadingScreen from './LoadingScreen'; // Ensure you have a LoadingScreen component
 import { AuthProvider, useAuth } from './AuthContext';
 

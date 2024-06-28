@@ -4,8 +4,6 @@ import { setToken, getToken, removeToken } from "../common/tokenStorage";
 import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "../core/firebaseConfig";
-import axios from "axios";
-
 
 const userResetPassword = async (email) => {
   try {
@@ -161,7 +159,6 @@ const addUserPreferences = async (preferences) => {
   return null;
 };
 
-
 const userLogout = async () => {
   try {
       const token = await getToken();
@@ -171,7 +168,6 @@ const userLogout = async () => {
                   Authorization: `Bearer ${token}`
               }
           });
-
           // await axios.get( "http://172.20.10.3:3000/logout", {
           //   headers: {
           //       Authorization: `Bearer ${token}`
@@ -193,15 +189,25 @@ const check = async () => {
   return clientApi.get("/check");
 };
 
+const getUserPreferences = async () => {
+  try {
+    const response = await clientApi.get("/getPreferences");
+    return response.data;
+  } catch (error) {
+    console.log("Api error:", error);
+  }
+  return null;
+};
 
 export default {
   addUser,
   addUserPreferences,
+  getUserPreferences,
   userLogin,
   userGoogleLogin,
   userGoogleSignOut,
   userSignup,
   userResetPassword,
   userLogout,
-  check
+  check,
 };

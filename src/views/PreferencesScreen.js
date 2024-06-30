@@ -12,7 +12,6 @@ import { Ionicons } from "@expo/vector-icons"; // For icons
 import Button from "../components/Button";
 import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
-import Paragraph from "../components/Paragraph";
 import Header from "../components/Header";
 
 const Preferences = ({ navigation }) => {

@@ -15,7 +15,7 @@ import TextInput from "../components/TextInput";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
-import { useAuth } from "../../AuthContext";
+import { useAuth } from "../common/AuthContext";
 
 
 export default function LoginScreen({ navigation }) {

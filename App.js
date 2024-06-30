@@ -8,7 +8,6 @@ import {
   LoginScreen,
   RegisterScreen,
   ResetPasswordScreen,
-  Dashboard,
 } from './src/screens';
 import { enableLatestRenderer } from 'react-native-maps';
 import DetailsScreen from './src/screens/DetailsScreen';
@@ -17,8 +16,8 @@ import HomeScreen from './src/views/HomeScreen';
 import DrawerContent from './src/components/DrawerContent';
 import SettingsScreen from './src/views/SettingsScreen';
 import PreferencesScreen from './src/views/PreferencesScreen';
-import LoadingScreen from './LoadingScreen'; // Ensure you have a LoadingScreen component
-import { AuthProvider, useAuth } from './AuthContext';
+import LoadingScreen from './src/common/LoadingScreen';
+import { AuthProvider, useAuth } from './src/common/AuthContext';
 
 enableLatestRenderer();
 
@@ -34,7 +33,7 @@ function Root() {
     <Drawer.Navigator>
       <Drawer.Screen name="Tripy" component={HomeScreen} />
       <Drawer.Screen name="Schedule" component={Schedule} />
-      <Drawer.Screen name="Profile" component={DrawerContent} />
+      {/* <Drawer.Screen name="Profile" component={DrawerContent} /> */}
       <Drawer.Screen name="Settings" component={SettingsScreen} />
       <Drawer.Screen name="Preferences" component={PreferencesScreen} />
     </Drawer.Navigator>

@@ -5,7 +5,7 @@ import Logo from '../components/Logo'
 import Button from '../components/Button'
 import Paragraph from '../components/Paragraph'
 import SocialLogins from '../components/SocialLogins'
-import AnimatedLogo from "../../AnimatedLogo"
+import AnimatedLogo from "../common/AnimatedLogo"
 
 export default function StartScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ export default function StartScreen({ navigation }) {
       <Button
         style={{ bottom: -5 }}
         mode="contained"
-        onPress={() => navigation.navigate('Root', { screen: 'Home' })}
+        onPress={() => navigation.navigate('LoginScreen')}
       >
         Login
       </Button>

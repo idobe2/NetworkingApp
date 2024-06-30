@@ -199,10 +199,21 @@ const getUserPreferences = async () => {
   return null;
 };
 
+const getUserDetails = async () => {
+  try {
+    const response = await clientApi.get("/getDetails");
+    return response.data;
+  } catch (error) {
+    console.log("Api error:", error);
+  }
+  return null;
+};
+
 export default {
   addUser,
   addUserPreferences,
   getUserPreferences,
+  getUserDetails,
   userLogin,
   userGoogleLogin,
   userGoogleSignOut,

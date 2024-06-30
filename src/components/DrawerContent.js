@@ -1,33 +1,73 @@
-import React from 'react'
-import { View, StyleSheet } from 'react-native'
-import { DrawerItem, DrawerContentScrollView } from '@react-navigation/drawer';
+import React, { useState, useEffect } from 'react'
+import { View, StyleSheet, ActivityIndicator } from 'react-native'
+import { DrawerContentScrollView } from '@react-navigation/drawer';
 import {
   Avatar,
   Title,
   Caption,
-  Paragraph,
-  Drawer,
-  Text,
-  TouchableRipple,
-  Switch,
 } from 'react-native-paper'
-import { SettingsIcon } from '../assets/icons'
+import UserApi from '../api/UserApi';
+import { theme } from '../core/theme';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function DrawerContent() {
+const DrawerContent = () => {
+  const [userDetails, setUserDetails] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const user = await UserApi.getUserDetails();
+        if (user) {
+          console.log("user: ", user);
+          setUserDetails(user);
+        }
+      } catch (error) {
+        console.log("Error fetching user:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
+  const getUserTypeIcon = (userType) => {
+    if (userType === 'google') {
+      return <Icon name="google" size={24} color={theme.colors.primary} />;
+    } else {
+      return <Icon name="account" size={24} color={theme.colors.primary} />;
+    }
+  };
+
   return (
     <DrawerContentScrollView>
       <View style={styles.drawerContent}>
+      <View style={styles.iconContainer}>
+            {getUserTypeIcon(userDetails.userType)}
+          </View>
         <View style={styles.userInfoSection}>
           <Avatar.Image
             size={80}
             source={{
               uri:
-                'https://instagram.ftlv1-1.fna.fbcdn.net/v/t51.2885-19/359979335_318139347307470_1230971796262779820_n.jpg?stp=dst-jpg_s150x150&_nc_ht=instagram.ftlv1-1.fna.fbcdn.net&_nc_cat=106&_nc_ohc=KvUfcNOx09gAX-pJhWr&edm=ACWDqb8BAAAA&ccb=7-5&oh=00_AfBvSJZibQH9TbPC2lr7Y1Q14PesDEsigbEEaF3EhJ_GgA&oe=65ECA406&_nc_sid=ee9879',
+                `https://ui-avatars.com/api/?background=0D8ABC&color=fff&name=
+                ${userDetails.name.split(' ').slice(0, -1).join(' ')}+
+                ${userDetails.name.split(' ').slice(-1).join(' ')}&size=250`,
             }}
           />
-          <Title style={styles.title}>YaDoo</Title>
-          <Caption style={styles.caption}>@ido_bennoun</Caption>
-          <View style={styles.row}>
+         
+          <Title style={styles.title}>{userDetails.name}</Title>
+          <Caption style={styles.caption}>{userDetails.email}</Caption>
+          {/* <View style={styles.row}>
             <View style={styles.section}>
               <Paragraph style={[styles.paragraph, styles.caption]}>
                 54
@@ -40,17 +80,17 @@ export default function DrawerContent() {
               </Paragraph>
               <Caption style={styles.caption}>Followers</Caption>
             </View>
-          </View>
+          </View> */}
         </View>
-        <Drawer.Section style={styles.drawerSection}>
+        {/* <Drawer.Section style={styles.drawerSection}>
           <DrawerItem
             label="Settings"
             icon={({ color }) => <SettingsIcon fill={color} />}
             onPress={() => {}}
           />
-        </Drawer.Section>
-        
-        <Drawer.Section title="Preferences">
+        </Drawer.Section> */}
+
+        {/* <Drawer.Section title="Preferences">
           <TouchableRipple onPress={() => {}}>
             <View style={styles.preference}>
               <Text>Notifications</Text>
@@ -59,16 +99,17 @@ export default function DrawerContent() {
               </View>
             </View>
           </TouchableRipple>
-          
-        </Drawer.Section>
+        </Drawer.Section> */}
+
       </View>
     </DrawerContentScrollView>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   drawerContent: {
     flex: 1,
+    bottom: 30,
   },
   userInfoSection: {
     paddingLeft: 20,
@@ -104,4 +145,16 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  iconContainer: {
+    top: 10,
+    position: 'absolute',
+    right: 20,
+  },
 })
+
+export default DrawerContent;

@@ -6,7 +6,8 @@ import React from "react";
 import Button from '../components/Button';
 import userApi from "../api/UserApi";
 import { theme } from "../core/theme";
-import { useAuth } from "../../AuthContext";
+import { useAuth } from "../common/AuthContext";
+import DrawerContent from "../components/DrawerContent";
 
 const Settings = ({ navigation }) => {
   const { colorScheme, toggleColorScheme } = useColorScheme();
@@ -61,6 +62,12 @@ const Settings = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.sectionProfile}>
+        <Text style={styles.sectionTitle}>Profile</Text>
+        <View style={styles.setting}>
+          <DrawerContent></DrawerContent>
+        </View>
+      </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Appearance</Text>
         <View style={styles.setting}>
@@ -100,10 +107,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   section: {
-    marginVertical: 20,
+    marginVertical: 10,
     padding: 20,
     backgroundColor: "#f9f9f9",
     borderRadius: 10,
+  },
+  sectionProfile: {
+    marginVertical: 10,
+    padding: 20,
+    backgroundColor: "#f9f9f9",
+    borderRadius: 10,
+    paddingBottom: 0,
   },
   sectionTitle: {
     fontSize: 18,

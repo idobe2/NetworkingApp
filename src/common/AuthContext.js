@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { getToken } from './src/common/tokenStorage';
-import clientApi from './src/api/ClientApi';
+import { getToken } from './tokenStorage';
+import clientApi from '../api/ClientApi';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { WEB_GOOGLE_CLIENT_ID } from './src/core/config';
+import { WEB_GOOGLE_CLIENT_ID } from '../core/config';
 
 const AuthContext = createContext(undefined);
 

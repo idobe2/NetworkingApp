@@ -1,4 +1,3 @@
-// AnimatedLogo.js
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet, Image } from 'react-native';
 
@@ -23,7 +22,7 @@ const AnimatedLogo = () => {
   return (
     <View style={styles.container}>
       <Animated.Image
-        source={require('./src/assets/logo.png')} // replace with your logo path
+        source={require('../assets/logo.png')} // replace with your logo path
         style={[styles.logo, { transform: [{ rotate: spin }] }]}
         resizeMode="contain"
       />

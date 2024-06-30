@@ -54,7 +54,7 @@ const LoadingScreen = () => {
     <View style={styles.container}>
       <Animated.View style={[styles.logo, { opacity: fadeAnim }]}>
         <Image
-          source={require('./src/assets/logo.png')}
+          source={require('../assets/logo.png')}
           style={styles.logoImage}
           resizeMode="contain"
         />

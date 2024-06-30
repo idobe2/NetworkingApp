@@ -92,7 +92,7 @@ import * as WebBrowser from "expo-web-browser";
 import { WEB_GOOGLE_CLIENT_ID } from "../core/config";
 import { useNavigation } from "@react-navigation/native";
 import userApi from "../api/UserApi";
-import { useAuth } from "../../AuthContext";
+import { useAuth } from "../common/AuthContext";
 
 
 WebBrowser.maybeCompleteAuthSession();

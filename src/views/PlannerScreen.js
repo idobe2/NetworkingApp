@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
@@ -10,6 +10,7 @@ import { API_KEY } from "../core/config";
 import LoadLevelSlider from "../components/LoadLevelSlider";
 import SelectDatesModal from "../components/SelectDatesModal";
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
+import AnimatedLogo from "../common/AnimatedLogo"
 
 const Planner = ({ navigation }) => {
   const [destination, setDestination] = useState("");
@@ -22,6 +23,7 @@ const Planner = ({ navigation }) => {
     markedDates: {},
   });
   const [loadLevel, setLoadLevel] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   const handleDayPress = (day) => {
     const { dateString } = day;
@@ -99,33 +101,39 @@ const Planner = ({ navigation }) => {
       alert("Please select a date range");
       return;
     }
-    if (await planApi.checkSelectedDates(dateRange.startDate, dateRange.endDate)) {
-      alert("Dates overlap with existing plan");
-      return;
-    }
-    console.log(
-      "destination:",
-      destination,
-      "dateRange:",
-      "social:",
-      social,
-      dateRange.startDate,
-      dateRange.endDate,
-      "loadLevel:",
-      loadLevel
-    );
-    const response = await planApi.addPlan(
-      destination,
-      dateRange.startDate,
-      dateRange.endDate,
-      social,
-      loadLevel
-    );
-    if (!response) {
-      alert("Failed to create plan");
-      return;
-    } else {
-      navigation.navigate("Previous Plans");
+    // if (await planApi.checkSelectedDates(dateRange.startDate, dateRange.endDate)) {
+    //   alert("Dates overlap with existing plan");
+    //   return;
+    // }
+    
+    setLoading(true); // Show the activity indicator
+
+    try {
+      console.log(
+        "destination:",
+        destination,
+        "dateRange:",
+        "social:",
+        social,
+        dateRange.startDate,
+        dateRange.endDate,
+        "loadLevel:",
+        loadLevel
+      );
+      const response = await planApi.addPlan(
+        destination,
+        dateRange.startDate,
+        dateRange.endDate,
+        social,
+        loadLevel
+      );
+      if (!response) {
+        alert("Failed to create plan");
+      } else {
+        navigation.navigate("Previous Plans");
+      }
+    } finally {
+      setLoading(false); // Hide the activity indicator
     }
   };
 
@@ -134,11 +142,9 @@ const Planner = ({ navigation }) => {
     { key: 'paragraph' },
     { key: 'googlePlacesAutocomplete' },
     { key: 'dropDownPicker' },
-    // { key: 'loadLevelSlider' },
     { key: 'selectDatesButton' },
     { key: 'dateRange' },
     { key: 'continueButton' },
-    
   ];
 
   const renderItem = ({ item }) => {
@@ -174,25 +180,23 @@ const Planner = ({ navigation }) => {
       case 'dropDownPicker':
         return (
           <View>
-          <DropDownPicker
-            open={openSocialPicker}
-            value={social}
-            items={[
-              { label: "Myself", value: "Solo" },
-              { label: "Partner", value: "with partner" },
-              { label: "Friends", value: "with friends" },
-              { label: "Family", value: "with family" },
-            ]}
-            setOpen={setOpenSocialPicker}
-            setValue={setSocial}
-            setItems={() => {}}
-            zIndex={2000}
-          />
-          <LoadLevelSlider value={loadLevel} onValueChange={setLoadLevel} />
-        </View>
-        
+            <DropDownPicker
+              open={openSocialPicker}
+              value={social}
+              items={[
+                { label: "Myself", value: "Solo" },
+                { label: "Partner", value: "with partner" },
+                { label: "Friends", value: "with friends" },
+                { label: "Family", value: "with family" },
+              ]}
+              setOpen={setOpenSocialPicker}
+              setValue={setSocial}
+              setItems={() => {}}
+              zIndex={2000}
+            />
+            <LoadLevelSlider value={loadLevel} onValueChange={setLoadLevel} />
+          </View>
         );
-  
       case 'selectDatesButton':
         return (
           <Button mode="contained" onPress={() => setShowCalendar(true)}>
@@ -231,6 +235,11 @@ const Planner = ({ navigation }) => {
         onDayPress={handleDayPress}
         markedDates={dateRange.markedDates}
       />
+         {loading && (
+        <View style={styles.loadingOverlay}>
+          <AnimatedLogo />
+        </View>
+      )}
     </>
   );
 };
@@ -254,6 +263,23 @@ const styles = StyleSheet.create({
   },
   dropDownContainerStyle: {
     zIndex: 3000,
+  },
+  loadingContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+    zIndex: 1,
   },
 });
 

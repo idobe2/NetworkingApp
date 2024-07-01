@@ -19,6 +19,8 @@ import plansApi from "../api/PlanApi";
 import { format, isSameYear } from 'date-fns';
 import DropDownPicker from "react-native-dropdown-picker";
 import { Swipeable } from 'react-native-gesture-handler';
+import AnimatedLogo from "../common/AnimatedLogo"
+
 
 export default function PreviousPlans({ navigation }) {
   const [destinationImages, setDestinationImages] = useState({});
@@ -258,6 +260,11 @@ export default function PreviousPlans({ navigation }) {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       />
+         {loading && (
+        <View style={styles.loadingOverlay}>
+          <AnimatedLogo />
+        </View>
+      )}
     </View>
   );
 }
@@ -316,5 +323,16 @@ const styles = StyleSheet.create({
     width: 70,
     height: "92%",
     borderRadius: 5,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+    zIndex: 1,
   },
 });

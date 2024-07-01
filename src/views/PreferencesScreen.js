@@ -13,6 +13,8 @@ import Button from "../components/Button";
 import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
 import Header from "../components/Header";
+import AnimatedLogo from "../common/AnimatedLogo"
+
 
 const Preferences = ({ navigation }) => {
   const [selectedPreferences, setSelectedPreferences] = useState([]);
@@ -62,7 +64,7 @@ const Preferences = ({ navigation }) => {
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <AnimatedLogo />
       </View>
     );
   }
@@ -199,6 +201,17 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     backgroundColor: theme.colors.primary,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+    zIndex: 1,
   },
 });
 

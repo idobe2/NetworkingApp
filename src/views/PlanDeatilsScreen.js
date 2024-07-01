@@ -12,24 +12,28 @@ import {
 import placesApi from "../api/PlacesApi";
 import { API_KEY } from "../core/config";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import ActivityModal from "../components/ActivityModal";
+import ActivityBottomSheet from "../components/ActivityBottomSheet";
 import PlanApi from "../api/PlanApi";
 import RatingStars from "../components/RatingStars";
+import AnimatedLogo from "../common/AnimatedLogo"
 
 export default function PlanDetailsScreen({ route }) {
   const { trip, image } = route.params;
   const [activitiesDetails, setActivitiesDetails] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [additionalActivitiesDetails, setAdditionalActivitiesDetails] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const fetchActivitiesDetails = async () => {
+    setLoading(true);
     const details = await Promise.all(
       trip.travelPlan.flatMap((day) =>
         day.activities.map((activity) => placesApi.getPlaceDetails(activity))
       )
     );
     setActivitiesDetails(details);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -62,7 +66,7 @@ export default function PlanDetailsScreen({ route }) {
                 placesApi.getPlaceDetails(placeId)
               )
             );
-
+            setBottomSheetVisible(true);
             setAdditionalActivitiesDetails(additionalDetails);
             setSelectedActivity({
               ...activity,
@@ -70,7 +74,7 @@ export default function PlanDetailsScreen({ route }) {
               dayIndex,
               tripId: trip.planId,
             });
-            setModalVisible(true);
+            setBottomSheetVisible(true);
           },
         },
       ],
@@ -78,7 +82,7 @@ export default function PlanDetailsScreen({ route }) {
     );
   };
 
-  const handleDelete = (activity) => {
+  const handleDelete = (activity, activityIndex, dayIndex) => {
     Alert.alert(
       "Delete",
       "Do you want to delete this activity?",
@@ -90,7 +94,17 @@ export default function PlanDetailsScreen({ route }) {
         },
         {
           text: "OK",
-          onPress: async () => console.log("Delete activity:", activity),
+          onPress: async () => {
+            console.log("Delete activity:", activity);
+            const response = await PlanApi.deleteActivity(trip.planId, dayIndex, activityIndex);
+            console.log("Response:", response);
+            // Remove the deleted activity from the activitiesDetails state
+            const newActivitiesDetails = activitiesDetails.filter(
+              (item, index) => index !== activityIndex
+            );
+
+            setActivitiesDetails(newActivitiesDetails);
+          }
         },
       ],
       { cancelable: true }
@@ -132,11 +146,11 @@ export default function PlanDetailsScreen({ route }) {
         <Text style={styles.activityTitle}>{truncateText(item.name, 20)}</Text>
         <View style={styles.iconContainer}>
           <TouchableOpacity
-            onPress={() => handleEdit(item, index, dayIndex, trip.planId)}
+            onPress={() => handleEdit(item, index, dayIndex)}
           >
             <Icon name="pencil" style={styles.icon} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete(item)}>
+          <TouchableOpacity onPress={() => handleDelete(item, index, dayIndex)}>
             <Icon name="delete" style={styles.icon} />
           </TouchableOpacity>
         </View>
@@ -167,7 +181,7 @@ export default function PlanDetailsScreen({ route }) {
           <FlatList
             data={dayActivities}
             renderItem={(props) =>
-              renderActivity({ ...props, dayIndex: index, tripId: trip.planId })
+              renderActivity({ ...props, dayIndex: index })
             }
             keyExtractor={(activity, index) => index.toString()}
           />
@@ -192,7 +206,7 @@ export default function PlanDetailsScreen({ route }) {
     const response = await PlanApi.replaceActivity(planId, dayIndex, activityIndex, newActivity);
     trip.travelPlan[dayIndex].activities[activityIndex] = newActivity;
     await fetchActivitiesDetails();
-    setModalVisible(false);
+    setBottomSheetVisible(false);
   };
 
   return (
@@ -214,9 +228,14 @@ export default function PlanDetailsScreen({ route }) {
         renderItem={renderDay}
         keyExtractor={(day, index) => index.toString()}
       />
-      <ActivityModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <AnimatedLogo />
+        </View>
+      )}
+      <ActivityBottomSheet
+        visible={bottomSheetVisible}
+        onClose={() => setBottomSheetVisible(false)}
         activity={selectedActivity}
         additionalActivities={additionalActivitiesDetails}
         onSelect={handleSelectActivity}
@@ -283,7 +302,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginLeft: 10,
-    fontSize: 22,
+    fontSize: 28,
     color: "grey",
   },
   activityText: {
@@ -294,5 +313,16 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 5,
     marginTop: 10,
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+    zIndex: 1,
   },
 });

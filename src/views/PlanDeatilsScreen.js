@@ -8,14 +8,17 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
+  Linking,
 } from "react-native";
 import placesApi from "../api/PlacesApi";
 import { API_KEY } from "../core/config";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import ActivityActions from "../components/ActivityActions"; // Import the new component
 import ActivityBottomSheet from "../components/ActivityBottomSheet";
 import PlanApi from "../api/PlanApi";
 import RatingStars from "../components/RatingStars";
-import AnimatedLogo from "../common/AnimatedLogo"
+import AnimatedLogo from "../common/AnimatedLogo";
+// import RNCalendarEvents from "react-native-calendar-events";
+import HomeBackground from "../components/HomeBackground";
 
 export default function PlanDetailsScreen({ route }) {
   const { trip, image } = route.params;
@@ -130,6 +133,60 @@ export default function PlanDetailsScreen({ route }) {
     );
   };
 
+  const handleCalendar = (item, index, dayIndex) => {
+    let startHour, endHour;
+    if (index === 0) {
+      startHour = '10:00';
+      endHour = '12:00';
+    }
+    else if (index === 1) {
+      startHour = '12:00';
+      endHour = '14:00';
+    }
+    else if (index === 2) {
+      startHour = '14:00';
+      endHour = '16:00';
+    }
+    else {
+      startHour = '16:00';
+      endHour = '18:00';
+    }
+
+    const [day, month, year] = trip.travelPlan[dayIndex].day.split('/');
+    const startDate = new Date(`20${year}-${month}-${day}T${startHour}:00.000Z`);
+    const endDate = new Date(`20${year}-${month}-${day}T${endHour}:00.000Z`);
+
+    // RNCalendarEvents.requestPermissions()
+    // .then(status => {
+    //   if (status === 'authorized') {
+    //     RNCalendarEvents.saveEvent(item.name, {
+    //       startDate: startDate.toISOString(),
+    //       endDate: endDate.toISOString(),
+    //       location: item.address,
+    //       notes: `Activity: ${item.name}\nAddress: ${item.address}`,
+    //     }).then(id => {
+    //       console.log(`Event created with id: ${id}`);
+    //     }).catch(error => {
+    //       console.log(`Error creating event: ${error}`);
+    //     });
+    //   } else {
+    //     console.log('Permission not granted');
+    //   }
+    // }).catch(error => {
+    //   console.log(`Error requesting calendar permissions: ${error}`);
+    // });
+
+  const startDateString = startDate.toISOString().replace(/-|:|\.\d{3}/g, "");
+  const endDateString = endDate.toISOString().replace(/-|:|\.\d{3}/g, "");
+
+  const url = `https://www.google.com/calendar/render?action=TEMPLATE&
+  text=${encodeURIComponent(item.name)}&
+  dates=${startDateString}/${endDateString}&
+  details=${encodeURIComponent(`Activity: ${item.name}\nAddress: ${item.address}`)}&
+  location=${encodeURIComponent(item.address)}`;
+  Linking.openURL(url).catch(err => console.error('An error occurred', err));
+  };
+
   const truncateText = (text, length) => {
     if (text.length > length) {
       return text.substring(0, length) + "...";
@@ -144,16 +201,11 @@ export default function PlanDetailsScreen({ route }) {
     >
       <View style={styles.activityHeader}>
         <Text style={styles.activityTitle}>{truncateText(item.name, 20)}</Text>
-        <View style={styles.iconContainer}>
-          <TouchableOpacity
-            onPress={() => handleEdit(item, index, dayIndex)}
-          >
-            <Icon name="pencil" style={styles.icon} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete(item, index, dayIndex)}>
-            <Icon name="delete" style={styles.icon} />
-          </TouchableOpacity>
-        </View>
+        <ActivityActions
+          onEdit={() => handleEdit(item, index, dayIndex)}
+          onDelete={() => handleDelete(item, index, dayIndex)}
+          onCalendar={() => handleCalendar(item, index, dayIndex)}
+        />
       </View>
       <Text style={styles.activityText}>{item.address}</Text>
       <RatingStars rating={item.rank} />
@@ -210,6 +262,7 @@ export default function PlanDetailsScreen({ route }) {
   };
 
   return (
+    <HomeBackground>
     <View style={styles.container}>
       <View style={styles.header}>
         {image && (
@@ -241,6 +294,7 @@ export default function PlanDetailsScreen({ route }) {
         onSelect={handleSelectActivity}
       />
     </View>
+    </HomeBackground>
   );
 }
 
@@ -296,14 +350,6 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontSize: 18,
     fontWeight: "bold",
-  },
-  iconContainer: {
-    flexDirection: "row",
-  },
-  icon: {
-    marginLeft: 10,
-    fontSize: 28,
-    color: "grey",
   },
   activityText: {
     fontSize: 12,

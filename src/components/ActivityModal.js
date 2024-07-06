@@ -1,3 +1,4 @@
+// This component is not used in the application. It was intended to be used to display additional activities that the user can add to their trip.
 import React, { useState } from "react";
 import {
   View,

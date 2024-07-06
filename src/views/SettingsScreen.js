@@ -8,6 +8,7 @@ import userApi from "../api/UserApi";
 import { theme } from "../core/theme";
 import { useAuth } from "../common/AuthContext";
 import DrawerContent from "../components/DrawerContent";
+import HomeBackground from "../components/HomeBackground";
 
 const Settings = ({ navigation }) => {
   const { colorScheme, toggleColorScheme } = useColorScheme();
@@ -61,6 +62,7 @@ const Settings = ({ navigation }) => {
   };
 
   return (
+    <HomeBackground>
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.sectionProfile}>
         <Text style={styles.sectionTitle}>Profile</Text>
@@ -93,13 +95,14 @@ const Settings = ({ navigation }) => {
       </Button>
       <StatusBar style="auto" />
     </ScrollView>
+    </HomeBackground>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: "white",
+    // backgroundColor: "white",
     padding: 20,
   },
   header: {
@@ -109,13 +112,13 @@ const styles = StyleSheet.create({
   section: {
     marginVertical: 10,
     padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#add8e6",
     borderRadius: 10,
   },
   sectionProfile: {
     marginVertical: 10,
     padding: 20,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#add8e6",
     borderRadius: 10,
     paddingBottom: 0,
   },

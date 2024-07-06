@@ -12,6 +12,7 @@ import { API_KEY } from "../core/config";
 import placesApi from "../api/PlacesApi";
 import Banners from "../components/Banners";
 import InfoModal from "../components/InfoModal";
+import HomeBackground from "../components/HomeBackground";
 
 export default function Explore({ navigation }) {
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -49,6 +50,7 @@ export default function Explore({ navigation }) {
   };
 
   return (
+    <HomeBackground>
     <SafeAreaView style={{ flex: 1 }}>
       <View style={styles.container}>
         <View style={styles.searchContainer}>
@@ -86,6 +88,7 @@ export default function Explore({ navigation }) {
         onClose={() => setModalVisible(false)}
       />
     </SafeAreaView>
+  </HomeBackground>
   );
 }
 

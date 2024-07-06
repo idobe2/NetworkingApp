@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
+import HomeBackground from '../components/HomeBackground';
 
 // Initialize the locale config for Calendar component
 LocaleConfig.locales['en'] = {
@@ -41,6 +42,7 @@ const Schedule = () => {
   // };
 
   return (
+    <HomeBackground>
     <View style={styles.container}>
       <View style={styles.calendarContainer}>
         <Calendar
@@ -53,6 +55,7 @@ const Schedule = () => {
         {/* Display events here based on selectedDate */}
       </View>
     </View>
+    </HomeBackground>
   );
 }
 

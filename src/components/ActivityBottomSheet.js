@@ -137,11 +137,12 @@ const styles = StyleSheet.create({
   },
   additionalActivityContainer: {
     marginBottom: 10,
-    width: "100%",
+    width: "90%",
     padding: 10,
     backgroundColor: "#E6E6FA",
-    borderRadius: 5,
-    alignItems: "center",
+    borderRadius: 10,
+    // alignItems: "center",
+    alignSelf: "center",
   },
   selectedActivityContainer: {
     backgroundColor: "#D3D3D3",

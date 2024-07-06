@@ -14,6 +14,7 @@ import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
 import Header from "../components/Header";
 import AnimatedLogo from "../common/AnimatedLogo"
+import HomeBackground from "../components/HomeBackground";
 
 
 const Preferences = ({ navigation }) => {
@@ -81,6 +82,7 @@ const Preferences = ({ navigation }) => {
   };
 
   return (
+    <HomeBackground>
     <View style={styles.container}>
       <Image
         source={{ uri: "https://example.com/header-image.jpg" }} // Replace with your image URL
@@ -134,6 +136,7 @@ const Preferences = ({ navigation }) => {
         Save Preferences
       </Button>
     </View>
+    </HomeBackground>
   );
 };
 
@@ -141,7 +144,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#f7f7f7",
+    // backgroundColor: "#f7f7f7",
   },
   loadingContainer: {
     flex: 1,
@@ -175,7 +178,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 10,
-    backgroundColor: "#4caf50",
+    backgroundColor: "#72bcd4",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
@@ -183,7 +186,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   selectedButton: {
-    backgroundColor: "#388e3c",
+    backgroundColor: "#add8e6",
   },
   icon: {
     marginRight: 10,

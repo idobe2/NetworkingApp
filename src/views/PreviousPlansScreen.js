@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import CheckBox from "@react-native-community/checkbox";
-import Button from "../components/Button";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
 import placesApi from "../api/PlacesApi";
@@ -20,6 +19,7 @@ import { format, isSameYear } from 'date-fns';
 import DropDownPicker from "react-native-dropdown-picker";
 import { Swipeable } from 'react-native-gesture-handler';
 import AnimatedLogo from "../common/AnimatedLogo"
+import HomeBackground from "../components/HomeBackground";
 
 
 export default function PreviousPlans({ navigation }) {
@@ -217,6 +217,7 @@ export default function PreviousPlans({ navigation }) {
   );
 
   return (
+    <HomeBackground>
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <Header>Previous Plans</Header>
@@ -266,6 +267,7 @@ export default function PreviousPlans({ navigation }) {
         </View>
       )}
     </View>
+    </HomeBackground>
   );
 }
 
@@ -282,7 +284,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     height: 40,
-    borderColor: "#CCC",
+    // borderColor: "#CCC",
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
@@ -297,7 +299,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#E6E6FA",
+    backgroundColor: "#add8e6",
     padding: 15,
     marginBottom: 10,
     borderRadius: 5,

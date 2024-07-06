@@ -11,6 +11,7 @@ import LoadLevelSlider from "../components/LoadLevelSlider";
 import SelectDatesModal from "../components/SelectDatesModal";
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import AnimatedLogo from "../common/AnimatedLogo"
+import HomeBackground from "../components/HomeBackground";
 
 const Planner = ({ navigation }) => {
   const [destination, setDestination] = useState("");
@@ -97,15 +98,25 @@ const Planner = ({ navigation }) => {
       alert("Please select a destination");
       return;
     }
+
     if (!dateRange.startDate || !dateRange.endDate) {
       alert("Please select a date range");
       return;
     }
+
     // if (await planApi.checkSelectedDates(dateRange.startDate, dateRange.endDate)) {
     //   alert("Dates overlap with existing plan");
     //   return;
     // }
-    
+
+    const today = new Date();
+    const selectedStartDate = new Date(dateRange.startDate);
+    const selectedEndDate = new Date(dateRange.endDate);
+    if (selectedStartDate < today || selectedEndDate < today) {
+      alert("Please select dates later than today's date");
+      return;
+    }
+
     setLoading(true); // Show the activity indicator
 
     try {
@@ -222,6 +233,7 @@ const Planner = ({ navigation }) => {
 
   return (
     <>
+    <HomeBackground>
       <KeyboardAwareFlatList
         data={data}
         renderItem={renderItem}
@@ -229,6 +241,7 @@ const Planner = ({ navigation }) => {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       />
+      </HomeBackground>
       <SelectDatesModal
         visible={showCalendar}
         onClose={() => setShowCalendar(false)}
@@ -247,7 +260,7 @@ const Planner = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "#f0f0f0",
+    // backgroundColor: "#f0f0f0",
   },
   googlePlacesInput: {
     marginTop: 10,

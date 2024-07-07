@@ -38,6 +38,7 @@ export default function PreviousPlans({ navigation }) {
     { label: 'Sort by Destination', value: 'destination' },
     { label: 'Sort by Social', value: 'social' }
   ]);
+  const [hasFetchedData, setHasFetchedData] = useState(false); // New state variable
 
   const fetchData = useCallback(async () => {
     if (loading) return; // Prevent multiple fetches
@@ -60,14 +61,17 @@ export default function PreviousPlans({ navigation }) {
     }
 
     setLoading(false);
+    setHasFetchedData(true); // Set data fetched flag
   }, [loading]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
-      fetchData();
+      if (!hasFetchedData) {
+        fetchData();
+      }
     });
     return () => unsubscribe();
-  }, [navigation, fetchData]);
+  }, [navigation, fetchData, hasFetchedData]);
 
   useEffect(() => {
     applyFilters();
@@ -218,55 +222,55 @@ export default function PreviousPlans({ navigation }) {
 
   return (
     <HomeBackground>
-    <View style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Header>Previous Plans</Header>
-        <TouchableOpacity onPress={() => setIsSelectionMode(!isSelectionMode)}>
-          <MaterialIcons
-            name={isSelectionMode ? "cancel" : "select-all"}
-            size={28}
-            color="black"
-          />
-        </TouchableOpacity>
-        {isSelectionMode && selectedPlans.length > 0 && (
-          <TouchableOpacity onPress={handleDeleteSelected}>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Header>Previous Plans</Header>
+          <TouchableOpacity onPress={() => setIsSelectionMode(!isSelectionMode)}>
             <MaterialIcons
-              name="delete"
+              name={isSelectionMode ? "cancel" : "select-all"}
               size={28}
-              color="red"
+              color="black"
             />
           </TouchableOpacity>
+          {isSelectionMode && selectedPlans.length > 0 && (
+            <TouchableOpacity onPress={handleDeleteSelected}>
+              <MaterialIcons
+                name="delete"
+                size={28}
+                color="red"
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search by destination"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+        <DropDownPicker
+          open={open}
+          value={sortOption}
+          items={items}
+          setOpen={setOpen}
+          setValue={setSortOption}
+          setItems={setItems}
+          containerStyle={styles.dropdown}
+        />
+        <FlatList
+          data={filteredPlans}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <AnimatedLogo />
+          </View>
         )}
       </View>
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search by destination"
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-      />
-      <DropDownPicker
-        open={open}
-        value={sortOption}
-        items={items}
-        setOpen={setOpen}
-        setValue={setSortOption}
-        setItems={setItems}
-        containerStyle={styles.dropdown}
-      />
-      <FlatList
-        data={filteredPlans}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      />
-         {loading && (
-        <View style={styles.loadingOverlay}>
-          <AnimatedLogo />
-        </View>
-      )}
-    </View>
     </HomeBackground>
   );
 }
@@ -284,16 +288,13 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     height: 40,
-    // borderColor: "#CCC",
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 10,
-    bottom: 10,
   },
   dropdown: {
     marginBottom: 10,
-    bottom: 10,
   },
   itemContainer: {
     flexDirection: "row",

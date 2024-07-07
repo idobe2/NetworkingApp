@@ -123,6 +123,7 @@ const GoogleLogin = ({ setLoading }) => {
         navigation.navigate("Root", { screen: "Home" });
         ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
       } else if (!response.data.success) {
+        setIsAuthenticated(true);
         navigation.navigate("Root", { screen: "Preferences" });
         ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
       } else {

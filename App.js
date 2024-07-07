@@ -23,6 +23,7 @@ enableLatestRenderer();
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
+const NewStack = createStackNavigator();
 
 NativeWindStyleSheet.setOutput({
   default: 'native',
@@ -30,13 +31,13 @@ NativeWindStyleSheet.setOutput({
 
 function Root() {
   return (
-    <Drawer.Navigator>
-      <Drawer.Screen name="Tripy" component={HomeScreen} />
-      <Drawer.Screen name="Schedule" component={Schedule} />
+    <NewStack.Navigator screenOptions={{ headerShown: false }}>
+      <NewStack.Screen name="Tripy" component={HomeScreen} />
+      <NewStack.Screen name="Schedule" component={Schedule} />
       {/* <Drawer.Screen name="Profile" component={DrawerContent} /> */}
-      <Drawer.Screen name="Settings" component={SettingsScreen} />
-      <Drawer.Screen name="Preferences" component={PreferencesScreen} />
-    </Drawer.Navigator>
+      <NewStack.Screen name="Settings" component={SettingsScreen} />
+      <NewStack.Screen name="Preferences" component={PreferencesScreen} />
+    </NewStack.Navigator>
   );
 }
 

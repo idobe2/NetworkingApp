@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { View, StyleSheet, ToastAndroid} from "react-native";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
@@ -142,6 +142,7 @@ const Planner = ({ navigation }) => {
         alert("Failed to create plan");
       } else {
         navigation.navigate("Previous Plans");
+        ToastAndroid.show("Plan created successfully", ToastAndroid.SHORT);
       }
     } finally {
       setLoading(false); // Hide the activity indicator
@@ -260,7 +261,8 @@ const Planner = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    // backgroundColor: "#f0f0f0",
+     top: 20,
+    marginTop: 20,
   },
   googlePlacesInput: {
     marginTop: 10,

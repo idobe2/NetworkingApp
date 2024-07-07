@@ -8,6 +8,7 @@ import {
   Alert,
   RefreshControl,
   TextInput,
+  ToastAndroid
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import CheckBox from "@react-native-community/checkbox";
@@ -20,6 +21,7 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { Swipeable } from 'react-native-gesture-handler';
 import AnimatedLogo from "../common/AnimatedLogo"
 import HomeBackground from "../components/HomeBackground";
+
 
 
 export default function PreviousPlans({ navigation }) {
@@ -127,6 +129,7 @@ export default function PreviousPlans({ navigation }) {
               const updatedPlans = plans.filter((plan) => plan.id !== item.id);
               setPlans(updatedPlans);
               fetchData();
+              ToastAndroid.show("Plan deleted successfully", ToastAndroid.SHORT);
             }
           },
         },
@@ -279,6 +282,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    top: 20,
+    marginTop: 20,
+    
   },
   headerContainer: {
     flexDirection: "row",

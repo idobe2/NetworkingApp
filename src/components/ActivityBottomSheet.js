@@ -71,6 +71,7 @@ const ActivityBottomSheet = ({
         snapPoints={snapPoints}
         onChange={handleSheetChange}
         onClose={handleClosePress}
+        enablePanDownToClose={true} // Enable dragging down to close
         onOpenStart={() => {
           if (listRef.current) {
             listRef.current.scrollToIndex({ index: 0, animated: false });
@@ -106,7 +107,7 @@ const ActivityBottomSheet = ({
           contentContainerStyle={styles.contentContainer}
         />
         <Button mode="contained" style={styles.button} onPress={handleClosePress}>
-          <Text >Close</Text>
+          <Text>Close</Text>
         </Button>
       </BottomSheet>
       <ConfirmationModal
@@ -141,7 +142,6 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#E6E6FA",
     borderRadius: 10,
-    // alignItems: "center",
     alignSelf: "center",
   },
   selectedActivityContainer: {
@@ -178,10 +178,8 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 10,
     elevation: 2,
-    // marginVertical: 5,
     width: '50%',
     alignSelf: 'center',
-    // bottom: -10,
   },
 });
 

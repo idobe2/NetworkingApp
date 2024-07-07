@@ -35,7 +35,7 @@ const Trip = () => {
       <Stack.Screen
         name="PlanDetails"
         component={PlanDetailsScreen}
-        options={{ title: '' }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

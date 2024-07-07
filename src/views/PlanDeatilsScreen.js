@@ -19,8 +19,9 @@ import RatingStars from "../components/RatingStars";
 import AnimatedLogo from "../common/AnimatedLogo";
 // import RNCalendarEvents from "react-native-calendar-events";
 import HomeBackground from "../components/HomeBackground";
+import BackButton from "../components/BackButton";
 
-export default function PlanDetailsScreen({ route }) {
+export default function PlanDetailsScreen({ route, navigation }) {
   const { trip, image } = route.params;
   const [activitiesDetails, setActivitiesDetails] = useState([]);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
@@ -227,7 +228,7 @@ export default function PlanDetailsScreen({ route }) {
     );
 
     return (
-      <ScrollView nestedScrollEnabled={true}>
+      
         <View>
           <Text style={styles.dayTitle}>Day: {item.day}</Text>
           <FlatList
@@ -238,7 +239,7 @@ export default function PlanDetailsScreen({ route }) {
             keyExtractor={(activity, index) => index.toString()}
           />
         </View>
-      </ScrollView>
+      
     );
   };
 
@@ -263,6 +264,7 @@ export default function PlanDetailsScreen({ route }) {
 
   return (
     <HomeBackground>
+    <BackButton goBack={navigation.goBack} />
     <View style={styles.container}>
       <View style={styles.header}>
         {image && (
@@ -302,6 +304,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    top: 20,
+    marginTop: 50,
   },
   header: {
     flexDirection: "row",

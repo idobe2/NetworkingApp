@@ -1,19 +1,23 @@
 import React from 'react';
 import { StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import Planner from './PlannerScreen';
 import HomeStack from './HomeStack';
+import HomeBackground from '../components/HomeBackground';
 
 const Tab = createBottomTabNavigator();
 
 export default function HomeScreen() {
   return (
+    <HomeBackground>
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={0}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -64}
     >
+       <NavigationContainer independent={true}>
       <Tab.Navigator
         screenOptions={{
           activeTintColor: 'blue',
@@ -37,6 +41,7 @@ export default function HomeScreen() {
             headerShown: false,
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="map" color={color} size={size} />
+              
             ),
           }}
         />
@@ -51,7 +56,9 @@ export default function HomeScreen() {
           }}
         />
       </Tab.Navigator>
+      </NavigationContainer>
     </KeyboardAvoidingView>
+    </HomeBackground>
   );
 }
 

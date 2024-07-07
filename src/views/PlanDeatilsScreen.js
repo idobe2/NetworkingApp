@@ -7,36 +7,43 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-  ScrollView,
   Linking,
 } from "react-native";
 import placesApi from "../api/PlacesApi";
 import { API_KEY } from "../core/config";
-import ActivityActions from "../components/ActivityActions"; // Import the new component
+import ActivityActions from "../components/ActivityActions";
 import ActivityBottomSheet from "../components/ActivityBottomSheet";
 import PlanApi from "../api/PlanApi";
 import RatingStars from "../components/RatingStars";
 import AnimatedLogo from "../common/AnimatedLogo";
-// import RNCalendarEvents from "react-native-calendar-events";
 import HomeBackground from "../components/HomeBackground";
 import BackButton from "../components/BackButton";
+import MealTypeModal from "../components/MealTypeModal";
 
 export default function PlanDetailsScreen({ route, navigation }) {
   const { trip, image } = route.params;
   const [activitiesDetails, setActivitiesDetails] = useState([]);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
   const [selectedActivity, setSelectedActivity] = useState(null);
-  const [additionalActivitiesDetails, setAdditionalActivitiesDetails] = useState([]);
+  const [additionalActivitiesDetails, setAdditionalActivitiesDetails] =
+    useState([]);
   const [loading, setLoading] = useState(false);
+  const [mealModalVisible, setMealModalVisible] = useState(false);
+  const [mealDetails, setMealDetails] = useState({});
+  const [caller, setCaller] = useState(null);
 
   const fetchActivitiesDetails = async () => {
     setLoading(true);
-    const details = await Promise.all(
-      trip.travelPlan.flatMap((day) =>
-        day.activities.map((activity) => placesApi.getPlaceDetails(activity))
-      )
-    );
-    setActivitiesDetails(details);
+    try {
+      const details = await Promise.all(
+        trip?.travelPlan?.flatMap((day) =>
+          day.activities.map((activity) => placesApi.getPlaceDetails(activity))
+        ) || []
+      );
+      setActivitiesDetails(details);
+    } catch (error) {
+      console.error("Error fetching activity details:", error);
+    }
     setLoading(false);
   };
 
@@ -45,6 +52,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
   }, [trip]);
 
   const handleEdit = (activity, activityIndex, dayIndex) => {
+    setCaller("edit");
     Alert.alert(
       "Generate",
       "Do you want to generate new activities?",
@@ -100,19 +108,53 @@ export default function PlanDetailsScreen({ route, navigation }) {
           text: "OK",
           onPress: async () => {
             console.log("Delete activity:", activity);
-            const response = await PlanApi.deleteActivity(trip.planId, dayIndex, activityIndex);
+            const response = await PlanApi.deleteActivity(
+              trip.planId,
+              dayIndex,
+              activityIndex
+            );
             console.log("Response:", response);
-            // Remove the deleted activity from the activitiesDetails state
             const newActivitiesDetails = activitiesDetails.filter(
               (item, index) => index !== activityIndex
             );
 
             setActivitiesDetails(newActivitiesDetails);
-          }
+          },
         },
       ],
       { cancelable: true }
     );
+  };
+
+  const handleMeal = (activity, activityIndex, dayIndex) => {
+    setCaller("meal");
+    setMealDetails({ activity, activityIndex, dayIndex });
+    setMealModalVisible(true);
+  };
+
+  const onMealSelect = async (mealType) => {
+    setMealModalVisible(false);
+    const { activity, activityIndex, dayIndex } = mealDetails;
+    console.log("Add meal to activity:", activity, "Meal Type:", mealType);
+    const response = await PlanApi.generateMeals(
+      trip.planId,
+      dayIndex,
+      activityIndex,
+      mealType
+    );
+
+    const additionalDetails = await Promise.all(
+      response.map((place) => placesApi.getPlaceDetails(place.placeId))
+    );
+    setBottomSheetVisible(true);
+    setAdditionalActivitiesDetails(additionalDetails);
+    setSelectedActivity({
+      ...activity,
+      activityIndex,
+      dayIndex,
+      tripId: trip.planId,
+    });
+    setBottomSheetVisible(true);
   };
 
   const handleLinking = async (place) => {
@@ -134,27 +176,34 @@ export default function PlanDetailsScreen({ route, navigation }) {
     );
   };
 
+  const fixedDate = (date) => {
+    const [day, month, year] = date.split("/");
+    const newDate = new Date(`20${year}-${month}-${day}T00:00:00.000Z`);
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const formattedDate = newDate.toLocaleDateString("en-US", options);
+    return formattedDate;
+  };
+
   const handleCalendar = (item, index, dayIndex) => {
     let startHour, endHour;
     if (index === 0) {
-      startHour = '10:00';
-      endHour = '12:00';
-    }
-    else if (index === 1) {
-      startHour = '12:00';
-      endHour = '14:00';
-    }
-    else if (index === 2) {
-      startHour = '14:00';
-      endHour = '16:00';
-    }
-    else {
-      startHour = '16:00';
-      endHour = '18:00';
+      startHour = "10:00";
+      endHour = "12:00";
+    } else if (index === 1) {
+      startHour = "12:00";
+      endHour = "14:00";
+    } else if (index === 2) {
+      startHour = "14:00";
+      endHour = "16:00";
+    } else {
+      startHour = "16:00";
+      endHour = "18:00";
     }
 
-    const [day, month, year] = trip.travelPlan[dayIndex].day.split('/');
-    const startDate = new Date(`20${year}-${month}-${day}T${startHour}:00.000Z`);
+    const [day, month, year] = trip.travelPlan[dayIndex].day.split("/");
+    const startDate = new Date(
+      `20${year}-${month}-${day}T${startHour}:00.000Z`
+    );
     const endDate = new Date(`20${year}-${month}-${day}T${endHour}:00.000Z`);
 
     // RNCalendarEvents.requestPermissions()
@@ -177,15 +226,19 @@ export default function PlanDetailsScreen({ route, navigation }) {
     //   console.log(`Error requesting calendar permissions: ${error}`);
     // });
 
-  const startDateString = startDate.toISOString().replace(/-|:|\.\d{3}/g, "");
-  const endDateString = endDate.toISOString().replace(/-|:|\.\d{3}/g, "");
+    const startDateString = startDate.toISOString().replace(/-|:|\.\d{3}/g, "");
+    const endDateString = endDate.toISOString().replace(/-|:|\.\d{3}/g, "");
 
-  const url = `https://www.google.com/calendar/render?action=TEMPLATE&
-  text=${encodeURIComponent(item.name)}&
-  dates=${startDateString}/${endDateString}&
-  details=${encodeURIComponent(`Activity: ${item.name}\nAddress: ${item.address}`)}&
-  location=${encodeURIComponent(item.address)}`;
-  Linking.openURL(url).catch(err => console.error('An error occurred', err));
+    const url = `https://www.google.com/calendar/render?action=TEMPLATE&
+    text=${encodeURIComponent(item.name)}&
+    dates=${startDateString}/${endDateString}&
+    details=${encodeURIComponent(
+      `Activity: ${item.name}\nAddress: ${item.address}`
+    )}&
+    location=${encodeURIComponent(item.address)}`;
+    Linking.openURL(url).catch((err) =>
+      console.error("An error occurred", err)
+    );
   };
 
   const truncateText = (text, length) => {
@@ -201,9 +254,10 @@ export default function PlanDetailsScreen({ route, navigation }) {
       style={styles.activityContainer}
     >
       <View style={styles.activityHeader}>
-        <Text style={styles.activityTitle}>{truncateText(item.name, 20)}</Text>
+        <Text style={styles.activityTitle}>{truncateText(item.name, 19)}</Text>
         <ActivityActions
           onEdit={() => handleEdit(item, index, dayIndex)}
+          onMeal={() => handleMeal(item, index, dayIndex)}
           onDelete={() => handleDelete(item, index, dayIndex)}
           onCalendar={() => handleCalendar(item, index, dayIndex)}
         />
@@ -223,23 +277,23 @@ export default function PlanDetailsScreen({ route, navigation }) {
 
   const renderDay = ({ item, index }) => {
     const dayActivities = activitiesDetails.slice(
-      item.startIndex,
-      item.endIndex + 1
+      trip.travelPlan
+        .slice(0, index)
+        .reduce((sum, day) => sum + day.activities.length, 0),
+      trip.travelPlan
+        .slice(0, index + 1)
+        .reduce((sum, day) => sum + day.activities.length, 0)
     );
 
     return (
-      
-        <View>
-          <Text style={styles.dayTitle}>Day: {item.day}</Text>
-          <FlatList
-            data={dayActivities}
-            renderItem={(props) =>
-              renderActivity({ ...props, dayIndex: index })
-            }
-            keyExtractor={(activity, index) => index.toString()}
-          />
-        </View>
-      
+      <View>
+        <Text style={styles.dayTitle}>{fixedDate(item.day)}</Text>
+        <FlatList
+          data={dayActivities}
+          renderItem={(props) => renderActivity({ ...props, dayIndex: index })}
+          keyExtractor={(activity, index) => index.toString()}
+        />
+      </View>
     );
   };
 
@@ -249,53 +303,82 @@ export default function PlanDetailsScreen({ route, navigation }) {
     endIndex: (index + 1) * day.activities.length - 1,
   }));
 
-  const handleSelectActivity = async (newActivity, activityIndex, dayIndex, planId) => {
+  const handleSelectActivity = async (
+    newActivity,
+    activityIndex,
+    dayIndex,
+    planId,
+    activityName
+  ) => {
+    console.log("Caller:", caller);
     console.log("Selected Activity:", {
       planId: planId,
       dayIndex: dayIndex,
       activityIndex: activityIndex,
-      newActivity: newActivity
+      newActivity: newActivity,
+      activityName: activityName,
     });
-    const response = await PlanApi.replaceActivity(planId, dayIndex, activityIndex, newActivity);
-    trip.travelPlan[dayIndex].activities[activityIndex] = newActivity;
+    if (caller === "edit") {
+      const response = await PlanApi.replaceActivity(
+        planId,
+        dayIndex,
+        activityIndex,
+        newActivity
+      );
+      trip.travelPlan[dayIndex].activities[activityIndex] = newActivity;
+    } else if (caller === "meal") {
+      const response = await PlanApi.addMeal(
+        planId,
+        dayIndex,
+        activityIndex,
+        activityName,
+        newActivity
+      );
+    }
     await fetchActivitiesDetails();
     setBottomSheetVisible(false);
   };
 
   return (
     <HomeBackground>
-    <BackButton goBack={navigation.goBack} />
-    <View style={styles.container}>
-      <View style={styles.header}>
-        {image && (
-          <Image source={{ uri: image }} style={styles.destinationImage} />
+      <BackButton goBack={navigation.goBack} />
+      <View style={styles.container}>
+        <View style={styles.header}>
+          {image && (
+            <Image source={{ uri: image }} style={styles.destinationImage} />
+          )}
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.title}>{trip.destination}</Text>
+            <Text style={styles.subtitle}>{trip.social}</Text>
+            <Text style={styles.date}>
+              {trip.arrivalDate} to {trip.departureDate}
+            </Text>
+          </View>
+        </View>
+        <FlatList
+          data={travelPlanWithIndices}
+          renderItem={renderDay}
+          keyExtractor={(day, index) => index.toString()}
+        />
+        {loading && (
+          <View style={styles.loadingOverlay}>
+            <AnimatedLogo />
+          </View>
         )}
-        <View style={styles.headerTextContainer}>
-          <Text style={styles.title}>{trip.destination}</Text>
-          <Text style={styles.subtitle}>{trip.social}</Text>
-          <Text style={styles.date}>
-            {trip.arrivalDate} to {trip.departureDate}
-          </Text>
-        </View>
+        <ActivityBottomSheet
+          visible={bottomSheetVisible}
+          onClose={() => setBottomSheetVisible(false)}
+          activity={selectedActivity}
+          additionalActivities={additionalActivitiesDetails}
+          onSelect={handleSelectActivity}
+          caller={caller}
+        />
       </View>
-      <FlatList
-        data={travelPlanWithIndices}
-        renderItem={renderDay}
-        keyExtractor={(day, index) => index.toString()}
+      <MealTypeModal
+        visible={mealModalVisible}
+        onClose={() => setMealModalVisible(false)}
+        onSelect={onMealSelect}
       />
-      {loading && (
-        <View style={styles.loadingOverlay}>
-          <AnimatedLogo />
-        </View>
-      )}
-      <ActivityBottomSheet
-        visible={bottomSheetVisible}
-        onClose={() => setBottomSheetVisible(false)}
-        activity={selectedActivity}
-        additionalActivities={additionalActivitiesDetails}
-        onSelect={handleSelectActivity}
-      />
-    </View>
     </HomeBackground>
   );
 }
@@ -365,14 +448,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   loadingOverlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
     zIndex: 1,
   },
 });

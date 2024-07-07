@@ -83,6 +83,7 @@ const generateActivities = async (planId, day, activity) => {
 };
 
 const replaceActivity = async (planId, day, activity, newActivity) => {
+  console.log("Replace Activity:", planId, day, activity, newActivity);
   try {
     const response = await clientApi.post("/replaceActivity", {
       planId,
@@ -127,6 +128,38 @@ const replaceActivity = async (planId, day, activity, newActivity) => {
 //   }
 // };
 
+const generateMeals = async (planId, day, activity, mealType) => {
+  console.log("Generate Meals:", planId, day, activity, mealType);
+  try {
+    const response = await clientApi.post("/FindRestaurantNearBy", {
+      planId,
+      day: day.toString(),
+      activity: activity.toString(),
+      mealType: mealType.toString(),
+    });
+    console.log("Meals generated successfully");
+    return response.data;
+  } catch {
+    console.log("Api error:", error);
+  }
+}
+
+const addMeal = async (planId, dayIndex, activityIndex, restaurantName, placeId) => {
+  try {
+    const response = await clientApi.post("/addRestaurantToPlan", {
+      planId,
+      dayIndex: dayIndex.toString(),
+      activityIndex: activityIndex.toString(),
+      restaurantName: restaurantName.toString(),
+      placeId,
+    });
+    console.log("Meal added successfully");
+    return response.data;
+  } catch {
+    console.log("Api error:", error);
+  }
+}
+
 const deleteActivity = async (planId, day, activity) => {
   try {
     const response = await clientApi.post("/deleteActivity", {
@@ -148,5 +181,7 @@ export default {
   generateActivities,
   replaceActivity,
   deleteActivity,
+  generateMeals,
+  addMeal,
   // checkSelectedDates
 };

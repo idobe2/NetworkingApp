@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-const ConfirmationModal = ({ visible, onClose, onConfirm, onGoogleMaps, selectedActivity }) => {
+const ConfirmationModal = ({ visible, onClose, onConfirm, onGoogleMaps, selectedActivity, caller }) => {
   if (!selectedActivity) return null;
 
   return (
@@ -12,11 +12,18 @@ const ConfirmationModal = ({ visible, onClose, onConfirm, onGoogleMaps, selected
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContainer}>
-          {/* <Text style={styles.modalTitle}>Confirm Selection</Text>
-          <Text style={styles.modalText}>Do you want to select {selectedActivity.name}?</Text> */}
+          <Text style={styles.modalTitle}>Confirm Selection</Text>
+          <Text style={styles.modalText}>
+            {caller === 'edit' ? 
+              `Do you want to replace the current activity with ${selectedActivity.name}?` :
+              `Do you want to add ${selectedActivity.name} as your meal location?`
+            }
+          </Text>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
-              <Text style={styles.buttonText}>Replace activity</Text>
+              <Text style={styles.buttonText}>
+                {caller === 'edit' ? 'Replace activity' : 'Add meal'}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.confirmButton} onPress={onGoogleMaps}>
               <Text style={styles.buttonText}>Open in Google Maps</Text>

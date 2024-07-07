@@ -177,7 +177,7 @@ const Planner = ({ navigation }) => {
             placeholder="Search"
             onPress={(data, details = null) => {
               setDestination(data.structured_formatting.main_text);
-              console.log(data, details);
+              // console.log(data, details);
             }}
             query={{
               key: API_KEY,

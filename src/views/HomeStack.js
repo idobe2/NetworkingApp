@@ -8,7 +8,6 @@ import ExploreScreen from './ExploreScreen';
 import Schedule from './ScheduleScreen'; // Ensure ScheduleScreen is imported
 import SettingsScreen from './SettingsScreen'; // Ensure SettingsScreen is imported
 import PreferencesScreen from './PreferencesScreen'; // Ensure PreferencesScreen is imported
-import DrawerContent from '../components/DrawerContent'; // Ensure DrawerContent is imported
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -52,7 +51,7 @@ const Explore = () => {
       <Stack.Screen
         name="Welcome"
         component={WelcomeScreen}
-        options={{ title: '' }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

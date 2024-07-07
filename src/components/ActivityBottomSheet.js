@@ -19,6 +19,7 @@ const ActivityBottomSheet = ({
   activity,
   additionalActivities,
   onSelect,
+  caller,
 }) => {
   const [selectedActivity, setSelectedActivity] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -47,7 +48,8 @@ const ActivityBottomSheet = ({
         selectedActivity.place_id,
         activity.activityIndex,
         activity.dayIndex,
-        activity.tripId
+        activity.tripId,
+        selectedActivity.name
       );
       setSelectedActivity(null);
       setModalVisible(false);
@@ -116,6 +118,7 @@ const ActivityBottomSheet = ({
         onConfirm={handleConfirmSelect}
         onGoogleMaps={handleGoogleMaps}
         selectedActivity={selectedActivity}
+        caller={caller} // Pass the caller prop to the ConfirmationModal
       />
     </>
   );

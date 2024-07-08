@@ -3,9 +3,9 @@ import {
   TouchableOpacity,
   StyleSheet,
   View,
-  Alert,
   ActivityIndicator,
-} from "react-native"; // 1. Import ActivityIndicator
+  ToastAndroid,
+} from "react-native";
 import { Text, IconButton } from "react-native-paper";
 import Background from "../components/Background";
 import Logo from "../components/Logo";
@@ -17,12 +17,11 @@ import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
 import { useAuth } from "../common/AuthContext";
 
-
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // 2. Add isLoading state
+  const [isLoading, setIsLoading] = useState(false);
   const { setIsAuthenticated } = useAuth();
 
   const handleTogglePasswordVisibility = () => {
@@ -31,48 +30,37 @@ export default function LoginScreen({ navigation }) {
 
   const onLoginPressed = async () => {
     try {
-      setIsLoading(true); // Start loading
-      const response = await userApi.userLogin(email, password);
-  
+      setIsLoading(true);
+      const response = await userApi.userLogin(email.value, password.value);
       if (response === null) {
         console.log("response is null");
-        setIsLoading(false); // Stop loading
+        setIsLoading(false);
         return;
       }
-  
-      console.log("response from Api:", response);  
+      console.log("response from Api:", response);
       if (response.success) {
-        // console.log("Navigating to Home with userId:", response.userId);
         setIsAuthenticated(true);
-        navigation.navigate("Root", { 
-          screen: "Home",
-        });
+        navigation.navigate("Root", { screen: "Home" });
       } else {
         const targetScreen = response.tranferTo;
         setIsAuthenticated(true);
         console.log("targetScreen:", targetScreen);
-  
         if (targetScreen === "Preferences") {
-          // console.log("Navigating to Preferences with userId:", response.userId);
           setIsAuthenticated(true);
-          navigation.navigate("Root", {
-            screen: targetScreen,
-          });
+          navigation.navigate("Root", { screen: targetScreen });
         } else {
-          // console.log("Navigating to", targetScreen, "with userId:", response.userId);
           setIsAuthenticated(true);
           navigation.navigate(targetScreen);
         }
       }
     } catch (error) {
       console.log("Error:", error);
-      Alert.alert("Error", "An error occurred. Please try again.");
+      ToastAndroid.show("An error occurred. Please try again.", ToastAndroid.SHORT);
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
-  
-  
+
   return (
     <Background>
       <BackButton goBack={navigation.goBack} />
@@ -80,35 +68,36 @@ export default function LoginScreen({ navigation }) {
       <Header>Welcome back.</Header>
       <TextInput
         placeholder="Email"
-        TextInput={email}
-        onChangeText={(text) => setEmail(text)}
+        value={email.value}
+        onChangeText={(text) => setEmail({ value: text, error: "" })}
       />
       <View style={styles.passwordContainer}>
         <TextInput
           placeholder="Password"
           value={password.value}
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={(text) => setPassword({ value: text, error: "" })}
           secureTextEntry={!showPassword}
-          style={[styles.input, { paddingRight: 40 }]}
         />
-        <IconButton
-          icon={showPassword ? "eye-off" : "eye"}
+        <TouchableOpacity
           onPress={handleTogglePasswordVisibility}
-          style={[
-            styles.iconButton,
-            { position: "absolute", right: 10, bottom: 15 },
-          ]}
-        />
+          style={styles.iconButton}
+        >
+          <IconButton
+            icon={showPassword ? "eye-off" : "eye"}
+            style={{ margin: 0 }}
+          />
+        </TouchableOpacity>
       </View>
       <View style={styles.forgotPassword}>
         <TouchableOpacity
           onPress={() => navigation.navigate("ResetPasswordScreen")}
+          style={{ paddingTop: 10 }}
         >
           <Text style={styles.forgot}>Forgot your password?</Text>
         </TouchableOpacity>
       </View>
       {isLoading ? (
-        <ActivityIndicator size="large" color={theme.colors.primary} /> // Display the loading indicator
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       ) : (
         <Button mode="contained" onPress={onLoginPressed}>
           Login
@@ -146,18 +135,16 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: theme.colors.surface, // Background color to match TextInput style
+    backgroundColor: theme.colors.surface,
     borderColor: theme.colors.surface,
     borderWidth: 1,
     borderRadius: 10,
-    height: 80, // Adjust height to match TextInput style
-  },
-  input: {
-    flex: 1,
-    height: 40,
-    backgroundColor: theme.colors.surface,
+    height: 60,
+    // paddingRight: 50,
   },
   iconButton: {
-    margin: 0, // Adjust position of icon
+    // position: "absolute", // Can't click on the icon with this
+    right: 0,
+    padding: 10,
   },
 });

@@ -8,8 +8,7 @@ import {
   Alert,
   Image,
   ActivityIndicator,
-  Modal,
-  Button,
+  ToastAndroid,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import RNCalendarEvents from "react-native-calendar-events";
@@ -24,6 +23,7 @@ import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
 import BackButton from "../components/BackButton";
 import MealTypeModal from "../components/MealTypeModal";
+import { Swipeable } from 'react-native-gesture-handler';
 
 export default function PlanDetailsScreen({ route, navigation }) {
   const { trip, image } = route.params;
@@ -38,8 +38,6 @@ export default function PlanDetailsScreen({ route, navigation }) {
   const [caller, setCaller] = useState(null);
   const [calendars, setCalendars] = useState([]);
   const [selectedCalendar, setSelectedCalendar] = useState(null);
-  const [calendarModalVisible, setCalendarModalVisible] = useState(false);
-
   const [menuVisible, setMenuVisible] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([]);
@@ -55,10 +53,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
       if (status === "authorized") {
         fetchCalendars();
       } else {
-        Alert.alert(
-          "Permission Denied",
-          "Calendar permission is required to add events"
-        );
+        ToastAndroid.show("Calendar permission is required to add events", ToastAndroid.SHORT);
       }
     } catch (error) {
       console.error("Error requesting calendar permissions: ", error);
@@ -74,8 +69,6 @@ export default function PlanDetailsScreen({ route, navigation }) {
       const emailCalendars = calendars.filter(
         (calendar) => calendar.isPrimary === true
       );
-
-      console.log("Filtered Email Calendars:", emailCalendars); // Log the filtered email calendars
 
       setCalendars(emailCalendars);
       setItems(
@@ -280,7 +273,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
 
   const addAllActivitiesToCalendar = async () => {
     if (!selectedCalendar) {
-      Alert.alert("No Calendar Selected", "Please select a calendar first.");
+      ToastAndroid.show("No Calendar Selected, Please select a calendar first.", ToastAndroid.SHORT);
       return;
     }
 
@@ -317,22 +310,13 @@ export default function PlanDetailsScreen({ route, navigation }) {
         const successfulEvents = results.filter(
           (result) => result !== null
         ).length;
-        Alert.alert(
-          "Events Added",
-          `${successfulEvents} activities have been added to your calendar`
-        );
+        ToastAndroid.show(`${successfulEvents} activities have been added to your calendar`, ToastAndroid.SHORT);
       } else {
-        Alert.alert(
-          "Permission Denied",
-          "Calendar permission is required to add events"
-        );
+        ToastAndroid.show("Calendar permission is required to add events", ToastAndroid.SHORT);
       }
     } catch (error) {
       console.error("Error adding all activities to calendar: ", error);
-      Alert.alert(
-        "Error",
-        "An error occurred while adding activities to the calendar"
-      );
+      ToastAndroid.show("An error occurred while adding activities to the calendar", ToastAndroid.SHORT);
     }
   };
 
@@ -343,33 +327,48 @@ export default function PlanDetailsScreen({ route, navigation }) {
     return text;
   };
 
+  const renderRightActions = (progress, dragX, item, index, dayIndex) => {
+    return (
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={() => handleDelete(item, index, dayIndex)}
+      >
+        <Icon name="delete" size={30} color="#fff" />
+      </TouchableOpacity>
+    );
+  };
+  
   const renderActivity = ({ item, index, dayIndex }) => (
-    <TouchableOpacity
-      onPress={() => handleLinking(item)}
-      style={styles.activityContainer}
+    <Swipeable
+      renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item, index, dayIndex)}
     >
-      <View style={styles.activityHeader}>
-        <Text style={styles.activityTitle}>{truncateText(item.name, 19)}</Text>
-        <ActivityActions
-          onEdit={() => handleEdit(item, index, dayIndex)}
-          onMeal={() => handleMeal(item, index, dayIndex)}
-          onDelete={() => handleDelete(item, index, dayIndex)}
-          onCalendar={() =>
-            handleCalendar(item, index, dayIndex, selectedCalendar?.id)
-          }
-        />
-      </View>
-      <Text style={styles.activityText}>{item.address}</Text>
-      <RatingStars rating={item.rank} />
-      {item.photo_reference && (
-        <Image
-          source={{
-            uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${item.photo_reference}&key=${API_KEY}`,
-          }}
-          style={styles.activityImage}
-        />
-      )}
-    </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => handleLinking(item)}
+        style={styles.activityContainer}
+      >
+        <View style={styles.activityHeader}>
+          <Text style={styles.activityTitle}>{truncateText(item.name, 19)}</Text>
+          <ActivityActions
+            onEdit={() => handleEdit(item, index, dayIndex)}
+            onMeal={() => handleMeal(item, index, dayIndex)}
+            onDelete={() => handleDelete(item, index, dayIndex)}
+            onCalendar={() =>
+              handleCalendar(item, index, dayIndex, selectedCalendar?.id)
+            }
+          />
+        </View>
+        <Text style={styles.activityText}>{item.address}</Text>
+        <RatingStars rating={item.rank} />
+        {item.photo_reference && (
+          <Image
+            source={{
+              uri: `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${item.photo_reference}&key=${API_KEY}`,
+            }}
+            style={styles.activityImage}
+          />
+        )}
+      </TouchableOpacity>
+    </Swipeable>
   );
 
   const renderDay = ({ item, index }) => {
@@ -535,7 +534,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 5,
   },
   subtitle: {
     fontSize: 18,
@@ -636,5 +634,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "rgba(255, 255, 255, 0.7)", // Semi-transparent background
     zIndex: 1,
+  },
+  deleteButton: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    backgroundColor: 'red',
+    borderRadius: 5,
+    marginBottom: 10,
   },
 });

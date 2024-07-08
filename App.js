@@ -13,7 +13,6 @@ import { enableLatestRenderer } from 'react-native-maps';
 import DetailsScreen from './src/screens/DetailsScreen';
 import Schedule from './src/views/ScheduleScreen';
 import HomeScreen from './src/views/HomeScreen';
-import DrawerContent from './src/components/DrawerContent';
 import SettingsScreen from './src/views/SettingsScreen';
 import PreferencesScreen from './src/views/PreferencesScreen';
 import LoadingScreen from './src/common/LoadingScreen';

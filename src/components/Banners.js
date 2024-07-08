@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,  // Adjust margin to add space between banners
     padding: 10,
     position: 'relative',
+    elevation: 5, // Add elevation to the banners container=
   },
   iconContainer: {
     position: 'absolute',

@@ -4,7 +4,6 @@ import { View, StyleSheet, SafeAreaView } from "react-native";
 import Banners from "../components/Banners";
 import InfoModal from "../components/InfoModal";
 import HomeBackground from "../components/HomeBackground";
-import SearchPlacesBar from "../components/SearchPlacesBar"; // Import the new component
 
 export default function Explore({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
@@ -42,5 +41,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    bottom: 50,
   },
 });

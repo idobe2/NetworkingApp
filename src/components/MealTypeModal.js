@@ -17,7 +17,7 @@ const MealTypeModal = ({ visible, onClose, onSelect }) => {
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Select Meal Type</Text>
+          <Text style={styles.modalTitle}>What would you like?</Text>
           <TouchableOpacity
             style={styles.optionButton}
             onPress={() => onSelect("breakfast")}

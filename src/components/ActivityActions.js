@@ -11,9 +11,9 @@ export default function ActivityActions({ onEdit, onMeal, onDelete, onCalendar }
       <TouchableOpacity onPress={onMeal}>
         <Icon name="food" style={styles.icon} />
       </TouchableOpacity>
-      <TouchableOpacity onPress={onCalendar}>
+      {/* <TouchableOpacity onPress={onCalendar}>
         <Icon name="calendar" style={styles.icon} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <TouchableOpacity onPress={onDelete}>
         <Icon name="delete" style={styles.icon} />
       </TouchableOpacity>

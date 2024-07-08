@@ -1,21 +1,20 @@
 import React, { useState } from "react";
-import { View, StyleSheet, ToastAndroid} from "react-native";
+import { View, StyleSheet, ToastAndroid, Text} from "react-native";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
-import DropDownPicker from "react-native-dropdown-picker";
+import { Dropdown } from 'react-native-element-dropdown';
 import planApi from "../api/PlanApi";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { API_KEY } from "../core/config";
 import LoadLevelSlider from "../components/LoadLevelSlider";
 import SelectDatesModal from "../components/SelectDatesModal";
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
-import AnimatedLogo from "../common/AnimatedLogo"
+import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
 
 const Planner = ({ navigation }) => {
   const [destination, setDestination] = useState("");
-  const [openSocialPicker, setOpenSocialPicker] = useState(false);
   const [social, setSocial] = useState("");
   const [showCalendar, setShowCalendar] = useState(false);
   const [dateRange, setDateRange] = useState({
@@ -104,11 +103,6 @@ const Planner = ({ navigation }) => {
       return;
     }
 
-    // if (await planApi.checkSelectedDates(dateRange.startDate, dateRange.endDate)) {
-    //   alert("Dates overlap with existing plan");
-    //   return;
-    // }
-
     const today = new Date();
     const selectedStartDate = new Date(dateRange.startDate);
     const selectedEndDate = new Date(dateRange.endDate);
@@ -153,7 +147,8 @@ const Planner = ({ navigation }) => {
     { key: 'header' },
     { key: 'paragraph' },
     { key: 'googlePlacesAutocomplete' },
-    { key: 'dropDownPicker' },
+    { key: 'dropdown' },
+    { key: 'loadLevelSlider' },
     { key: 'selectDatesButton' },
     { key: 'dateRange' },
     { key: 'continueButton' },
@@ -173,41 +168,54 @@ const Planner = ({ navigation }) => {
         );
       case 'googlePlacesAutocomplete':
         return (
-          <GooglePlacesAutocomplete
-            placeholder="Search"
-            onPress={(data, details = null) => {
-              setDestination(data.structured_formatting.main_text);
-              // console.log(data, details);
-            }}
-            query={{
-              key: API_KEY,
-              language: "en",
-              types: "(cities)",
-            }}
-            styles={{
-              textInput: styles.googlePlacesInput,
-            }}
-          />
-        );
-      case 'dropDownPicker':
-        return (
-          <View>
-            <DropDownPicker
-              open={openSocialPicker}
-              value={social}
-              items={[
-                { label: "Myself", value: "Solo" },
-                { label: "Partner", value: "with partner" },
-                { label: "Friends", value: "with friends" },
-                { label: "Family", value: "with family" },
-              ]}
-              setOpen={setOpenSocialPicker}
-              setValue={setSocial}
-              setItems={() => {}}
-              zIndex={2000}
-            />
-            <LoadLevelSlider value={loadLevel} onValueChange={setLoadLevel} />
+          <View style={styles.searchContainer}>
+            <View style={styles.labelContainer}>
+              <Text style={styles.headerLabel}>Select Destination</Text>
+              <GooglePlacesAutocomplete
+                placeholder="Search"
+                onPress={(data, details = null) => {
+                  setDestination(data.structured_formatting.main_text);
+                }}
+                query={{
+                  key: API_KEY,
+                  language: "en",
+                  types: "(cities)",
+                }}
+                styles={{
+                  textInput: styles.googlePlacesInput,
+                }}
+              />
+            </View>
           </View>
+        );
+      case 'dropdown':
+        return (
+          <View style={styles.dropdownContainer}>
+            <View style={styles.labelContainer}>
+              <Text style={styles.headerLabel}>Who are you traveling with?</Text>
+              <Dropdown
+                data={[
+                  { label: "Myself", value: "Solo" },
+                  { label: "Partner", value: "with partner" },
+                  { label: "Friends", value: "with friends" },
+                  { label: "Family", value: "with family" },
+                ]}
+                labelField="label"
+                valueField="value"
+                placeholder="Select one"
+                value={social}
+                onChange={item => {
+                  setSocial(item.value);
+                }}
+                style={styles.dropdown}
+                containerStyle={styles.dropdownContainerStyle}
+              />
+            </View>
+          </View>
+        );
+      case 'loadLevelSlider':
+        return (
+          <LoadLevelSlider value={loadLevel} onValueChange={setLoadLevel} />
         );
       case 'selectDatesButton':
         return (
@@ -234,14 +242,14 @@ const Planner = ({ navigation }) => {
 
   return (
     <>
-    <HomeBackground>
-      <KeyboardAwareFlatList
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.key}
-        contentContainerStyle={styles.container}
-        keyboardShouldPersistTaps="handled"
-      />
+      <HomeBackground>
+        <KeyboardAwareFlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.key}
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled"
+        />
       </HomeBackground>
       <SelectDatesModal
         visible={showCalendar}
@@ -249,7 +257,7 @@ const Planner = ({ navigation }) => {
         onDayPress={handleDayPress}
         markedDates={dateRange.markedDates}
       />
-         {loading && (
+      {loading && (
         <View style={styles.loadingOverlay}>
           <AnimatedLogo />
         </View>
@@ -261,8 +269,7 @@ const Planner = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-     top: 20,
-    marginTop: 20,
+    top: 20,
   },
   googlePlacesInput: {
     marginTop: 10,
@@ -271,13 +278,26 @@ const styles = StyleSheet.create({
   pickerContainer: {
     position: 'relative',
     marginBottom: 20,
-    zIndex: 3000, // Ensure DropDownPicker has higher zIndex
   },
-  dropDownPicker: {
-    zIndex: 3000,
+  dropdownContainer: {
+    paddingHorizontal: 20,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    elevation: 3,
+    padding: 10,
   },
-  dropDownContainerStyle: {
-    zIndex: 3000,
+  dropdown: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    marginBottom: 20,
+    marginTop: 10,
+  },
+  dropdownContainerStyle: {
+    backgroundColor: '#f9f9f9',
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -295,6 +315,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
     zIndex: 1,
+  },
+  searchContainer: {
+    marginBottom: 20,
+    paddingHorizontal: 20,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    elevation: 3,
+    padding: 10,
+  },
+  labelContainer: {
+    justifyContent: 'space-between',
+  },
+  headerLabel: {
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'left',
+    color: '#333',
+    marginBottom: 10,
   },
 });
 

@@ -41,9 +41,10 @@ const Settings = ({ navigation }) => {
     try {
       setIsLoading(true);
       await userApi.check();
-      await userApi.userLogout();
-      setIsAuthenticated(false); // Update authentication state
-      navigation.navigate("StartScreen");
+      response = await userApi.userLogout();
+      if (response === 'logout successful'){
+        setIsAuthenticated(false);
+      }
       ToastAndroid.show(
         "Goodbye 👋, See you again soon 😊",
         ToastAndroid.SHORT
@@ -63,7 +64,7 @@ const Settings = ({ navigation }) => {
 
   return (
     <HomeBackground>
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <View style={styles.sectionProfile}>
         <Text style={styles.sectionTitle}>Profile</Text>
         <View style={styles.setting}>
@@ -94,8 +95,8 @@ const Settings = ({ navigation }) => {
         Delete Account
       </Button>
       <StatusBar style="auto" />
-    </ScrollView>
-    </HomeBackground>
+    </View>
+     </HomeBackground>
   );
 };
 

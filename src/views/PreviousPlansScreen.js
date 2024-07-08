@@ -19,10 +19,8 @@ import plansApi from "../api/PlanApi";
 import { format, isSameYear } from 'date-fns';
 import DropDownPicker from "react-native-dropdown-picker";
 import { Swipeable } from 'react-native-gesture-handler';
-import AnimatedLogo from "../common/AnimatedLogo"
+import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
-
-
 
 export default function PreviousPlans({ navigation }) {
   const [destinationImages, setDestinationImages] = useState({});
@@ -40,10 +38,10 @@ export default function PreviousPlans({ navigation }) {
     { label: 'Sort by Destination', value: 'destination' },
     { label: 'Sort by Social', value: 'social' }
   ]);
-  const [hasFetchedData, setHasFetchedData] = useState(false); // New state variable
+  const [hasFetchedData, setHasFetchedData] = useState(false);
 
   const fetchData = useCallback(async () => {
-    if (loading) return; // Prevent multiple fetches
+    if (loading) return;
     setLoading(true);
 
     const fetchedPlans = await plansApi.fetchPlans();
@@ -63,7 +61,7 @@ export default function PreviousPlans({ navigation }) {
     }
 
     setLoading(false);
-    setHasFetchedData(true); // Set data fetched flag
+    setHasFetchedData(true);
   }, [loading]);
 
   useEffect(() => {
@@ -78,6 +76,19 @@ export default function PreviousPlans({ navigation }) {
   useEffect(() => {
     applyFilters();
   }, [searchQuery, sortOption, plans]);
+
+  useEffect(() => {
+    let timeout;
+    if (loading) {
+      timeout = setTimeout(() => {
+        if (loading) {
+          ToastAndroid.show("Server is taking too long to respond", ToastAndroid.SHORT);
+          setLoading(false);
+        }
+      }, 10000); // 10 seconds timeout
+    }
+    return () => clearTimeout(timeout);
+  }, [loading]);
 
   const applyFilters = () => {
     let updatedPlans = plans;
@@ -138,7 +149,7 @@ export default function PreviousPlans({ navigation }) {
     );
   };
 
-  const handleDeleteSelected = () => {
+  const handleDeleteSelected = async () => {
     Alert.alert(
       "Delete Selected Plans",
       "Are you sure you want to delete the selected plans?",
@@ -150,7 +161,7 @@ export default function PreviousPlans({ navigation }) {
         {
           text: "Delete",
           onPress: async () => {
-            const promises = selectedPlans.map((item) => handleDelete(item));
+            const promises = selectedPlans.map((item) => plansApi.deletePlan(item.planId));
             await Promise.all(promises);
             setSelectedPlans([]);
             setIsSelectionMode(false);

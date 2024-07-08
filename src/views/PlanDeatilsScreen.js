@@ -3,12 +3,17 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   FlatList,
   TouchableOpacity,
   Alert,
-  Linking,
+  Image,
+  ActivityIndicator,
+  Modal,
+  Button,
 } from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import RNCalendarEvents from "react-native-calendar-events";
+import { Menu, Provider } from "react-native-paper";
 import placesApi from "../api/PlacesApi";
 import { API_KEY } from "../core/config";
 import ActivityActions from "../components/ActivityActions";
@@ -31,6 +36,58 @@ export default function PlanDetailsScreen({ route, navigation }) {
   const [mealModalVisible, setMealModalVisible] = useState(false);
   const [mealDetails, setMealDetails] = useState({});
   const [caller, setCaller] = useState(null);
+  const [calendars, setCalendars] = useState([]);
+  const [selectedCalendar, setSelectedCalendar] = useState(null);
+  const [calendarModalVisible, setCalendarModalVisible] = useState(false);
+
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    fetchActivitiesDetails();
+    requestCalendarPermissions();
+  }, [trip]);
+
+  const requestCalendarPermissions = async () => {
+    try {
+      const status = await RNCalendarEvents.requestPermissions();
+      if (status === "authorized") {
+        fetchCalendars();
+      } else {
+        Alert.alert(
+          "Permission Denied",
+          "Calendar permission is required to add events"
+        );
+      }
+    } catch (error) {
+      console.error("Error requesting calendar permissions: ", error);
+    }
+  };
+
+  //show only emails accounts
+  const fetchCalendars = async () => {
+    try {
+      const calendars = await RNCalendarEvents.findCalendars();
+
+      // Filter calendars that are primary
+      const emailCalendars = calendars.filter(
+        (calendar) => calendar.isPrimary === true
+      );
+
+      console.log("Filtered Email Calendars:", emailCalendars); // Log the filtered email calendars
+
+      setCalendars(emailCalendars);
+      setItems(
+        emailCalendars.map((calendar) => ({
+          label: calendar.title,
+          value: calendar.id,
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching calendars: ", error);
+    }
+  };
 
   const fetchActivitiesDetails = async () => {
     setLoading(true);
@@ -46,10 +103,6 @@ export default function PlanDetailsScreen({ route, navigation }) {
     }
     setLoading(false);
   };
-
-  useEffect(() => {
-    fetchActivitiesDetails();
-  }, [trip]);
 
   const handleEdit = (activity, activityIndex, dayIndex) => {
     setCaller("edit");
@@ -184,7 +237,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
     return formattedDate;
   };
 
-  const handleCalendar = (item, index, dayIndex) => {
+  const handleCalendar = async (item, index, dayIndex, calendarId) => {
     let startHour, endHour;
     if (index === 0) {
       startHour = "10:00";
@@ -206,39 +259,81 @@ export default function PlanDetailsScreen({ route, navigation }) {
     );
     const endDate = new Date(`20${year}-${month}-${day}T${endHour}:00.000Z`);
 
-    // RNCalendarEvents.requestPermissions()
-    // .then(status => {
-    //   if (status === 'authorized') {
-    //     RNCalendarEvents.saveEvent(item.name, {
-    //       startDate: startDate.toISOString(),
-    //       endDate: endDate.toISOString(),
-    //       location: item.address,
-    //       notes: `Activity: ${item.name}\nAddress: ${item.address}`,
-    //     }).then(id => {
-    //       console.log(`Event created with id: ${id}`);
-    //     }).catch(error => {
-    //       console.log(`Error creating event: ${error}`);
-    //     });
-    //   } else {
-    //     console.log('Permission not granted');
-    //   }
-    // }).catch(error => {
-    //   console.log(`Error requesting calendar permissions: ${error}`);
-    // });
+    try {
+      console.log(`Attempting to add event: ${item.name}`);
+      console.log(`Start Date: ${startDate.toISOString()}`);
+      console.log(`End Date: ${endDate.toISOString()}`);
+      const eventId = await RNCalendarEvents.saveEvent(item.name, {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        location: item.address,
+        notes: `Activity: ${item.name}\nAddress: ${item.address}`,
+        calendarId: calendarId, // Specify the calendar ID here
+      });
+      console.log(`Event added with ID: ${eventId}`);
+      return eventId;
+    } catch (error) {
+      console.error(`Error creating event for ${item.name}: `, error);
+      return null;
+    }
+  };
 
-    const startDateString = startDate.toISOString().replace(/-|:|\.\d{3}/g, "");
-    const endDateString = endDate.toISOString().replace(/-|:|\.\d{3}/g, "");
+  const addAllActivitiesToCalendar = async () => {
+    if (!selectedCalendar) {
+      Alert.alert("No Calendar Selected", "Please select a calendar first.");
+      return;
+    }
 
-    const url = `https://www.google.com/calendar/render?action=TEMPLATE&
-    text=${encodeURIComponent(item.name)}&
-    dates=${startDateString}/${endDateString}&
-    details=${encodeURIComponent(
-      `Activity: ${item.name}\nAddress: ${item.address}`
-    )}&
-    location=${encodeURIComponent(item.address)}`;
-    Linking.openURL(url).catch((err) =>
-      console.error("An error occurred", err)
-    );
+    try {
+      const status = await RNCalendarEvents.requestPermissions();
+      console.log(`Calendar permission status: ${status}`);
+      if (status === "authorized") {
+        const promises = [];
+        for (let dayIndex = 0; dayIndex < trip.travelPlan.length; dayIndex++) {
+          const day = trip.travelPlan[dayIndex];
+          for (
+            let activityIndex = 0;
+            activityIndex < day.activities.length;
+            activityIndex++
+          ) {
+            const activity =
+              activitiesDetails[
+                trip.travelPlan
+                  .slice(0, dayIndex)
+                  .reduce((sum, day) => sum + day.activities.length, 0) +
+                  activityIndex
+              ];
+            promises.push(
+              handleCalendar(
+                activity,
+                activityIndex,
+                dayIndex,
+                selectedCalendar.id
+              )
+            );
+          }
+        }
+        const results = await Promise.all(promises);
+        const successfulEvents = results.filter(
+          (result) => result !== null
+        ).length;
+        Alert.alert(
+          "Events Added",
+          `${successfulEvents} activities have been added to your calendar`
+        );
+      } else {
+        Alert.alert(
+          "Permission Denied",
+          "Calendar permission is required to add events"
+        );
+      }
+    } catch (error) {
+      console.error("Error adding all activities to calendar: ", error);
+      Alert.alert(
+        "Error",
+        "An error occurred while adding activities to the calendar"
+      );
+    }
   };
 
   const truncateText = (text, length) => {
@@ -259,7 +354,9 @@ export default function PlanDetailsScreen({ route, navigation }) {
           onEdit={() => handleEdit(item, index, dayIndex)}
           onMeal={() => handleMeal(item, index, dayIndex)}
           onDelete={() => handleDelete(item, index, dayIndex)}
-          onCalendar={() => handleCalendar(item, index, dayIndex)}
+          onCalendar={() =>
+            handleCalendar(item, index, dayIndex, selectedCalendar?.id)
+          }
         />
       </View>
       <Text style={styles.activityText}>{item.address}</Text>
@@ -340,46 +437,82 @@ export default function PlanDetailsScreen({ route, navigation }) {
   };
 
   return (
-    <HomeBackground>
-      <BackButton goBack={navigation.goBack} />
-      <View style={styles.container}>
-        <View style={styles.header}>
-          {image && (
-            <Image source={{ uri: image }} style={styles.destinationImage} />
+    <Provider>
+      <HomeBackground>
+        <BackButton goBack={navigation.goBack} />
+        <View style={styles.container}>
+          <View style={styles.header}>
+            {image && (
+              <Image source={{ uri: image }} style={styles.destinationImage} />
+            )}
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.title}>{trip.destination}</Text>
+              <Text style={styles.subtitle}>{trip.social}</Text>
+              <Text style={styles.date}>
+                {trip.arrivalDate} to {trip.departureDate}
+              </Text>
+            </View>
+            <Menu
+              visible={menuVisible}
+              onDismiss={() => setMenuVisible(false)}
+              anchor={
+                <TouchableOpacity
+                  style={styles.calendarButton}
+                  onPress={() => setMenuVisible(true)}
+                >
+                  <Icon name="calendar-today" size={30} color="#000" />
+                </TouchableOpacity>
+              }
+            >
+              <Menu.Item title="Select a Calendar" disabled={true} />
+              {items.map((item) => (
+                <Menu.Item
+                  key={item.value}
+                  onPress={() => {
+                    setValue(item.value);
+                    setSelectedCalendar(
+                      calendars.find((calendar) => calendar.id === item.value)
+                    );
+                    setMenuVisible(false);
+                    addAllActivitiesToCalendar();
+                  }}
+                  title={item.label}
+                />
+              ))}
+              <Menu.Item
+                onPress={() => {
+                  setMenuVisible(false);
+                }}
+                title="Cancel"
+              />
+            </Menu>
+          </View>
+          <FlatList
+            data={travelPlanWithIndices}
+            renderItem={renderDay}
+            keyExtractor={(day, index) => index.toString()}
+          />
+          {loading && (
+            <View style={styles.loadingOverlay}>
+              <ActivityIndicator size="large" color="#0000ff" />
+            </View>
           )}
-          <View style={styles.headerTextContainer}>
-            <Text style={styles.title}>{trip.destination}</Text>
-            <Text style={styles.subtitle}>{trip.social}</Text>
-            <Text style={styles.date}>
-              {trip.arrivalDate} to {trip.departureDate}
-            </Text>
-          </View>
+          <ActivityBottomSheet
+            visible={bottomSheetVisible}
+            onClose={() => setBottomSheetVisible(false)}
+            activity={selectedActivity}
+            additionalActivities={additionalActivitiesDetails}
+            onSelect={handleSelectActivity}
+            caller={caller}
+          />
         </View>
-        <FlatList
-          data={travelPlanWithIndices}
-          renderItem={renderDay}
-          keyExtractor={(day, index) => index.toString()}
+        <MealTypeModal
+          visible={mealModalVisible}
+          onClose={() => setMealModalVisible(false)}
+          onSelect={onMealSelect}
         />
-        {loading && (
-          <View style={styles.loadingOverlay}>
-            <AnimatedLogo />
-          </View>
-        )}
-        <ActivityBottomSheet
-          visible={bottomSheetVisible}
-          onClose={() => setBottomSheetVisible(false)}
-          activity={selectedActivity}
-          additionalActivities={additionalActivitiesDetails}
-          onSelect={handleSelectActivity}
-          caller={caller}
-        />
-      </View>
-      <MealTypeModal
-        visible={mealModalVisible}
-        onClose={() => setMealModalVisible(false)}
-        onSelect={onMealSelect}
-      />
-    </HomeBackground>
+      </HomeBackground>
+    </Provider>
   );
 }
 
@@ -387,13 +520,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    top: 20,
     marginTop: 50,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 20,
+    justifyContent: "space-between",
   },
   headerTextContainer: {
     flex: 1,
@@ -402,7 +535,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: -5,
+    marginBottom: 5,
   },
   subtitle: {
     fontSize: 18,
@@ -411,7 +544,6 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 14,
     color: "grey",
-    bottom: 5,
   },
   destinationImage: {
     width: 80,
@@ -424,7 +556,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   activityContainer: {
-    marginBottom: 5,
+    marginBottom: 10,
     padding: 10,
     backgroundColor: "#E6E6FA",
     borderRadius: 5,
@@ -446,6 +578,53 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 5,
     marginTop: 10,
+  },
+  calendarButton: {
+    marginRight: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  dropdown: {
+    marginBottom: 20,
+    width: "100%",
+  },
+  dropdownContainer: {
+    width: "100%",
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 20,
+  },
+  calendarContainer: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    width: "100%",
+    alignItems: "center",
+  },
+  selectedCalendarContainer: {
+    backgroundColor: "#f0f8ff",
+  },
+  calendarTitle: {
+    fontSize: 18,
   },
   loadingOverlay: {
     position: "absolute",

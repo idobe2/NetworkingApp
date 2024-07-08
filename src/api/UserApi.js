@@ -163,21 +163,17 @@ const userLogout = async () => {
   try {
       const token = await getToken();
       if (token) {
-          await clientApi.get('/logout', {
+         const response =  await clientApi.get('/logout', {
               headers: {
                   Authorization: `Bearer ${token}`
               }
           });
-          // await axios.get( "http://172.20.10.3:3000/logout", {
-          //   headers: {
-          //       Authorization: `Bearer ${token}`
-          //   }
-          // });
           if (await GoogleSignin.isSignedIn()) {
             console.log("Google sign out");
               await GoogleSignin.signOut();
           }
           await removeToken();
+          return response.data;
       }
   } catch (err) {
       console.log("Logout fail " + err);

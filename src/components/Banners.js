@@ -6,7 +6,7 @@ const Banners = ({ onBannerPress }) => {
   const banners = [
     { id: 1, text: "Getting Started", color: "#FFDBBB", icon: "rocket" },
     { id: 2, text: "Next Activities", color: "#bbdaa4", icon: "calendar" },
-    { id: 3, text: "Information", color: "#a7cdf2", icon: "info-circle" },
+    // { id: 3, text: "Information", color: "#a7cdf2", icon: "info-circle" },
   ];
 
   return (

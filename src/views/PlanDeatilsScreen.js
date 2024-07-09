@@ -23,7 +23,7 @@ import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
 import BackButton from "../components/BackButton";
 import MealTypeModal from "../components/MealTypeModal";
-import { Swipeable } from 'react-native-gesture-handler';
+import { Swipeable } from "react-native-gesture-handler";
 
 export default function PlanDetailsScreen({ route, navigation }) {
   const { trip, image } = route.params;
@@ -53,7 +53,10 @@ export default function PlanDetailsScreen({ route, navigation }) {
       if (status === "authorized") {
         fetchCalendars();
       } else {
-        ToastAndroid.show("Calendar permission is required to add events", ToastAndroid.SHORT);
+        ToastAndroid.show(
+          "Calendar permission is required to add events",
+          ToastAndroid.SHORT
+        );
       }
     } catch (error) {
       console.error("Error requesting calendar permissions: ", error);
@@ -64,12 +67,15 @@ export default function PlanDetailsScreen({ route, navigation }) {
   const fetchCalendars = async () => {
     try {
       const calendars = await RNCalendarEvents.findCalendars();
-
+      console.log('Fetched Calendars:', calendars); // Log the fetched calendars
+  
       // Filter calendars that are primary
       const emailCalendars = calendars.filter(
         (calendar) => calendar.isPrimary === true
       );
-
+  
+      console.log('Filtered Email Calendars:', emailCalendars); // Log the filtered email calendars
+  
       setCalendars(emailCalendars);
       setItems(
         emailCalendars.map((calendar) => ({
@@ -77,10 +83,21 @@ export default function PlanDetailsScreen({ route, navigation }) {
           value: calendar.id,
         }))
       );
+  
+      // Check if there is a previously selected calendar
+      const previouslySelectedCalendar = emailCalendars.find(calendar => calendar.id === selectedCalendar?.id);
+  
+      if (previouslySelectedCalendar) {
+        setSelectedCalendar(previouslySelectedCalendar);
+      } else if (emailCalendars.length > 0) {
+        setSelectedCalendar(emailCalendars[0]);
+      }
+  
     } catch (error) {
       console.error("Error fetching calendars: ", error);
     }
   };
+  
 
   const fetchActivitiesDetails = async () => {
     setLoading(true);
@@ -273,7 +290,10 @@ export default function PlanDetailsScreen({ route, navigation }) {
 
   const addAllActivitiesToCalendar = async () => {
     if (!selectedCalendar) {
-      ToastAndroid.show("No Calendar Selected, Please select a calendar first.", ToastAndroid.SHORT);
+      ToastAndroid.show(
+        "No Calendar Selected, Please select a calendar first.",
+        ToastAndroid.SHORT
+      );
       return;
     }
 
@@ -310,13 +330,22 @@ export default function PlanDetailsScreen({ route, navigation }) {
         const successfulEvents = results.filter(
           (result) => result !== null
         ).length;
-        ToastAndroid.show(`${successfulEvents} activities have been added to your calendar`, ToastAndroid.SHORT);
+        ToastAndroid.show(
+          `${successfulEvents} activities have been added to your calendar`,
+          ToastAndroid.SHORT
+        );
       } else {
-        ToastAndroid.show("Calendar permission is required to add events", ToastAndroid.SHORT);
+        ToastAndroid.show(
+          "Calendar permission is required to add events",
+          ToastAndroid.SHORT
+        );
       }
     } catch (error) {
       console.error("Error adding all activities to calendar: ", error);
-      ToastAndroid.show("An error occurred while adding activities to the calendar", ToastAndroid.SHORT);
+      ToastAndroid.show(
+        "An error occurred while adding activities to the calendar",
+        ToastAndroid.SHORT
+      );
     }
   };
 
@@ -337,17 +366,21 @@ export default function PlanDetailsScreen({ route, navigation }) {
       </TouchableOpacity>
     );
   };
-  
+
   const renderActivity = ({ item, index, dayIndex }) => (
     <Swipeable
-      renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item, index, dayIndex)}
+      renderRightActions={(progress, dragX) =>
+        renderRightActions(progress, dragX, item, index, dayIndex)
+      }
     >
       <TouchableOpacity
         onPress={() => handleLinking(item)}
         style={styles.activityContainer}
       >
         <View style={styles.activityHeader}>
-          <Text style={styles.activityTitle}>{truncateText(item.name, 19)}</Text>
+          <Text style={styles.activityTitle}>
+            {truncateText(item.name, 19)}
+          </Text>
           <ActivityActions
             onEdit={() => handleEdit(item, index, dayIndex)}
             onMeal={() => handleMeal(item, index, dayIndex)}
@@ -452,39 +485,45 @@ export default function PlanDetailsScreen({ route, navigation }) {
               </Text>
             </View>
             <Menu
-              visible={menuVisible}
-              onDismiss={() => setMenuVisible(false)}
-              anchor={
-                <TouchableOpacity
-                  style={styles.calendarButton}
-                  onPress={() => setMenuVisible(true)}
-                >
-                  <Icon name="calendar-today" size={30} color="#000" />
-                </TouchableOpacity>
-              }
-            >
-              <Menu.Item title="Select a Calendar" disabled={true} />
-              {items.map((item) => (
-                <Menu.Item
-                  key={item.value}
-                  onPress={() => {
-                    setValue(item.value);
-                    setSelectedCalendar(
-                      calendars.find((calendar) => calendar.id === item.value)
-                    );
-                    setMenuVisible(false);
-                    addAllActivitiesToCalendar();
-                  }}
-                  title={item.label}
-                />
-              ))}
-              <Menu.Item
-                onPress={() => {
-                  setMenuVisible(false);
-                }}
-                title="Cancel"
-              />
-            </Menu>
+  visible={menuVisible}
+  onDismiss={() => setMenuVisible(false)}
+  anchor={
+    <TouchableOpacity
+      style={styles.calendarButton}
+      onPress={() => setMenuVisible(true)}
+    >
+      <Icon name="calendar-today" size={30} color="#000" />
+    </TouchableOpacity>
+  }
+>
+  <Menu.Item title="Select a Calendar" disabled={true} />
+  {items.map((item) => (
+    <Menu.Item
+      key={item.value}
+      onPress={() => {
+        if (selectedCalendar && selectedCalendar.id === item.value) {
+          addAllActivitiesToCalendar();
+        } else {
+          setValue(item.value);
+          setSelectedCalendar(
+            calendars.find((calendar) => calendar.id === item.value)
+          );
+          addAllActivitiesToCalendar();
+        }
+        setMenuVisible(false);
+      }}
+      title={item.label}
+      style={selectedCalendar && selectedCalendar.id === item.value ? styles.selectedCalendarItem : null}
+    />
+  ))}
+  <Menu.Item
+    onPress={() => {
+      setMenuVisible(false);
+    }}
+    title="Cancel"
+  />
+</Menu>
+
           </View>
           <FlatList
             data={travelPlanWithIndices}
@@ -643,4 +682,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
   },
+  selectedCalendarItem: {
+    backgroundColor: '#e0e0e0', // Highlight the selected item
+  },
 });
+

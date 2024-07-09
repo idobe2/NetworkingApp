@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NativeWindStyleSheet } from 'nativewind';
+import NetInfo from '@react-native-community/netinfo';
+import { Alert } from 'react-native';
+
 import {
   StartScreen,
   LoginScreen,
@@ -33,7 +36,6 @@ function Root() {
     <NewStack.Navigator screenOptions={{ headerShown: false }}>
       <NewStack.Screen name="Tripy" component={HomeScreen} />
       <NewStack.Screen name="Schedule" component={Schedule} />
-      {/* <Drawer.Screen name="Profile" component={DrawerContent} /> */}
       <NewStack.Screen name="Settings" component={SettingsScreen} />
       <NewStack.Screen name="Preferences" component={PreferencesScreen} />
     </NewStack.Navigator>
@@ -62,7 +64,29 @@ function UnauthStack() {
 }
 
 function App() {
-  const { loading, isAuthenticated } = useAuth();
+  const { loading, isAuthenticated, setIsAuthenticated } = useAuth();
+  const [isConnected, setIsConnected] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+    });
+
+    if (!isConnected) {
+      Alert.alert("No Network", "You are offline. Redirecting to Start Screen.", [
+        {
+          text: "OK",
+          onPress: () => {
+            setIsAuthenticated(false);
+          }
+        }
+      ]);
+    }
+
+    return () => {
+      unsubscribe();
+    };
+  }, [isConnected]);
 
   if (loading) {
     return <LoadingScreen />;

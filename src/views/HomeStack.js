@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import NetInfo from '@react-native-community/netinfo';
+import { Alert } from 'react-native';
+import { useAuth } from '../common/AuthContext'; // Ensure correct import
+
 import PreviousPlans from './PreviousPlansScreen';
 import PlanDetailsScreen from './PlanDeatilsScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
@@ -14,7 +18,7 @@ const Drawer = createDrawerNavigator();
 
 const DrawerList = () => {
   return (
-    <Drawer.Navigator >
+    <Drawer.Navigator>
       <Drawer.Screen name="Explore" component={ExploreScreen} />
       <Drawer.Screen name="Schedule" component={Schedule} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
@@ -23,7 +27,31 @@ const DrawerList = () => {
   );
 };
 
-const Trip = () => {
+const Trip = ({ navigation }) => {
+  const { setIsAuthenticated } = useAuth();
+  const [isConnected, setIsConnected] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+    });
+
+    if (!isConnected) {
+      Alert.alert("No Network", "You are offline. Redirecting to Start Screen.", [
+        {
+          text: "OK",
+          onPress: () => {
+            setIsAuthenticated(false);
+          }
+        }
+      ]);
+    }
+
+    return () => {
+      unsubscribe();
+    };
+  }, [isConnected]);
+
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -38,7 +66,7 @@ const Trip = () => {
       />
     </Stack.Navigator>
   );
-}
+};
 
 const Explore = () => {
   return (
@@ -55,6 +83,6 @@ const Explore = () => {
       />
     </Stack.Navigator>
   );
-}
+};
 
 export default { Trip, Explore };

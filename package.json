@@ -19,6 +19,7 @@
     "@react-native-community/cli-platform-android": "^12.3.6",
     "@react-native-community/datetimepicker": "7.7.0",
     "@react-native-community/masked-view": "0.1.10",
+    "@react-native-community/netinfo": "^11.3.2",
     "@react-native-community/slider": "^4.5.2",
     "@react-native-google-signin/google-signin": "^11.0.0",
     "@react-native-picker/picker": "^2.6.1",

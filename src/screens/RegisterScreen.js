@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-} from "react-native"; // 1. Import ActivityIndicator
+} from "react-native";
 import { Text, IconButton } from "react-native-paper";
 import Background from "../components/Background";
 import Logo from "../components/Logo";
@@ -25,7 +25,7 @@ export default function RegisterScreen({ navigation }) {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // 2. Add isLoading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleTogglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -36,7 +36,7 @@ export default function RegisterScreen({ navigation }) {
   };
 
   const handleSignup = async () => {
-    setIsLoading(true); // 3. Start loading
+    setIsLoading(true);
     const response = await userApi.userSignup(
       email.value,
       password.value,
@@ -139,18 +139,16 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: theme.colors.surface, // Background color to match TextInput style
+    backgroundColor: theme.colors.surface,
     borderColor: theme.colors.surface,
     borderWidth: 1,
     borderRadius: 10,
-    height: 80, // Adjust height to match TextInput style
+    height: 90,
   },
   input: {
-    flex: 1,
-    height: 40,
     backgroundColor: theme.colors.surface,
   },
   iconButton: {
-    margin: 0, // Adjust position of icon
+    margin: 10,
   },
 });

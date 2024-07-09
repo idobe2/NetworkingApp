@@ -85,7 +85,7 @@ export default function PreviousPlans({ navigation }) {
           ToastAndroid.show("Server is taking too long to respond", ToastAndroid.SHORT);
           setLoading(false);
         }
-      }, 10000); // 10 seconds timeout
+      }, 20000); // 10 seconds timeout
     }
     return () => clearTimeout(timeout);
   }, [loading]);

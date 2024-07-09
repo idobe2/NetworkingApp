@@ -71,22 +71,23 @@ export default function LoginScreen({ navigation }) {
         value={email.value}
         onChangeText={(text) => setEmail({ value: text, error: "" })}
       />
-      <View style={styles.passwordContainer}>
+    <View style={styles.passwordContainer}>
         <TextInput
-          placeholder="Password"
+          label="Password"
+          returnKeyType="done"
           value={password.value}
           onChangeText={(text) => setPassword({ value: text, error: "" })}
-          secureTextEntry={!showPassword}
+          secureTextEntry={!showPassword} // Toggle secureTextEntry based on showPassword state
+          style={[styles.input, { paddingRight: 40 }]} // Add padding to avoid text overlap with the icon
         />
-        <TouchableOpacity
+        <IconButton
+          icon={showPassword ? "eye-off" : "eye"}
           onPress={handleTogglePasswordVisibility}
-          style={styles.iconButton}
-        >
-          <IconButton
-            icon={showPassword ? "eye-off" : "eye"}
-            style={{ margin: 0 }}
-          />
-        </TouchableOpacity>
+          style={[
+            styles.iconButton,
+            { position: "absolute", right: 10, bottom: 5 },
+          ]} // Adjust position as needed
+        />
       </View>
       <View style={styles.forgotPassword}>
         <TouchableOpacity
@@ -143,8 +144,9 @@ const styles = StyleSheet.create({
     // paddingRight: 50,
   },
   iconButton: {
-    // position: "absolute", // Can't click on the icon with this
-    right: 0,
-    padding: 10,
+    margin: 0, // Adjust position of icon
+  },
+  input: {
+    backgroundColor: theme.colors.surface,
   },
 });

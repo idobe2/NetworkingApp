@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 const Banners = ({ onBannerPress }) => {
   const banners = [
     { id: 1, text: "Getting Started", color: "#FFDBBB", icon: "rocket" },
-    { id: 2, text: "Next Activity", color: "#bbdaa4", icon: "calendar" },
+    { id: 2, text: "Next Activities", color: "#bbdaa4", icon: "calendar" },
     { id: 3, text: "Information", color: "#a7cdf2", icon: "info-circle" },
   ];
 

@@ -19,6 +19,9 @@ export default function Explore({ navigation }) {
     } else if (bannerId === 3) {
       setModalVisible(true); // Show modal when bannerId is 3
     }
+    else if (bannerId === 2){
+      navigation.navigate("NextActivities");
+    }
   };
 
   return (

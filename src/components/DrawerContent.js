@@ -42,20 +42,22 @@ const DrawerContent = () => {
 
   const getUserTypeIcon = (userType) => {
     if (userType === 'google') {
-      return <Icon name="google" size={24} color={theme.colors.primary} />;
+      return <Icon name="google" size={30} color={theme.colors.primary} />;
     } else {
-      return <Icon name="account" size={24} color={theme.colors.primary} />;
+      return <Icon name="account" size={30} color={theme.colors.primary} />;
     }
   };
 
   return (
     <DrawerContentScrollView>
-      <View style={styles.drawerContent}>
-      <View style={styles.iconContainer}>
+        <View style={styles.iconContainer}>
             {getUserTypeIcon(userDetails.userType)}
           </View>
+      <View style={styles.drawerContent}>
+    
         <View style={styles.userInfoSection}>
           <Avatar.Image
+          style= {{top:30}}
             size={80}
             source={{
               uri:
@@ -115,10 +117,12 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   title: {
+    top:15,
     marginTop: 20,
     fontWeight: 'bold',
   },
   caption: {
+    top:15,
     fontSize: 14,
     lineHeight: 14,
   },
@@ -151,7 +155,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   iconContainer: {
-    top: 10,
     position: 'absolute',
     right: 20,
   },

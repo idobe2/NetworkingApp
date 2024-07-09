@@ -1,7 +1,10 @@
 import clientApi from "./ClientApi";
 import { Alert } from "react-native";
 import { setToken, getToken, removeToken } from "../common/tokenStorage";
-import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth } from "../core/firebaseConfig";
 
@@ -22,21 +25,32 @@ const userSignup = async (email, password, confirmPassword) => {
 
   try {
     const response_mail = await clientApi.post(`/post_email`, { email });
-    const response_password = await clientApi.post(`/post_password`, { password });
+    const response_password = await clientApi.post(`/post_password`, {
+      password,
+    });
 
     if (
       response_mail.data !== "Email is available" ||
       response_password.data !== "Password received"
     ) {
-      return { success: false, message: response_mail.data || response_password.data };
+      return {
+        success: false,
+        message: response_mail.data || response_password.data,
+      };
     }
 
     const post_response = await clientApi.post(`/signup`, { email, password });
 
     if (post_response.data.success) {
-      return { success: true, message: "You have successfully registered. Email verification sent." };
+      return {
+        success: true,
+        message: "You have successfully registered. Email verification sent.",
+      };
     } else {
-      return { success: false, message: post_response.data.message || "Error signing up" };
+      return {
+        success: false,
+        message: post_response.data.message || "Error signing up",
+      };
     }
   } catch (error) {
     console.error(error);
@@ -69,7 +83,7 @@ const userGoogleLogin = async () => {
     // Send credential and access token to the backend
     const response = await clientApi.post("/googleSignIn", {
       credentialResponse,
-      googleToken
+      googleToken,
     });
     await setToken(response.data.accessToken, response.data.refreshToken);
     console.log("getToken", await getToken());
@@ -121,29 +135,28 @@ const userLogin = async (email, password) => {
       return null;
     }
     await setToken(response.data.accessToken, response.data.refreshToken);
-    console.log("getToken", await getToken())
+    console.log("getToken", await getToken());
     console.log("User logged in successfully");
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.log("Api error:", error);
   }
   return null;
-    };
+};
 
 const addUser = async (name, formattedDateString, gender) => {
-try {
-  const response = await clientApi.post("/addDetails", {
-    name: name,
-    birthday: formattedDateString,
-    gender: gender,
-  });
+  try {
+    const response = await clientApi.post("/addDetails", {
+      name: name,
+      birthday: formattedDateString,
+      gender: gender,
+    });
     console.log("User added successfully");
     return response.data;
-    } catch (error) {
+  } catch (error) {
     console.log("Api error:", error);
-    }
-    return null;
+  }
+  return null;
 };
 
 const addUserPreferences = async (preferences) => {
@@ -161,23 +174,23 @@ const addUserPreferences = async (preferences) => {
 
 const userLogout = async () => {
   try {
-      const token = await getToken();
-      if (token) {
-         const response =  await clientApi.get('/logout', {
-              headers: {
-                  Authorization: `Bearer ${token}`
-              }
-          });
-          if (await GoogleSignin.isSignedIn()) {
-            console.log("Google sign out");
-              await GoogleSignin.signOut();
-          }
-          await removeToken();
-          return response.data;
+    const token = await getToken();
+    if (token) {
+      const response = await clientApi.get("/logout", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (await GoogleSignin.isSignedIn()) {
+        console.log("Google sign out");
+        await GoogleSignin.signOut();
       }
+      await removeToken();
+      return response.data;
+    }
   } catch (err) {
-      console.log("Logout fail " + err);
-      throw err; // Rethrow the error to handle it in UserModel
+    console.log("Logout fail " + err);
+    throw err; // Rethrow the error to handle it in UserModel
   }
 };
 
@@ -205,6 +218,32 @@ const getUserDetails = async () => {
   return null;
 };
 
+const userChangePassword = async (currentPassword, newPassword) => {
+  try {
+    const response = await clientApi.post("/changePassword", {
+      currentPassword,
+      newPassword,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error changing password:", error);
+    Alert.alert("Error changing password. Please try again.");
+  }
+};
+
+const userDeleteAccount = async (currentPassword) => {
+  try {
+    const response = await clientApi.post("/deleteAccount", {
+      currentPassword,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("Api error:", error);
+    Alert.alert("Error deleting account. Please try again.");
+  }
+  return null;
+}
+
 export default {
   addUser,
   addUserPreferences,
@@ -217,4 +256,6 @@ export default {
   userResetPassword,
   userLogout,
   check,
+  userChangePassword,
+  userDeleteAccount,
 };

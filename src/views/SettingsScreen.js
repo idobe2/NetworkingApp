@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { View, Text, StyleSheet, Switch, ScrollView, ActivityIndicator, ToastAndroid,} from "react-native";
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, ToastAndroid } from "react-native";
 import { useColorScheme } from "nativewind";
 import React from "react";
 import Button from '../components/Button';
@@ -9,39 +9,40 @@ import { theme } from "../core/theme";
 import { useAuth } from "../common/AuthContext";
 import DrawerContent from "../components/DrawerContent";
 import HomeBackground from "../components/HomeBackground";
+import ChangePasswordModal from "../components/ChangePasswordModal";
+import DeleteAccountModal from "../components/DeleteAccountModal";
 
 const Settings = ({ navigation }) => {
   const { colorScheme, toggleColorScheme } = useColorScheme();
   const [isLoading, setIsLoading] = useState(false);
   const { setIsAuthenticated } = useAuth();
+  const [userType, setUserType] = useState("");
+  const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] = useState(false);
+  const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] = useState(false);
 
-  console.log("colorScheme:", colorScheme);
 
-  // TODO: handle different types of logout
-  // const handleLogout = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //       const response = await userApi.userGoogleSignOut();
-  //       if (response.success) {
-  //         console.log("Signed out successfully");
-  //         ToastAndroid.show("Signed Out", ToastAndroid.TOP);
-  //       } else {
-  //         console.log("Google sign out failed:", response.error);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error signing out:", error);
-  //     } finally {
-  //       setIsLoading(false);
-  //   };
-  //   navigation.navigate("StartScreen"); // Navigate to StartScreen
-  // };
+
+  useEffect(() => {
+    const fetchUserType = async () => { 
+      try {
+        const response = await userApi.getUserDetails();
+        if (response)
+          setUserType(response.userType);
+      } catch (error) {
+        console.error("Error fetching user type:", error);
+      }
+    };
+  fetchUserType();
+}, []);
+
+
 
   const handleLogout = async () => {
     console.log("Logout Button Pressed");
     try {
       setIsLoading(true);
       await userApi.check();
-      response = await userApi.userLogout();
+      const response = await userApi.userLogout();
       if (response === 'logout successful'){
         setIsAuthenticated(false);
       }
@@ -58,49 +59,107 @@ const Settings = ({ navigation }) => {
 
   // Function to handle account deletion
   const handleDeleteAccount = () => {
-    // Handle account deletion logic here
-    console.log("Account deleted");
+    setIsDeleteAccountModalVisible(true);
+  };
+
+  const handleChangePassword = () => {
+    setIsChangePasswordModalVisible(true);
+  };
+
+  const handleConfirmChangePassword = async (currentPassword, newPassword) => {
+    console.log("Changing password...");
+    setIsLoading(true);
+    try {
+      const response = await userApi.userChangePassword(currentPassword, newPassword);
+      if (response.success) {
+        console.log("Password changed successfully");
+        ToastAndroid.show("Password changed successfully", ToastAndroid.TOP);
+      } else {
+        console.log("Password change failed:", response.error);
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleConfirmDeleteAccount = async (email, password) => {
+    setIsLoading(true);
+    try {
+      const response = await userApi.userDeleteAccount(email, password);
+      if (response.success) {
+        console.log("Account deleted successfully");
+        ToastAndroid.show("Account deleted successfully", ToastAndroid.TOP);
+        setIsAuthenticated(false);
+      } else {
+        console.log("Account deletion failed:", response.error);
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <HomeBackground>
-    <View style={styles.container}>
-      <View style={styles.sectionProfile}>
-        <Text style={styles.sectionTitle}>Profile</Text>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <View style={styles.sectionProfile}>
+            <Text style={styles.sectionTitle}>Profile</Text>
+            <View style={styles.setting}>
+            <DrawerContent></DrawerContent>
+            </View>
+          </View>
+          <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Security</Text>
+        {userType === "local" && (
         <View style={styles.setting}>
-          <DrawerContent></DrawerContent>
+          <Text style={styles.settingText}>Change Password</Text>
+         
+      <Button mode="contained" onPress={handleChangePassword} style={styles.verifyButton}>
+        Verify
+      </Button>
+       
+        </View>
+        )}
+        <View style={styles.setting}>
+          <Text style={styles.settingText}>Delete Account</Text>
+         
+      <Button mode="contained" onPress={handleDeleteAccount} style={styles.verifyButton}>
+        Verify
+      </Button>
+        
         </View>
       </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Appearance</Text>
-        <View style={styles.setting}>
-          <Text style={styles.settingText}>Dark Mode</Text>
-          <Switch value={colorScheme == "dark"} onChange={toggleColorScheme} />
+          {isLoading ? (
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+          ) : (
+            <Button mode="contained" onPress={handleLogout} style={styles.button}>
+              Logout
+            </Button>
+          )}
         </View>
-      </View>
-      {/* Add more sections and settings as needed */}
-      {isLoading ? (
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-        ) : (
-      <Button mode="contained" onPress={handleLogout} style={styles.button}>
-        Logout
-      </Button>
-      )}
-      <Button 
-        mode="contained" 
-        onPress={handleDeleteAccount} 
-        style={styles.button}
-        buttonStyle={{ backgroundColor: 'red' }}
-      >
-        Delete Account
-      </Button>
-      <StatusBar style="auto" />
-    </View>
-     </HomeBackground>
+        <ChangePasswordModal
+          visible={isChangePasswordModalVisible}
+          onClose={() => setIsChangePasswordModalVisible(false)}
+          onConfirm={handleConfirmChangePassword}
+        />
+        <DeleteAccountModal
+          visible={isDeleteAccountModalVisible}
+          onClose={() => setIsDeleteAccountModalVisible(false)}
+          onConfirm={handleConfirmDeleteAccount}
+        />
+      </ScrollView>
+    </HomeBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flexGrow: 1,
     // backgroundColor: "white",
@@ -139,6 +198,10 @@ const styles = StyleSheet.create({
   },
   button: {
     marginVertical: 10,
+  },
+  verifyButton: {
+    width: 100,
+    backgroundColor: "#FFD580",
   },
 });
 

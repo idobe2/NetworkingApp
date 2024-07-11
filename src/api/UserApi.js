@@ -259,11 +259,11 @@ const verifyAndDeleteAccount = async (verificationCode) => {
     const response = await clientApi.post("/deleteUserData", {
       verifynumber: verificationCode,
     });
-    if (await GoogleSignin.isSignedIn()) {
-      console.log("Google sign out");
-      await GoogleSignin.signOut();
-    }
-    await removeToken();
+     if (await GoogleSignin.isSignedIn()) {
+        console.log("Google sign out");
+        await GoogleSignin.signOut();
+      }
+      await removeToken();
     return response.data;
   } catch (error) {
     console.error("Error verifying and deleting account:", error);

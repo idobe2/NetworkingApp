@@ -22,7 +22,7 @@ const Planner = ({ navigation }) => {
     endDate: null,
     markedDates: {},
   });
-  const [loadLevel, setLoadLevel] = useState(1);
+  const [loadLevel, setLoadLevel] = useState(2);
   const [loading, setLoading] = useState(false);
 
   const handleDayPress = (day) => {

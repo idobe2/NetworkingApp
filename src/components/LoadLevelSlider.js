@@ -20,8 +20,8 @@ const LoadLevelSlider = ({ value, onValueChange }) => {
       </View>
       <Slider
         style={styles.slider}
-        minimumValue={1}
-        maximumValue={3}
+        minimumValue={2}
+        maximumValue={4}
         step={1}
         value={value}
         onValueChange={onValueChange}
@@ -45,9 +45,9 @@ const LoadLevelSlider = ({ value, onValueChange }) => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Load Level Information</Text>
-              <Text style={styles.modalText}>1 - Low: Minimal activities, relaxing trip.</Text>
-              <Text style={styles.modalText}>2 - Medium: Balanced activities, moderate pace.</Text>
-              <Text style={styles.modalText}>3 - High: Packed schedule, lots of activities.</Text>
+              <Text style={styles.modalText}>2 - Low: Minimal activities, relaxing trip.</Text>
+              <Text style={styles.modalText}>3 - Medium: Balanced activities, moderate pace.</Text>
+              <Text style={styles.modalText}>4 - High: Packed schedule, lots of activities.</Text>
               <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
                 <Text style={styles.closeButtonText}>Close</Text>
               </TouchableOpacity>
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    // backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },

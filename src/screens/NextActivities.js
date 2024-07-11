@@ -28,10 +28,12 @@ const NextActivities = ({ navigation }) => {
 
   const fetchNextActivities = useCallback(async () => {
     setLoading(true);
+    console.log('Fetching next activities...');
     try {
       const fetchedPlans = await plansApi.fetchPlans();
       if (fetchedPlans && fetchedPlans.length > 0) {
         const now = new Date();
+        now.setHours(0, 0, 0, 0); // Resetting time part for comparison
         let nextActivities = [];
         for (const plan of fetchedPlans) {
           for (const day of plan.travelPlan) {
@@ -42,6 +44,7 @@ const NextActivities = ({ navigation }) => {
               plan: plan,
             }));
             const activityDate = parse(day.day, 'dd/MM/yy', new Date());
+            activityDate.setHours(0, 0, 0, 0); // Resetting time part for comparison
             if (activityDate >= now) {
               nextActivities = [...nextActivities, ...activitiesToday];
             }
@@ -49,8 +52,8 @@ const NextActivities = ({ navigation }) => {
         }
         nextActivities.sort(
           (a, b) =>
-            parse(a.day, 'dd/MM/yy', new Date()) -
-            parse(b.day, 'dd/MM/yy', new Date())
+            parse(a.day, 'dd/MM/yy', new Date()).getTime() -
+            parse(b.day, 'dd/MM/yy', new Date()).getTime()
         );
         const closestDay = nextActivities.length
           ? nextActivities[0].day

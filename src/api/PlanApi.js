@@ -13,6 +13,7 @@ const addPlan = async (
       arrivalDate,
       departureDate,
       social,
+      loadLevel,
     });
     console.log("Plan added successfully");
     return response.data;

@@ -52,9 +52,16 @@ const Preferences = ({ navigation }) => {
     try {
       setIsLoading(true);
       await userApi.addUserPreferences(selectedPreferences);
-      navigation.navigate("Root", {
-        screen: "Tripy",
-      });
+      //check where the user to change navigation
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      }
+      else{
+        navigation.navigate("Root", {
+          screen: "Tripy",
+        });
+      }
+      
     } catch (err) {
       console.log(err);
     } finally {

@@ -16,7 +16,7 @@ import { useAuth } from "../common/AuthContext";
 import DrawerContent from "../components/DrawerContent";
 import HomeBackground from "../components/HomeBackground";
 import ChangePasswordModal from "../components/ChangePasswordModal";
-import DeleteAccountModal from "../components/DeleteAccountModal";
+import VerificationCodeModal from "../components/VerificationCodeModal"; // New component for verification code
 
 const Settings = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,14 +24,18 @@ const Settings = ({ navigation }) => {
   const [userType, setUserType] = useState("");
   const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] =
     useState(false);
-  const [isDeleteAccountModalVisible, setIsDeleteAccountModalVisible] =
+  const [isVerificationCodeModalVisible, setIsVerificationCodeModalVisible] =
     useState(false);
+  const [email, setEmail] = useState(""); // New state for email
 
   useEffect(() => {
     const fetchUserType = async () => {
       try {
         const response = await userApi.getUserDetails();
-        if (response) setUserType(response.userType);
+        if (response) {
+          setUserType(response.userType);
+          setEmail(response.email); // Set email from user details
+        }
       } catch (error) {
         console.error("Error fetching user type:", error);
       }
@@ -60,22 +64,51 @@ const Settings = ({ navigation }) => {
   };
 
   const handleDeleteAccount = () => {
-    if (userType === "google") {
-      Alert.alert(
-        "Confirm Account Deletion",
-        "Are you sure you want to delete your account?",
-        [
-          { text: "Cancel", style: "cancel" },
-          { text: "Delete", onPress: () => handleConfirmDeleteAccount() },
-        ]
-      );
-    } else {
-      setIsDeleteAccountModalVisible(true);
+    Alert.alert(
+      "Confirm Account Deletion",
+      "Are you sure you want to delete your account?",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Send Verification Code", onPress: () => handleSendVerificationCode() },
+      ]
+    );
+  };
+
+  const handleSendVerificationCode = async () => {
+    setIsLoading(true);
+    try {
+      const response = await userApi.sendVerificationCode(email); // Pass email to sendVerificationCode
+      console.log("response: ", response)
+      if (response  === 'Verification email sent') {
+        ToastAndroid.show("Verification code sent", ToastAndroid.TOP);
+        setIsVerificationCodeModalVisible(true);
+      } else {
+        console.log("Failed to send verification code:", response.error);
+      }
+    } catch (error) {
+      console.error("Error sending verification code:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleChangePassword = () => {
-    setIsChangePasswordModalVisible(true);
+  const handleConfirmVerificationCode = async (verificationCode) => {
+    setIsLoading(true);
+    try {
+      const response = await userApi.verifyAndDeleteAccount(verificationCode);
+      if (response === 'User data, plans, preferences, and authentication deleted successfully') {
+        console.log("Account deleted successfully");
+        ToastAndroid.show("Account deleted successfully", ToastAndroid.TOP);
+        setIsAuthenticated(false);
+      } else {
+        console.log("Account deletion failed:", response.error);
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+    } finally {
+      setIsLoading(false);
+      setIsVerificationCodeModalVisible(false);
+    }
   };
 
   const handleConfirmChangePassword = async (currentPassword, newPassword) => {
@@ -94,24 +127,6 @@ const Settings = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Error changing password:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleConfirmDeleteAccount = async (email, password) => {
-    setIsLoading(true);
-    try {
-      const response = await userApi.userDeleteAccount(email, password);
-      if (response.success) {
-        console.log("Account deleted successfully");
-        ToastAndroid.show("Account deleted successfully", ToastAndroid.TOP);
-        setIsAuthenticated(false);
-      } else {
-        console.log("Account deletion failed:", response.error);
-      }
-    } catch (error) {
-      console.error("Error deleting account:", error);
     } finally {
       setIsLoading(false);
     }
@@ -169,10 +184,11 @@ const Settings = ({ navigation }) => {
           onClose={() => setIsChangePasswordModalVisible(false)}
           onConfirm={handleConfirmChangePassword}
         />
-        <DeleteAccountModal
-          visible={isDeleteAccountModalVisible}
-          onClose={() => setIsDeleteAccountModalVisible(false)}
-          onConfirm={handleConfirmDeleteAccount}
+        <VerificationCodeModal
+          visible={isVerificationCodeModalVisible}
+          onClose={() => setIsVerificationCodeModalVisible(false)}
+          onConfirm={handleConfirmVerificationCode}
+          email = {email}
         />
       </ScrollView>
     </HomeBackground>

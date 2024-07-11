@@ -244,6 +244,33 @@ const userDeleteAccount = async (currentPassword) => {
   return null;
 }
 
+const sendVerificationCode = async (email) => {
+  try {
+    const response = await clientApi.post("/SendMail", {email});
+    return response.data;
+  } catch (error) {
+    console.error("Error sending verification code:", error);
+    return { success: false, error: "Error sending verification code" };
+  }
+};
+
+const verifyAndDeleteAccount = async (verificationCode) => {
+  try {
+    const response = await clientApi.post("/deleteUserData", {
+      verifynumber: verificationCode,
+    });
+    if (await GoogleSignin.isSignedIn()) {
+      console.log("Google sign out");
+      await GoogleSignin.signOut();
+    }
+    await removeToken();
+    return response.data;
+  } catch (error) {
+    console.error("Error verifying and deleting account:", error);
+    return { success: false, error: "Error verifying and deleting account" };
+  }
+};
+
 export default {
   addUser,
   addUserPreferences,
@@ -258,4 +285,6 @@ export default {
   check,
   userChangePassword,
   userDeleteAccount,
+  sendVerificationCode,
+  verifyAndDeleteAccount
 };

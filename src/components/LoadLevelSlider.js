@@ -30,9 +30,9 @@ const LoadLevelSlider = ({ value, onValueChange }) => {
         thumbTintColor="#007bff"
       />
       <View style={styles.sliderValues}>
-        <Icon name="circle-o" size={30} color={value === 1 ? "#007bff" : "#d3d3d3"} />
-        <Icon name="dot-circle-o" size={30} color={value === 2 ? "#007bff" : "#d3d3d3"} />
-        <Icon name="circle" size={30} color={value === 3 ? "#007bff" : "#d3d3d3"} />
+        <Icon name="circle-o" size={30} color={value === 2 ? "#007bff" : "#d3d3d3"} />
+        <Icon name="dot-circle-o" size={30} color={value === 3 ? "#007bff" : "#d3d3d3"} />
+        <Icon name="circle" size={30} color={value === 4 ? "#007bff" : "#d3d3d3"} />
       </View>
 
       <Modal

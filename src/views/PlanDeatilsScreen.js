@@ -74,7 +74,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
         (calendar) => calendar.isPrimary === true
       );
   
-      console.log('Filtered Email Calendars:', emailCalendars); // Log the filtered email calendars
+      // console.log('Filtered Email Calendars:', emailCalendars); // Log the filtered email calendars
   
       setCalendars(emailCalendars);
       setItems(

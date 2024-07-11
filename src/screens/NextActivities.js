@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,6 +9,7 @@ import {
   Linking,
   Alert,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import placesApi from '../api/PlacesApi';
 import plansApi from '../api/PlanApi';
 import HomeBackground from '../components/HomeBackground';
@@ -18,8 +19,11 @@ import RatingStars from '../components/RatingStars';
 import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import Button from '../components/Button';
+import { PlansContext } from '../common/PlansContext';
 
 const NextActivities = ({ navigation }) => {
+  const { plansChanged, setPlansChanged } = useContext(PlansContext); // Use context
+
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [city, setCity] = useState('');
@@ -29,7 +33,41 @@ const NextActivities = ({ navigation }) => {
   const fetchNextActivities = useCallback(async () => {
     setLoading(true);
     console.log('Fetching next activities...');
+
     try {
+      // Invalidate the cache if plans have changed
+      if (plansChanged) {
+        console.log('Invalidating cache due to plan changes');
+        await AsyncStorage.removeItem('nextActivities');
+        setPlansChanged(false);
+      }
+
+      // Try to get cached plans
+      let cachedPlans = [];
+      try {
+        const cachedData = await AsyncStorage.getItem('nextActivities');
+        if (cachedData !== null) {
+          cachedPlans = JSON.parse(cachedData);
+          // console.log('Cached data:', cachedPlans);
+        } else {
+          console.log('No cached data found');
+        }
+      } catch (error) {
+        console.error('Failed to load cached plans:', error);
+      }
+
+      if (cachedPlans && cachedPlans.activities && cachedPlans.activities.length > 0) {
+        console.log('Using cached data');
+        setActivities(cachedPlans.activities);
+        setCity(cachedPlans.city);
+        setDate(cachedPlans.date);
+        setCurrentPlan(cachedPlans.currentPlan);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch plans from API
+      console.log('Fetching new data from API');
       const fetchedPlans = await plansApi.fetchPlans();
       if (fetchedPlans && fetchedPlans.length > 0) {
         const now = new Date();
@@ -55,9 +93,7 @@ const NextActivities = ({ navigation }) => {
             parse(a.day, 'dd/MM/yy', new Date()).getTime() -
             parse(b.day, 'dd/MM/yy', new Date()).getTime()
         );
-        const closestDay = nextActivities.length
-          ? nextActivities[0].day
-          : null;
+        const closestDay = nextActivities.length ? nextActivities[0].day : null;
         if (closestDay) {
           const filteredActivities = nextActivities.filter(
             (activity) => activity.day === closestDay
@@ -80,6 +116,19 @@ const NextActivities = ({ navigation }) => {
             setCity(validDetailedActivities[0].destination);
             setDate(format(parse(validDetailedActivities[0].day, 'dd/MM/yy', new Date()), 'MMMM dd, yyyy'));
             setCurrentPlan(validDetailedActivities[0].plan);
+
+            // Cache the activities
+            try {
+              await AsyncStorage.setItem('nextActivities', JSON.stringify({
+                activities: validDetailedActivities,
+                city: validDetailedActivities[0].destination,
+                date: format(parse(validDetailedActivities[0].day, 'dd/MM/yy', new Date()), 'MMMM dd, yyyy'),
+                currentPlan: validDetailedActivities[0].plan,
+              }));
+              console.log('Data cached successfully');
+            } catch (error) {
+              console.error('Failed to save activities to cache:', error);
+            }
           }
           setActivities(validDetailedActivities);
         }
@@ -89,7 +138,7 @@ const NextActivities = ({ navigation }) => {
       console.error('Error fetching next activities:', error);
     }
     setLoading(false);
-  }, []);
+  }, [plansChanged, setPlansChanged]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', fetchNextActivities);
@@ -101,7 +150,7 @@ const NextActivities = ({ navigation }) => {
       <View style={{ flex: 1 }}>
         <Header style={styles.placeName}>{truncateText(item.name, 25) || 'Unknown Activity'}</Header>
         <RatingStars rating={item.rank} />
-        <Paragraph style={styles.placeAddress}>{truncateText(item.address,35) || 'Unknown Address'}</Paragraph>
+        <Paragraph style={styles.placeAddress}>{truncateText(item.address, 35) || 'Unknown Address'}</Paragraph>
       </View>
       {item.photo_reference && (
         <Image
@@ -182,7 +231,7 @@ const NextActivities = ({ navigation }) => {
                   View Plan Details
                 </Button>
                 <Button
-                mode="outlined"
+                  mode="outlined"
                   onPress={handleOpenGoogleMaps}
                 >
                   Open in Google Maps

@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   ToastAndroid,
   Alert,
+  Linking, // Import Linking
 } from "react-native";
 import React from "react";
 import Button from "../components/Button";
@@ -132,6 +133,13 @@ const Settings = ({ navigation }) => {
     }
   };
 
+  const handleSupportPress = () => {
+    const subject = 'Support Request';
+    const body = 'Hello,\n\nI need help with the Tripy app. Here are the details of my issue:\n\n[Describe your issue here]\n\nThank you,\n[Your Name]';
+    const mailto = `mailto:tripy@tech-center.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    Linking.openURL(mailto);
+  };
+
   return (
     <HomeBackground>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -178,6 +186,13 @@ const Settings = ({ navigation }) => {
               Logout
             </Button>
           )}
+          <Button
+            mode="outlined"
+            onPress={handleSupportPress}
+            style={styles.button}
+          >
+            Support
+          </Button>
         </View>
         <ChangePasswordModal
           visible={isChangePasswordModalVisible}
@@ -188,7 +203,7 @@ const Settings = ({ navigation }) => {
           visible={isVerificationCodeModalVisible}
           onClose={() => setIsVerificationCodeModalVisible(false)}
           onConfirm={handleConfirmVerificationCode}
-          email = {email}
+          email={email}
         />
       </ScrollView>
     </HomeBackground>

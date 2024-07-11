@@ -21,6 +21,8 @@ import PreferencesScreen from './src/views/PreferencesScreen';
 import LoadingScreen from './src/common/LoadingScreen';
 import { AuthProvider, useAuth } from './src/common/AuthContext';
 import clientApi from './src/api/ClientApi'; // Ensure correct import
+import { PlansProvider } from './src/common/PlansContext';
+
 
 enableLatestRenderer();
 
@@ -119,7 +121,9 @@ function App() {
 }
 
 export default () => (
+  <PlansProvider>
   <AuthProvider>
     <App />
   </AuthProvider>
+  </PlansProvider>
 );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import {
   View,
   StyleSheet,
@@ -21,8 +21,12 @@ import DropDownPicker from "react-native-dropdown-picker";
 import { Swipeable } from 'react-native-gesture-handler';
 import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PlansContext } from '../common/PlansContext'; // Import context
 
 export default function PreviousPlans({ navigation }) {
+  const { setPlansChanged } = useContext(PlansContext); // Use context
+
   const [destinationImages, setDestinationImages] = useState({});
   const [plans, setPlans] = useState([]);
   const [filteredPlans, setFilteredPlans] = useState([]);
@@ -120,6 +124,7 @@ export default function PreviousPlans({ navigation }) {
 
   const onRefresh = () => {
     setRefreshing(true);
+    setPlansChanged(true);
     fetchData().then(() => setRefreshing(false));
   };
 
@@ -139,8 +144,12 @@ export default function PreviousPlans({ navigation }) {
             if (response) {
               const updatedPlans = plans.filter((plan) => plan.id !== item.id);
               setPlans(updatedPlans);
+              await AsyncStorage.setItem('travelPlans', JSON.stringify(updatedPlans)); // Update cache
               fetchData();
               ToastAndroid.show("Plan deleted successfully", ToastAndroid.SHORT);
+              
+              // Notify that plans have changed
+              setPlansChanged(true);
             }
           },
         },
@@ -165,6 +174,10 @@ export default function PreviousPlans({ navigation }) {
             await Promise.all(promises);
             setSelectedPlans([]);
             setIsSelectionMode(false);
+            fetchData();
+
+            // Notify that plans have changed
+            setPlansChanged(true);
           },
         },
       ],

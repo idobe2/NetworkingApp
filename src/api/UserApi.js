@@ -18,7 +18,8 @@ const userResetPassword = async (email) => {
   }
 };
 
-const userSignup = async (email, password, confirmPassword) => {
+const userSignup = async (email, password, confirmPassword, name, formattedDateString, gender ) => {
+  
   if (password !== confirmPassword) {
     return { success: false, message: "Passwords do not match" };
   }
@@ -39,7 +40,8 @@ const userSignup = async (email, password, confirmPassword) => {
       };
     }
 
-    const post_response = await clientApi.post(`/signup`, { email, password });
+    const post_response = await clientApi.post(`/signup`, { email, password, name, gender, birthday: formattedDateString });
+
 
     if (post_response.data.success) {
       return {

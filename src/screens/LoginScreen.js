@@ -48,9 +48,6 @@ export default function LoginScreen({ navigation }) {
         if (targetScreen === "Preferences") {
           setIsAuthenticated(true);
           navigation.navigate("Root", { screen: targetScreen });
-        } else {
-          setIsAuthenticated(true);
-          navigation.navigate(targetScreen);
         }
       }
     } catch (error) {

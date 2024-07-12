@@ -18,6 +18,7 @@ import DrawerContent from "../components/DrawerContent";
 import HomeBackground from "../components/HomeBackground";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 import VerificationCodeModal from "../components/VerificationCodeModal"; // New component for verification code
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
 
 const Settings = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -93,6 +94,10 @@ const Settings = ({ navigation }) => {
     }
   };
 
+  const handleChangePassword = () => {
+    setIsChangePasswordModalVisible(true);
+  };
+
   const handleConfirmVerificationCode = async (verificationCode) => {
     setIsLoading(true);
     try {
@@ -138,6 +143,16 @@ const Settings = ({ navigation }) => {
     const body = 'Hello,\n\nI need help with the Tripy app. Here are the details of my issue:\n\n[Describe your issue here]\n\nThank you,\n[Your Name]';
     const mailto = `mailto:tripy@tech-center.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     Linking.openURL(mailto);
+  };
+
+  const handleResetCache = async () => {
+    try {
+      await AsyncStorage.clear();
+      ToastAndroid.show("Cache has been reset", ToastAndroid.SHORT);
+    } catch (error) {
+      console.error("Error resetting cache:", error);
+      ToastAndroid.show("Failed to reset cache", ToastAndroid.SHORT);
+    }
   };
 
   return (
@@ -192,6 +207,13 @@ const Settings = ({ navigation }) => {
             style={styles.button}
           >
             Support
+          </Button>
+          <Button
+            mode="outlined"
+            onPress={handleResetCache}
+            style={styles.button}
+          >
+            Reset Cache
           </Button>
         </View>
         <ChangePasswordModal

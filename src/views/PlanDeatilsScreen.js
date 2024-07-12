@@ -67,7 +67,6 @@ export default function PlanDetailsScreen({ route, navigation }) {
   const fetchCalendars = async () => {
     try {
       const calendars = await RNCalendarEvents.findCalendars();
-      console.log('Fetched Calendars:', calendars); // Log the fetched calendars
   
       // Filter calendars that are primary
       const emailCalendars = calendars.filter(
@@ -171,23 +170,60 @@ export default function PlanDetailsScreen({ route, navigation }) {
           text: "OK",
           onPress: async () => {
             console.log("Delete activity:", activity);
-            const response = await PlanApi.deleteActivity(
-              trip.planId,
-              dayIndex,
-              activityIndex
-            );
-            console.log("Response:", response);
-            const newActivitiesDetails = activitiesDetails.filter(
-              (item, index) => index !== activityIndex
-            );
-
-            setActivitiesDetails(newActivitiesDetails);
+            try {
+              const response = await PlanApi.deleteActivity(
+                trip.planId,
+                dayIndex,
+                activityIndex
+              );
+              console.log("Response:", response);
+  
+              // Update the trip.travelPlan to remove the activity
+              const updatedTravelPlan = [...trip.travelPlan];
+              updatedTravelPlan[dayIndex].activities.splice(activityIndex, 1);
+  
+              // Rebuild the activitiesDetails array
+              const newActivitiesDetails = [];
+              updatedTravelPlan.forEach(day => {
+                day.activities.forEach((activityId, index) => {
+                  const detailIndex = trip.travelPlan
+                    .flatMap(day => day.activities)
+                    .findIndex(id => id === activityId);
+  
+                  if (detailIndex !== -1) {
+                    newActivitiesDetails.push(activitiesDetails[detailIndex]);
+                  }
+                });
+              });
+  
+              // Set the new state
+              setActivitiesDetails(newActivitiesDetails);
+  
+              // Also update the trip object itself if needed elsewhere
+              trip.travelPlan = updatedTravelPlan;
+  
+              // Show a success toast
+              ToastAndroid.show(
+                "Activity deleted successfully",
+                ToastAndroid.SHORT
+              );
+            } catch (error) {
+              console.error("Error deleting activity:", error);
+              ToastAndroid.show(
+                "Failed to delete activity",
+                ToastAndroid.SHORT
+              );
+            }
           },
         },
       ],
       { cancelable: true }
     );
   };
+  
+  
+  
+  
 
   const handleMeal = (activity, activityIndex, dayIndex) => {
     setCaller("meal");

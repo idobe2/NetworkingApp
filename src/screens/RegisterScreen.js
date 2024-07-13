@@ -428,8 +428,9 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: "row",
-    marginTop: 16,
+    marginTop: 12,
     justifyContent: "center",
+    marginBottom: 20,
   },
   link: {
     fontWeight: "bold",
@@ -468,7 +469,7 @@ const styles = StyleSheet.create({
   ageErrorText: {
     color: "#b22222",
     marginLeft: 30,
-    marginTop: 15,
+    marginTop: 10,
     bottom: 12,
   },
   ageIconLeft: {
@@ -483,17 +484,19 @@ const styles = StyleSheet.create({
   logo: {
     alignItems: "center",
     top: 20,
+    marginBottom: 20,
   },
   input: {
     flex: 1,
     backgroundColor: theme.colors.surface,
-    padding: 18,
+    padding: 15,
     borderRadius: theme.roundness,
     borderWidth: 1,
-    borderColor: theme.colors.primary,
+    borderColor: 'grey',
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginBottom: 10,
   },
   inputText: {
     fontSize: 16,
@@ -516,8 +519,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.roundness,
     borderWidth: 1,
-    borderColor: theme.colors.primary,
-    padding: 12,
+    borderColor: 'grey',
+    padding: 15,
+    marginBottom: 12,
   },
   selectedText: {
     fontSize: 16,

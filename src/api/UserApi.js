@@ -30,13 +30,17 @@ const userSignup = async (email, password, confirmPassword, name, formattedDateS
       password,
     });
 
-    if (
-      response_mail.data !== "Email is available" ||
-      response_password.data !== "Password received"
-    ) {
+    if (response_mail.data !== "Email is available") {
       return {
-        success: false,
-        message: response_mail.data || response_password.data,
+      success: false,
+      message: response_mail.data,
+      };
+    }
+
+    if (response_password.data !== "Password received") {
+      return {
+      success: false,
+      message: response_password.data,
       };
     }
 

@@ -4,13 +4,10 @@ import { View, StyleSheet, SafeAreaView } from "react-native";
 import Banners from "../components/Banners";
 import InfoModal from "../components/InfoModal";
 import HomeBackground from "../components/HomeBackground";
+import ConfettiCannon from 'react-native-confetti-cannon';
 
 export default function Explore({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
-
-  const handlePlaceSelect = (placeDetails, photoUrl) => {
-    // Handle place selection if needed, or leave it empty
-  };
 
   const handleBannerPress = (bannerId) => {
     console.log(`Banner ${bannerId} pressed`);
@@ -26,6 +23,7 @@ export default function Explore({ navigation }) {
 
   return (
     <HomeBackground>
+      <ConfettiCannon count={150} origin={{ x: -10, y: 0 }} fadeOut/>      
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
           {/* <SearchPlacesBar onPlaceSelect={handlePlaceSelect} /> */}

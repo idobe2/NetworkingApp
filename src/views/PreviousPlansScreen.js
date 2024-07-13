@@ -22,10 +22,11 @@ import { Swipeable } from 'react-native-gesture-handler';
 import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PlansContext } from '../common/PlansContext'; // Import context
+import { PlansContext } from '../common/PlansContext';
+import NoPlansMessage from "../components/NoPlansMessage";
 
 export default function PreviousPlans({ navigation }) {
-  const { setPlansChanged } = useContext(PlansContext); // Use context
+  const { setPlansChanged } = useContext(PlansContext);
 
   const [destinationImages, setDestinationImages] = useState({});
   const [plans, setPlans] = useState([]);
@@ -43,25 +44,35 @@ export default function PreviousPlans({ navigation }) {
     { label: 'Sort by Social', value: 'social' }
   ]);
   const [hasFetchedData, setHasFetchedData] = useState(false);
+  const [apiError, setApiError] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (loading) return;
     setLoading(true);
+    setApiError(false);
 
-    const fetchedPlans = await plansApi.fetchPlans();
-    if (!fetchedPlans) {
-      setPlans([]);
-    } else if (fetchedPlans.length > 0) {
-      const plansWithId = fetchedPlans.map((plan, index) => ({
-        ...plan,
-        id: plan.id || index.toString(),
-      }));
-      setPlans(plansWithId);
-      setFilteredPlans(plansWithId);
-      const destination = await placesApi.fetchImages(plansWithId);
-      if (destination) {
-        setDestinationImages(destination);
+    try {
+      const fetchedPlans = await plansApi.fetchPlans();
+      if (!fetchedPlans) {
+        setPlans([]);
+      } else if (fetchedPlans.length > 0) {
+        const plansWithId = fetchedPlans.map((plan, index) => ({
+          ...plan,
+          id: plan.id || index.toString(),
+        }));
+        setPlans(plansWithId);
+        setFilteredPlans(plansWithId);
+        const destination = await placesApi.fetchImages(plansWithId);
+        if (destination) {
+          setDestinationImages(destination);
+        }
       }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setApiError(true);
+      }
+      ToastAndroid.show('Failed to fetch plans', ToastAndroid.SHORT);
+      console.error('Error fetching plans:', error);
     }
 
     setLoading(false);
@@ -89,7 +100,7 @@ export default function PreviousPlans({ navigation }) {
           ToastAndroid.show("Server is taking too long to respond", ToastAndroid.SHORT);
           setLoading(false);
         }
-      }, 20000); // 10 seconds timeout
+      }, 20000); // 20 seconds timeout
     }
     return () => clearTimeout(timeout);
   }, [loading]);
@@ -280,18 +291,25 @@ export default function PreviousPlans({ navigation }) {
           setItems={setItems}
           containerStyle={styles.dropdown}
         />
-        <FlatList
-          data={filteredPlans}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-        />
-        {loading && (
+        {loading ? (
           <View style={styles.loadingOverlay}>
             <AnimatedLogo />
           </View>
+        ) : (
+          <>
+            {filteredPlans.length > 0 ? (
+              <FlatList
+                data={filteredPlans}
+                renderItem={renderItem}
+                keyExtractor={(item) => item.id.toString()}
+                refreshControl={
+                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+              />
+            ) : (
+              <NoPlansMessage onGetStarted={() => navigation.navigate('Welcome')} />
+            )}
+          </>
         )}
       </View>
     </HomeBackground>

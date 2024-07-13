@@ -20,6 +20,7 @@ import Header from '../components/Header';
 import Paragraph from '../components/Paragraph';
 import Button from '../components/Button';
 import { PlansContext } from '../common/PlansContext';
+import NoPlansMessage from '../components/NoPlansMessage';
 
 const NextActivities = ({ navigation }) => {
   const { plansChanged, setPlansChanged } = useContext(PlansContext); // Use context
@@ -227,7 +228,7 @@ const NextActivities = ({ navigation }) => {
                 keyExtractor={(item, index) => index.toString()}
               />
             ) : (
-              <Paragraph style={{textAlign:'center'}}>It looks like you have no upcoming activities at the moment. You need to create a future plan first. ✈️</Paragraph>
+              <NoPlansMessage onGetStarted={() => navigation.navigate('Welcome')} />
             )}
             {currentPlan && (
               <View style={styles.buttonsContainer}>

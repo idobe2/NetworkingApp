@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
   Text,
@@ -24,6 +24,7 @@ import HomeBackground from "../components/HomeBackground";
 import BackButton from "../components/BackButton";
 import MealTypeModal from "../components/MealTypeModal";
 import { Swipeable } from "react-native-gesture-handler";
+import { PlansContext } from "../common/PlansContext"; // Import context
 
 export default function PlanDetailsScreen({ route, navigation }) {
   const { trip, image } = route.params;
@@ -41,6 +42,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([]);
+  const { setPlansChanged } = useContext(PlansContext); // Use context
 
   useEffect(() => {
     fetchActivitiesDetails();
@@ -67,14 +69,12 @@ export default function PlanDetailsScreen({ route, navigation }) {
   const fetchCalendars = async () => {
     try {
       const calendars = await RNCalendarEvents.findCalendars();
-  
+
       // Filter calendars that are primary
       const emailCalendars = calendars.filter(
         (calendar) => calendar.isPrimary === true
       );
-  
-      // console.log('Filtered Email Calendars:', emailCalendars); // Log the filtered email calendars
-  
+
       setCalendars(emailCalendars);
       setItems(
         emailCalendars.map((calendar) => ({
@@ -82,21 +82,21 @@ export default function PlanDetailsScreen({ route, navigation }) {
           value: calendar.id,
         }))
       );
-  
+
       // Check if there is a previously selected calendar
-      const previouslySelectedCalendar = emailCalendars.find(calendar => calendar.id === selectedCalendar?.id);
-  
+      const previouslySelectedCalendar = emailCalendars.find(
+        (calendar) => calendar.id === selectedCalendar?.id
+      );
+
       if (previouslySelectedCalendar) {
         setSelectedCalendar(previouslySelectedCalendar);
       } else if (emailCalendars.length > 0) {
         setSelectedCalendar(emailCalendars[0]);
       }
-  
     } catch (error) {
       console.error("Error fetching calendars: ", error);
     }
   };
-  
 
   const fetchActivitiesDetails = async () => {
     setLoading(true);
@@ -149,6 +149,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
               tripId: trip.planId,
             });
             setBottomSheetVisible(true);
+            setPlansChanged(true);
           },
         },
       ],
@@ -177,36 +178,37 @@ export default function PlanDetailsScreen({ route, navigation }) {
                 activityIndex
               );
               console.log("Response:", response);
-  
+
               // Update the trip.travelPlan to remove the activity
               const updatedTravelPlan = [...trip.travelPlan];
               updatedTravelPlan[dayIndex].activities.splice(activityIndex, 1);
-  
-              // Rebuild the activitiesDetails array
+
+              // Rebuild the activitiesDetails array based on updated travelPlan
               const newActivitiesDetails = [];
-              updatedTravelPlan.forEach(day => {
-                day.activities.forEach((activityId, index) => {
-                  const detailIndex = trip.travelPlan
-                    .flatMap(day => day.activities)
-                    .findIndex(id => id === activityId);
-  
-                  if (detailIndex !== -1) {
-                    newActivitiesDetails.push(activitiesDetails[detailIndex]);
+              for (const day of updatedTravelPlan) {
+                for (const activityId of day.activities) {
+                  const detail = activitiesDetails.find(
+                    (detail) => detail.place_id === activityId
+                  );
+                  if (detail) {
+                    newActivitiesDetails.push(detail);
                   }
-                });
-              });
-  
+                }
+              }
+
               // Set the new state
               setActivitiesDetails(newActivitiesDetails);
-  
+
               // Also update the trip object itself if needed elsewhere
               trip.travelPlan = updatedTravelPlan;
-  
+
               // Show a success toast
               ToastAndroid.show(
                 "Activity deleted successfully",
                 ToastAndroid.SHORT
               );
+              // console.log("Activities Details:", newActivitiesDetails);
+              // console.log("Updated Travel Plan:", updatedTravelPlan);
             } catch (error) {
               console.error("Error deleting activity:", error);
               ToastAndroid.show(
@@ -214,16 +216,13 @@ export default function PlanDetailsScreen({ route, navigation }) {
                 ToastAndroid.SHORT
               );
             }
+            setPlansChanged(true);
           },
         },
       ],
       { cancelable: true }
     );
   };
-  
-  
-  
-  
 
   const handleMeal = (activity, activityIndex, dayIndex) => {
     setCaller("meal");
@@ -490,6 +489,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
         activityIndex,
         newActivity
       );
+      console.log("Replace Activity Response:", response);
       trip.travelPlan[dayIndex].activities[activityIndex] = newActivity;
     } else if (caller === "meal") {
       const response = await PlanApi.addMeal(
@@ -499,9 +499,12 @@ export default function PlanDetailsScreen({ route, navigation }) {
         activityName,
         newActivity
       );
+      console.log("Add Meal Response:", response);
+      trip.travelPlan[dayIndex].activities.splice(activityIndex + 1, 0, newActivity);
     }
     await fetchActivitiesDetails();
     setBottomSheetVisible(false);
+    setPlansChanged(true);
   };
 
   return (
@@ -521,45 +524,51 @@ export default function PlanDetailsScreen({ route, navigation }) {
               </Text>
             </View>
             <Menu
-  visible={menuVisible}
-  onDismiss={() => setMenuVisible(false)}
-  anchor={
-    <TouchableOpacity
-      style={styles.calendarButton}
-      onPress={() => setMenuVisible(true)}
-    >
-      <Icon name="calendar-today" size={30} color="#000" />
-    </TouchableOpacity>
-  }
->
-  <Menu.Item title="Select a Calendar" disabled={true} />
-  {items.map((item) => (
-    <Menu.Item
-      key={item.value}
-      onPress={() => {
-        if (selectedCalendar && selectedCalendar.id === item.value) {
-          addAllActivitiesToCalendar();
-        } else {
-          setValue(item.value);
-          setSelectedCalendar(
-            calendars.find((calendar) => calendar.id === item.value)
-          );
-          addAllActivitiesToCalendar();
-        }
-        setMenuVisible(false);
-      }}
-      title={item.label}
-      style={selectedCalendar && selectedCalendar.id === item.value ? styles.selectedCalendarItem : null}
-    />
-  ))}
-  <Menu.Item
-    onPress={() => {
-      setMenuVisible(false);
-    }}
-    title="Cancel"
-  />
-</Menu>
-
+              visible={menuVisible}
+              onDismiss={() => setMenuVisible(false)}
+              anchor={
+                <TouchableOpacity
+                  style={styles.calendarButton}
+                  onPress={() => setMenuVisible(true)}
+                >
+                  <Icon name="calendar-today" size={30} color="#000" />
+                </TouchableOpacity>
+              }
+            >
+              <Menu.Item title="Select a Calendar" disabled={true} />
+              {items.map((item) => (
+                <Menu.Item
+                  key={item.value}
+                  onPress={() => {
+                    if (
+                      selectedCalendar &&
+                      selectedCalendar.id === item.value
+                    ) {
+                      addAllActivitiesToCalendar();
+                    } else {
+                      setValue(item.value);
+                      setSelectedCalendar(
+                        calendars.find((calendar) => calendar.id === item.value)
+                      );
+                      addAllActivitiesToCalendar();
+                    }
+                    setMenuVisible(false);
+                  }}
+                  title={item.label}
+                  style={
+                    selectedCalendar && selectedCalendar.id === item.value
+                      ? styles.selectedCalendarItem
+                      : null
+                  }
+                />
+              ))}
+              <Menu.Item
+                onPress={() => {
+                  setMenuVisible(false);
+                }}
+                title="Cancel"
+              />
+            </Menu>
           </View>
           <FlatList
             data={travelPlanWithIndices}
@@ -711,15 +720,14 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   deleteButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     width: 80,
-    backgroundColor: 'red',
+    backgroundColor: "red",
     borderRadius: 5,
     marginBottom: 10,
   },
   selectedCalendarItem: {
-    backgroundColor: '#e0e0e0', // Highlight the selected item
+    backgroundColor: "#e0e0e0", // Highlight the selected item
   },
 });
-

@@ -147,8 +147,6 @@ export default function PreviousPlans({ navigation }) {
               await AsyncStorage.setItem('travelPlans', JSON.stringify(updatedPlans)); // Update cache
               fetchData();
               ToastAndroid.show("Plan deleted successfully", ToastAndroid.SHORT);
-              
-              // Notify that plans have changed
               setPlansChanged(true);
             }
           },
@@ -175,8 +173,6 @@ export default function PreviousPlans({ navigation }) {
             setSelectedPlans([]);
             setIsSelectionMode(false);
             fetchData();
-
-            // Notify that plans have changed
             setPlansChanged(true);
           },
         },
@@ -307,7 +303,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     top: 20,
-    marginTop: 20,
+    // marginTop: 20,
     
   },
   headerContainer: {
@@ -317,7 +313,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   searchBar: {
-    height: 40,
+    height: 50,
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,

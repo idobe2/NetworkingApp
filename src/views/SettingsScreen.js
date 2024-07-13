@@ -54,6 +54,7 @@ const Settings = ({ navigation }) => {
       if (response === "logout successful") {
         setIsAuthenticated(false);
       }
+      handleResetCache();
       ToastAndroid.show(
         "Goodbye 👋, See you again soon 😊",
         ToastAndroid.SHORT

@@ -29,6 +29,7 @@ const NextActivities = ({ navigation }) => {
   const [city, setCity] = useState('');
   const [date, setDate] = useState('');
   const [currentPlan, setCurrentPlan] = useState(null);
+  const [apiError, setApiError] = useState(false);
 
   const fetchNextActivities = useCallback(async () => {
     setLoading(true);
@@ -132,8 +133,13 @@ const NextActivities = ({ navigation }) => {
           }
           setActivities(validDetailedActivities);
         }
+      } else {
+        setApiError(true);
       }
     } catch (error) {
+      if (error.response && error.response.status === 404) {
+        setApiError(true);
+      }
       ToastAndroid.show('Failed to fetch activities', ToastAndroid.SHORT);
       console.error('Error fetching next activities:', error);
     }
@@ -214,11 +220,15 @@ const NextActivities = ({ navigation }) => {
           <ActivityIndicator size="large" color="#0000ff" />
         ) : (
           <>
-            <FlatList
-              data={activities}
-              renderItem={renderItem}
-              keyExtractor={(item, index) => index.toString()}
-            />
+            {activities.length > 0 ? (
+              <FlatList
+                data={activities}
+                renderItem={renderItem}
+                keyExtractor={(item, index) => index.toString()}
+              />
+            ) : (
+              <Paragraph style={{textAlign:'center'}}>It looks like you have no upcoming activities at the moment. You need to create a future plan first. ✈️</Paragraph>
+            )}
             {currentPlan && (
               <View style={styles.buttonsContainer}>
                 <Button

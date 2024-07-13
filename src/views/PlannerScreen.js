@@ -111,7 +111,7 @@ const Planner = ({ navigation }) => {
       return;
     }
 
-    setLoading(true); // Show the activity indicator
+    setLoading(true);
 
     try {
       console.log(
@@ -135,11 +135,15 @@ const Planner = ({ navigation }) => {
       if (!response) {
         alert("Failed to create plan");
       } else {
+        setDestination("");
+        setSocial("");
+        setDateRange({});
+        setLoadLevel(2);
         navigation.navigate("Previous Plans");
         ToastAndroid.show("Plan created successfully", ToastAndroid.SHORT);
       }
     } finally {
-      setLoading(false); // Hide the activity indicator
+      setLoading(false);
     }
   };
 

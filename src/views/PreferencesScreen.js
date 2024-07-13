@@ -5,17 +5,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
-  Image,
+  ToastAndroid,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // For icons
+import { Ionicons } from "@expo/vector-icons";
 import Button from "../components/Button";
 import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
-import Header from "../components/Header";
 import AnimatedLogo from "../common/AnimatedLogo"
 import HomeBackground from "../components/HomeBackground";
-
+import Paragraph from "../components/Paragraph";
 
 const Preferences = ({ navigation }) => {
   const [selectedPreferences, setSelectedPreferences] = useState([]);
@@ -66,6 +64,7 @@ const Preferences = ({ navigation }) => {
       console.log(err);
     } finally {
       setIsLoading(false);
+      ToastAndroid.show("Preferences saved!", ToastAndroid.SHORT);
     }
   };
 
@@ -91,12 +90,12 @@ const Preferences = ({ navigation }) => {
   return (
     <HomeBackground>
     <View style={styles.container}>
-      <Image
+      {/* <Image
         source={{ uri: "https://example.com/header-image.jpg" }} // Replace with your image URL
         style={styles.headerImage}
-      />
+      /> */}
       {/* <Text style={styles.title}>Welcome to Tripy!</Text> */}
-      <Header style={{bottom: 20}}>To tailor the best trip for you,{'\n'}we'd love to know more about you 😊{'\n'}What do you like?</Header>
+      <Paragraph style={{marginTop: 20, bottom: 20}}>To tailor the best trip for you,{'\n'}we'd love to know more about you 😊{'\n'}What do you like?</Paragraph>
       {/* <Text style={styles.instruction}>Please select your preferences:</Text> */}
       <ScrollView style={styles.scrollView}>
         {[

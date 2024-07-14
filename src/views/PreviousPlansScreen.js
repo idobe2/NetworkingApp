@@ -26,7 +26,7 @@ import { PlansContext } from '../common/PlansContext';
 import NoPlansMessage from "../components/NoPlansMessage";
 
 export default function PreviousPlans({ navigation }) {
-  const { setPlansChanged } = useContext(PlansContext);
+  const { plansChanged, setPlansChanged } = useContext(PlansContext); 
 
   const [destinationImages, setDestinationImages] = useState({});
   const [plans, setPlans] = useState([]);
@@ -45,6 +45,7 @@ export default function PreviousPlans({ navigation }) {
   ]);
   const [hasFetchedData, setHasFetchedData] = useState(false);
   const [apiError, setApiError] = useState(false);
+  
 
   const fetchData = useCallback(async () => {
     if (loading) return;
@@ -79,14 +80,22 @@ export default function PreviousPlans({ navigation }) {
     setHasFetchedData(true);
   }, [loading]);
 
+
+  
+
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
+      console.log("Plans changed:", plansChanged);
       if (!hasFetchedData) {
         fetchData();
       }
+      else if (plansChanged) {
+        fetchData();
+        setPlansChanged(false);
+      }
     });
     return () => unsubscribe();
-  }, [navigation, fetchData, hasFetchedData]);
+  }, [navigation, fetchData, hasFetchedData, plansChanged, setPlansChanged]);
 
   useEffect(() => {
     applyFilters();

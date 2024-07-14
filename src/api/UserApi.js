@@ -230,12 +230,23 @@ const userChangePassword = async (currentPassword, newPassword) => {
       currentPassword,
       newPassword,
     });
-    return response.data;
+    return response.data;  // Returns the success message and data from the server
   } catch (error) {
-    console.error("Error changing password:", error);
-    Alert.alert("Error changing password. Please try again.");
+    console.log("Error changing password:", error);
+
+    // Check if the error response has data and a message
+    if (error.response && error.response.data) {
+      // Display the specific error message received from the server
+      Alert.alert("Error changing password", error.response.data.message);
+    } else {
+      // Generic error message if response data is not available
+      Alert.alert("Error changing password. Please try again.");
+    }
+    
+    return { success: false, message: (error.response && error.response.data.message) ? error.response.data.message : "Error changing password. Please try again." };
   }
 };
+
 
 const userDeleteAccount = async (currentPassword) => {
   try {

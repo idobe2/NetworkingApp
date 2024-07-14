@@ -23,7 +23,7 @@ import { PlansContext } from '../common/PlansContext';
 import NoPlansMessage from '../components/NoPlansMessage';
 
 const NextActivities = ({ navigation }) => {
-  const { plansChanged, setPlansChanged } = useContext(PlansContext); // Use context
+  const { plansChanged, setPlansChanged } = useContext(PlansContext); 
 
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);

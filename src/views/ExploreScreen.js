@@ -23,7 +23,6 @@ export default function Explore({ navigation }) {
 
   return (
     <HomeBackground>
-      <ConfettiCannon count={150} origin={{ x: -10, y: 0 }} fadeOut/>      
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
           {/* <SearchPlacesBar onPlaceSelect={handlePlaceSelect} /> */}

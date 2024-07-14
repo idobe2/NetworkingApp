@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, StyleSheet, ToastAndroid, Text} from "react-native";
 import Button from "../components/Button";
 import Header from "../components/Header";
@@ -12,6 +12,7 @@ import SelectDatesModal from "../components/SelectDatesModal";
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
+import { PlansContext } from '../common/PlansContext';
 
 const Planner = ({ navigation }) => {
   const [destination, setDestination] = useState("");
@@ -24,6 +25,7 @@ const Planner = ({ navigation }) => {
   });
   const [loadLevel, setLoadLevel] = useState(2);
   const [loading, setLoading] = useState(false);
+  const { setPlansChanged } = useContext(PlansContext);
 
   const handleDayPress = (day) => {
     const { dateString } = day;
@@ -139,10 +141,13 @@ const Planner = ({ navigation }) => {
         setSocial("");
         setDateRange({});
         setLoadLevel(2);
+        setPlansChanged(true);
         navigation.navigate("Previous Plans");
         ToastAndroid.show("Plan created successfully", ToastAndroid.SHORT);
       }
     } finally {
+      console.log("Plan created in finally");
+      
       setLoading(false);
     }
   };

@@ -41,6 +41,8 @@ export default function LoginScreen({ navigation }) {
       if (response.success) {
         setIsAuthenticated(true);
         navigation.navigate("Root", { screen: "Home" });
+        ToastAndroid.show("Welcome Back", ToastAndroid.SHORT);
+
       } else {
         const targetScreen = response.tranferTo;
         setIsAuthenticated(true);
@@ -64,7 +66,7 @@ export default function LoginScreen({ navigation }) {
       <Logo />
       <Header>Welcome back.</Header>
       <TextInput
-        placeholder="Email"
+        label="Email"
         value={email.value}
         onChangeText={(text) => setEmail({ value: text, error: "" })}
       />

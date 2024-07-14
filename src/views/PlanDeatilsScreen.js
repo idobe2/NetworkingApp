@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef  } from "react";
 import {
   View,
   Text,
@@ -42,7 +42,8 @@ export default function PlanDetailsScreen({ route, navigation }) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [value, setValue] = useState(null);
   const [items, setItems] = useState([]);
-  const { setPlansChanged } = useContext(PlansContext); // Use context
+  const { setPlansChanged } = useContext(PlansContext); 
+  const swipeableRefs = useRef(new Map()); // Add a reference to store swipeable components
 
   useEffect(() => {
     fetchActivitiesDetails();
@@ -201,6 +202,11 @@ export default function PlanDetailsScreen({ route, navigation }) {
 
               // Also update the trip object itself if needed elsewhere
               trip.travelPlan = updatedTravelPlan;
+
+              const swipeableRow = swipeableRefs.current.get(`${dayIndex}-${activityIndex}`);
+              if (swipeableRow) {
+                swipeableRow.close();
+              }
 
               // Show a success toast
               ToastAndroid.show(
@@ -404,6 +410,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
 
   const renderActivity = ({ item, index, dayIndex }) => (
     <Swipeable
+      ref={(ref) => swipeableRefs.current.set(`${dayIndex}-${index}`, ref)} // Store reference
       renderRightActions={(progress, dragX) =>
         renderRightActions(progress, dragX, item, index, dayIndex)
       }

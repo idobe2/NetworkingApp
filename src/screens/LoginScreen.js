@@ -5,6 +5,7 @@ import {
   View,
   ActivityIndicator,
   ToastAndroid,
+  Alert,
 } from "react-native";
 import { Text, IconButton } from "react-native-paper";
 import Background from "../components/Background";
@@ -16,6 +17,7 @@ import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
 import { useAuth } from "../common/AuthContext";
+import NetInfo from "@react-native-community/netinfo";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState({ value: "", error: "" });
@@ -29,6 +31,12 @@ export default function LoginScreen({ navigation }) {
   };
 
   const onLoginPressed = async () => {
+    const state = await NetInfo.fetch();
+    if (!state.isConnected) {
+      Alert.alert("No Internet Connection", "Please check your network connection and try again.");
+      return;
+    }
+
     try {
       setIsLoading(true);
       const response = await userApi.userLogin(email.value, password.value);
@@ -42,7 +50,6 @@ export default function LoginScreen({ navigation }) {
         setIsAuthenticated(true);
         navigation.navigate("Root", { screen: "Home" });
         ToastAndroid.show("Welcome Back", ToastAndroid.SHORT);
-
       } else {
         const targetScreen = response.tranferTo;
         setIsAuthenticated(true);
@@ -70,14 +77,14 @@ export default function LoginScreen({ navigation }) {
         value={email.value}
         onChangeText={(text) => setEmail({ value: text, error: "" })}
       />
-    <View style={styles.passwordContainer}>
+      <View style={styles.passwordContainer}>
         <TextInput
           label="Password"
           returnKeyType="done"
           value={password.value}
           onChangeText={(text) => setPassword({ value: text, error: "" })}
-          secureTextEntry={!showPassword} // Toggle secureTextEntry based on showPassword state
-          style={[styles.input, { paddingRight: 40 }]} // Add padding to avoid text overlap with the icon
+          secureTextEntry={!showPassword}
+          style={[styles.input, { paddingRight: 40 }]}
         />
         <IconButton
           icon={showPassword ? "eye-off" : "eye"}
@@ -85,7 +92,7 @@ export default function LoginScreen({ navigation }) {
           style={[
             styles.iconButton,
             { position: "absolute", right: 10, bottom: 5 },
-          ]} // Adjust position as needed
+          ]}
         />
       </View>
       <View style={styles.forgotPassword}>
@@ -140,10 +147,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     height: 60,
-    // paddingRight: 50,
   },
   iconButton: {
-    margin: 0, // Adjust position of icon
+    margin: 0,
   },
   input: {
     backgroundColor: theme.colors.surface,

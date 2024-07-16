@@ -31,6 +31,8 @@ import TextInput from "../components/TextInput";
 import CalendarPicker from "react-native-calendar-picker";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Dropdown } from "react-native-element-dropdown";
+import NetInfo from "@react-native-community/netinfo";
+
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -108,6 +110,14 @@ export default function RegisterScreen({ navigation }) {
   };
 
   const handleSignup = async () => {
+
+    const state = await NetInfo.fetch();
+    if (!state.isConnected) {
+      Alert.alert("No Internet Connection", "Please check your network connection and try again.");
+      return;
+    }
+
+
     setIsLoading(true);
     const formattedDateString = formatDate(selectedDate);
     const response = await userApi.userSignup(

@@ -114,16 +114,16 @@ export default function PreviousPlans({ navigation }) {
     return () => clearTimeout(timeout);
   }, [loading]);
 
-  const applyFilters = () => {
-    let updatedPlans = plans;
-
+  const applyFilters = useCallback(() => {
+    let updatedPlans = [...plans];
+  
     // Apply search filter
     if (searchQuery) {
       updatedPlans = updatedPlans.filter((plan) =>
         plan.destination.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-
+  
     // Apply sorting
     switch (sortOption) {
       case "date":
@@ -138,9 +138,10 @@ export default function PreviousPlans({ navigation }) {
       default:
         break;
     }
-
+  
     setFilteredPlans(updatedPlans);
-  };
+  }, [searchQuery, sortOption, plans]);
+  
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -291,15 +292,22 @@ export default function PreviousPlans({ navigation }) {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <DropDownPicker
-          open={open}
-          value={sortOption}
-          items={items}
-          setOpen={setOpen}
-          setValue={setSortOption}
-          setItems={setItems}
-          containerStyle={styles.dropdown}
-        />
+     <DropDownPicker
+  open={open}
+  value={sortOption}
+  items={items}
+  setOpen={setOpen}
+  setValue={(callback) => {
+    setSortOption((currentSortOption) => {
+      const newSortOption = callback(currentSortOption);
+      return newSortOption;
+    });
+    applyFilters(); // Apply filters whenever sortOption changes
+  }}
+  setItems={setItems}
+  containerStyle={styles.dropdown}
+/>
+
         {loading ? (
           <View style={styles.loadingOverlay}>
             <AnimatedLogo />

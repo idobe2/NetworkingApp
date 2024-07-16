@@ -13,8 +13,6 @@ import {
   ResetPasswordScreen,
 } from './src/screens';
 import { enableLatestRenderer } from 'react-native-maps';
-import DetailsScreen from './src/screens/DetailsScreen';
-import Schedule from './src/views/ScheduleScreen';
 import HomeScreen from './src/views/HomeScreen';
 import SettingsScreen from './src/views/SettingsScreen';
 import PreferencesScreen from './src/views/PreferencesScreen';
@@ -38,7 +36,6 @@ function Root() {
   return (
     <NewStack.Navigator screenOptions={{ headerShown: false }}>
       <NewStack.Screen name="Tripy" component={HomeScreen} />
-      <NewStack.Screen name="Schedule" component={Schedule} />
       <NewStack.Screen name="Settings" component={SettingsScreen} />
       <NewStack.Screen name="Preferences" component={PreferencesScreen} />
     </NewStack.Navigator>
@@ -49,8 +46,6 @@ function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Root" component={Root} />
-      <Stack.Screen name="DetailsScreen" component={DetailsScreen} />
-      <Stack.Screen name="Schedule" component={Schedule} />
     </Stack.Navigator>
   );
 }

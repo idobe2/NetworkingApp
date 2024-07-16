@@ -9,7 +9,7 @@ import PreviousPlans from './PreviousPlansScreen';
 import PlanDeatilsScreen from './PlanDeatilsScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import ExploreScreen from './ExploreScreen';
-import Schedule from './ScheduleScreen';
+
 import SettingsScreen from './SettingsScreen';
 import PreferencesScreen from './PreferencesScreen';
 import NextActivities from '../screens/NextActivities';
@@ -22,7 +22,6 @@ const DrawerList = () => {
   return (
     <Drawer.Navigator>
       <Drawer.Screen name="Explore" component={ExploreScreen} />
-      <Drawer.Screen name="Schedule" component={Schedule} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
       <Drawer.Screen name="Preferences" component={PreferencesScreen} />
     </Drawer.Navigator>

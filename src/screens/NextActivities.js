@@ -21,6 +21,7 @@ import Paragraph from '../components/Paragraph';
 import Button from '../components/Button';
 import { PlansContext } from '../common/PlansContext';
 import NoPlansMessage from '../components/NoPlansMessage';
+import BackButton from "../components/BackButton";
 
 const NextActivities = ({ navigation }) => {
   const { plansChanged, setPlansChanged } = useContext(PlansContext); 
@@ -214,6 +215,7 @@ const NextActivities = ({ navigation }) => {
 
   return (
     <HomeBackground>
+      <BackButton goBack={navigation.goBack} />
       <View style={styles.container}>
         <Header style={styles.city}>{city}</Header>
         <Paragraph style={styles.date}>{date}</Paragraph>

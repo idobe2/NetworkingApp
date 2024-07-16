@@ -74,8 +74,8 @@ const WelcomeScreen = ({ navigation }) => {
 
   return (
     <HomeBackground>
-      <BackButton goBack={navigation.goBack} />
       <View style={styles.outerContainer}>
+       
         <TouchableOpacity
           style={styles.leftButton}
           onPress={() => navigateToPage(Math.max(currentPage.value - 1, 0))}
@@ -122,6 +122,7 @@ const WelcomeScreen = ({ navigation }) => {
           })}
         </View>
       </View>
+      <BackButton goBack={navigation.goBack} />
     </HomeBackground>
   );
 };

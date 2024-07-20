@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { View, StyleSheet, ToastAndroid, Text} from "react-native";
+import { View, StyleSheet, ToastAndroid, Text } from "react-native";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
@@ -137,17 +137,24 @@ const Planner = ({ navigation }) => {
       if (!response) {
         alert("Failed to create plan");
       } else {
-        setDestination("");
-        setSocial("");
-        setDateRange({});
-        setLoadLevel(2);
-        setPlansChanged(true);
-        navigation.navigate("Previous Plans");
-        ToastAndroid.show("Plan created successfully", ToastAndroid.SHORT);
+        // Fetch the newly created plan details
+        console.log("Plan created111222:", response.planId);
+        const newPlan = await planApi.getPlans(response.planId);
+        console.log("newPlan:", newPlan);
+        if (newPlan) {
+          setDestination("");
+          setSocial("");
+          setDateRange({});
+          setLoadLevel(2);
+          setPlansChanged(true);
+          navigation.navigate("PlanDetails", { trip: newPlan });
+          ToastAndroid.show("Plan created successfully", ToastAndroid.SHORT);
+        } else {
+          alert("Failed to fetch the created plan details");
+        }
       }
     } finally {
       console.log("Plan created in finally");
-      
       setLoading(false);
     }
   };
@@ -346,4 +353,3 @@ const styles = StyleSheet.create({
 });
 
 export default Planner;
-  

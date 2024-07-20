@@ -90,8 +90,9 @@ export default function PreviousPlans({ navigation }) {
         fetchData();
       }
       else if (plansChanged) {
-        fetchData();
         setPlansChanged(false);
+        fetchData();
+        
       }
     });
     return () => unsubscribe();
@@ -163,12 +164,13 @@ export default function PreviousPlans({ navigation }) {
           onPress: async () => {
             const response = await plansApi.deletePlan(item.planId);
             if (response) {
+              setPlansChanged(true);
               const updatedPlans = plans.filter((plan) => plan.id !== item.id);
               setPlans(updatedPlans);
               await AsyncStorage.setItem('travelPlans', JSON.stringify(updatedPlans)); // Update cache
               fetchData();
               ToastAndroid.show("Plan deleted successfully", ToastAndroid.SHORT);
-              setPlansChanged(true);
+              
             }
           },
         },
@@ -191,10 +193,10 @@ export default function PreviousPlans({ navigation }) {
           onPress: async () => {
             const promises = selectedPlans.map((item) => plansApi.deletePlan(item.planId));
             await Promise.all(promises);
+            setPlansChanged(true);
             setSelectedPlans([]);
             setIsSelectionMode(false);
-            fetchData();
-            setPlansChanged(true);
+            fetchData(); 
           },
         },
       ],

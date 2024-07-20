@@ -184,5 +184,6 @@ export default {
   deleteActivity,
   generateMeals,
   addMeal,
+  getPlans,
   // checkSelectedDates
 };

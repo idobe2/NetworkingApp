@@ -9,6 +9,7 @@ import PreviousPlans from './PreviousPlansScreen';
 import PlanDeatilsScreen from './PlanDeatilsScreen';
 import WelcomeScreen from '../screens/WelcomeScreen';
 import ExploreScreen from './ExploreScreen';
+import AboutScreen from './AboutScreen';
 
 import SettingsScreen from './SettingsScreen';
 import PreferencesScreen from './PreferencesScreen';
@@ -22,8 +23,9 @@ const DrawerList = () => {
   return (
     <Drawer.Navigator>
       <Drawer.Screen name="Explore" component={ExploreScreen} />
-      <Drawer.Screen name="Settings" component={SettingsScreen} />
       <Drawer.Screen name="Preferences" component={PreferencesScreen} />
+      <Drawer.Screen name="Settings" component={SettingsScreen} />
+      <Drawer.Screen name="About" component={AboutScreen} />
     </Drawer.Navigator>
   );
 };

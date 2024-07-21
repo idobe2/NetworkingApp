@@ -32,7 +32,10 @@ import CalendarPicker from "react-native-calendar-picker";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Dropdown } from "react-native-element-dropdown";
 import NetInfo from "@react-native-community/netinfo";
-
+import CheckBox from "@react-native-community/checkbox"; // Add this import
+import { Linking } from "react-native"; // Add this import
+import PrivacyModal from "../components/privacyModal"; // Add this import
+import TermsModal from "../components/termsModal"; // Add this import
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -55,6 +58,18 @@ export default function RegisterScreen({ navigation }) {
   const [selectedDateTouched, setSelectedDateTouched] = useState(false); // State for date touched
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [privacyChecked, setPrivacyChecked] = useState(false);
+  const [privacyModalVisible, setPrivacyModalVisible] = useState(false);
+  const [termsModalVisible, setTermsModalVisible] = useState(false);
+
+  // Add this function
+  const openPrivacyPolicy = () => {
+    setPrivacyModalVisible(true);
+  };
+
+  const openTermsConditions = () => {
+    setTermsModalVisible(true);
+  };
 
   useEffect(() => {
     if (emailTouched) {
@@ -110,13 +125,14 @@ export default function RegisterScreen({ navigation }) {
   };
 
   const handleSignup = async () => {
-
     const state = await NetInfo.fetch();
     if (!state.isConnected) {
-      Alert.alert("No Internet Connection", "Please check your network connection and try again.");
+      Alert.alert(
+        "No Internet Connection",
+        "Please check your network connection and try again."
+      );
       return;
     }
-
 
     setIsLoading(true);
     const formattedDateString = formatDate(selectedDate);
@@ -153,7 +169,8 @@ export default function RegisterScreen({ navigation }) {
     isNameValid &&
     isGenderSelected &&
     isBirthDateSelected &&
-    isAgeValid;
+    isAgeValid &&
+    privacyChecked;
 
   const genderOptions = [
     { label: "Male", value: "Male" },
@@ -363,9 +380,58 @@ export default function RegisterScreen({ navigation }) {
                 style={styles.iconButton}
               />
             </View>
+
             {confirmPasswordTouched && confirmPasswordError ? (
               <Text style={styles.errorText}>{confirmPasswordError}</Text>
             ) : null}
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 12,
+              }}
+            >
+              <CheckBox
+                value={privacyChecked}
+                onValueChange={setPrivacyChecked}
+                tintColors={{ true: theme.colors.primary, false: "grey" }}
+                style={{ marginBottom: 10 }}
+              />
+              <View>
+                <Text>
+                  Confirm you agree to our{" "}
+                  <Text
+                    style={{
+                      color: theme.colors.primary,
+                      textDecorationLine: "underline",
+                    }}
+                    onPress={openPrivacyPolicy}
+                  >
+                    Privacy Policy
+                  </Text>
+                </Text>
+                <Text>
+                  and{" "}
+                  <Text
+                    style={{
+                      color: theme.colors.primary,
+                      textDecorationLine: "underline",
+                    }}
+                    onPress={openTermsConditions}
+                  >
+                    Terms & Conditions
+                  </Text>
+                </Text>
+              </View>
+            </View>
+            <PrivacyModal
+              visible={privacyModalVisible}
+              onClose={() => setPrivacyModalVisible(false)}
+            />
+            <TermsModal
+              visible={termsModalVisible}
+              onClose={() => setTermsModalVisible(false)}
+            />
             {isLoading ? (
               <ActivityIndicator size="large" color={theme.colors.primary} />
             ) : (
@@ -502,11 +568,11 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: theme.roundness,
     borderWidth: 1,
-    borderColor: 'grey',
+    borderColor: "grey",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 15,
   },
   inputText: {
     fontSize: 16,
@@ -529,7 +595,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
     borderRadius: theme.roundness,
     borderWidth: 1,
-    borderColor: 'grey',
+    borderColor: "grey",
     padding: 15,
     marginBottom: 12,
   },

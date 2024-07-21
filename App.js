@@ -5,7 +5,6 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NativeWindStyleSheet } from 'nativewind';
 import NetInfo from '@react-native-community/netinfo';
 import { Alert } from 'react-native';
-
 import {
   StartScreen,
   LoginScreen,
@@ -18,9 +17,9 @@ import SettingsScreen from './src/views/SettingsScreen';
 import PreferencesScreen from './src/views/PreferencesScreen';
 import LoadingScreen from './src/common/LoadingScreen';
 import { AuthProvider, useAuth } from './src/common/AuthContext';
-import clientApi from './src/api/ClientApi'; // Ensure correct import
+import clientApi from './src/api/ClientApi';
 import { PlansProvider } from './src/common/PlansContext';
-
+import AboutScreen from './src/views/AboutScreen';
 
 enableLatestRenderer();
 
@@ -38,6 +37,7 @@ function Root() {
       <NewStack.Screen name="Tripy" component={HomeScreen} />
       <NewStack.Screen name="Settings" component={SettingsScreen} />
       <NewStack.Screen name="Preferences" component={PreferencesScreen} />
+      <NewStack.Screen name="About" component={AboutScreen} />
     </NewStack.Navigator>
   );
 }

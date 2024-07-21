@@ -8,10 +8,10 @@ import {
   Alert,
   RefreshControl,
   TextInput,
-  ToastAndroid
+  ToastAndroid,
+  Text,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons";
-import CheckBox from "@react-native-community/checkbox";
+import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
 import placesApi from "../api/PlacesApi";
@@ -26,7 +26,7 @@ import { PlansContext } from '../common/PlansContext';
 import NoPlansMessage from "../components/NoPlansMessage";
 
 export default function PreviousPlans({ navigation }) {
-  const { plansChanged, setPlansChanged } = useContext(PlansContext); 
+  const { plansChanged, setPlansChanged } = useContext(PlansContext);
 
   const [destinationImages, setDestinationImages] = useState({});
   const [plans, setPlans] = useState([]);
@@ -45,7 +45,7 @@ export default function PreviousPlans({ navigation }) {
   ]);
   const [hasFetchedData, setHasFetchedData] = useState(false);
   const [apiError, setApiError] = useState(false);
-  
+
 
   const fetchData = useCallback(async () => {
     if (loading) return;
@@ -81,7 +81,7 @@ export default function PreviousPlans({ navigation }) {
   }, [loading]);
 
 
-  
+
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
@@ -92,7 +92,7 @@ export default function PreviousPlans({ navigation }) {
       else if (plansChanged) {
         setPlansChanged(false);
         fetchData();
-        
+
       }
     });
     return () => unsubscribe();
@@ -117,14 +117,14 @@ export default function PreviousPlans({ navigation }) {
 
   const applyFilters = useCallback(() => {
     let updatedPlans = [...plans];
-  
+
     // Apply search filter
     if (searchQuery) {
       updatedPlans = updatedPlans.filter((plan) =>
         plan.destination.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-  
+
     // Apply sorting
     switch (sortOption) {
       case "date":
@@ -139,10 +139,10 @@ export default function PreviousPlans({ navigation }) {
       default:
         break;
     }
-  
+
     setFilteredPlans(updatedPlans);
   }, [searchQuery, sortOption, plans]);
-  
+
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -170,7 +170,7 @@ export default function PreviousPlans({ navigation }) {
               await AsyncStorage.setItem('travelPlans', JSON.stringify(updatedPlans)); // Update cache
               fetchData();
               ToastAndroid.show("Plan deleted successfully", ToastAndroid.SHORT);
-              
+
             }
           },
         },
@@ -196,7 +196,8 @@ export default function PreviousPlans({ navigation }) {
             setPlansChanged(true);
             setSelectedPlans([]);
             setIsSelectionMode(false);
-            fetchData(); 
+            fetchData();
+            ToastAndroid.show("Plans deleted successfully", ToastAndroid.SHORT);
           },
         },
       ],
@@ -210,6 +211,11 @@ export default function PreviousPlans({ navigation }) {
         ? prevSelectedPlans.filter((plan) => plan !== item)
         : [...prevSelectedPlans, item]
     );
+  };
+
+  const cancelSelectionMode = () => {
+    setIsSelectionMode(false);
+    setSelectedPlans([]);
   };
 
   const formatDateRange = (startDate, endDate) => {
@@ -234,7 +240,10 @@ export default function PreviousPlans({ navigation }) {
   const renderItem = ({ item }) => (
     <Swipeable renderRightActions={() => renderRightActions(item)}>
       <TouchableOpacity
-        style={styles.itemContainer}
+        style={[
+          styles.itemContainer,
+          selectedPlans.includes(item) && styles.selectedItemContainer
+        ]}
         onPress={() => {
           if (isSelectionMode) {
             toggleSelectPlan(item);
@@ -247,10 +256,16 @@ export default function PreviousPlans({ navigation }) {
         }}
       >
         {isSelectionMode && (
-          <CheckBox
-            value={selectedPlans.includes(item)}
-            onValueChange={() => toggleSelectPlan(item)}
-          />
+          <TouchableOpacity
+            style={styles.circleCheckbox}
+            onPress={() => toggleSelectPlan(item)}
+          >
+            <Ionicons
+              name={selectedPlans.includes(item) ? "checkmark-circle" : "ellipse-outline"}
+              size={24}
+              color={selectedPlans.includes(item) ? "green" : "black"}
+            />
+          </TouchableOpacity>
         )}
         <View style={{ flex: 1 }}>
           <Paragraph style={styles.destination}>{item.destination} <Paragraph style={styles.social}>{item.social}</Paragraph></Paragraph>
@@ -271,22 +286,19 @@ export default function PreviousPlans({ navigation }) {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <Header>Previous Plans</Header>
-          <TouchableOpacity onPress={() => setIsSelectionMode(!isSelectionMode)}>
+          <TouchableOpacity onPress={() => {
+            if (isSelectionMode) {
+              cancelSelectionMode();
+            } else {
+              setIsSelectionMode(true);
+            }
+          }}>
             <MaterialIcons
               name={isSelectionMode ? "cancel" : "select-all"}
               size={28}
               color="black"
             />
           </TouchableOpacity>
-          {isSelectionMode && selectedPlans.length > 0 && (
-            <TouchableOpacity onPress={handleDeleteSelected}>
-              <MaterialIcons
-                name="delete"
-                size={28}
-                color="red"
-              />
-            </TouchableOpacity>
-          )}
         </View>
         <TextInput
           style={styles.searchBar}
@@ -294,21 +306,21 @@ export default function PreviousPlans({ navigation }) {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-     <DropDownPicker
-  open={open}
-  value={sortOption}
-  items={items}
-  setOpen={setOpen}
-  setValue={(callback) => {
-    setSortOption((currentSortOption) => {
-      const newSortOption = callback(currentSortOption);
-      return newSortOption;
-    });
-    applyFilters(); // Apply filters whenever sortOption changes
-  }}
-  setItems={setItems}
-  containerStyle={styles.dropdown}
-/>
+        <DropDownPicker
+          open={open}
+          value={sortOption}
+          items={items}
+          setOpen={setOpen}
+          setValue={(callback) => {
+            setSortOption((currentSortOption) => {
+              const newSortOption = callback(currentSortOption);
+              return newSortOption;
+            });
+            applyFilters(); // Apply filters whenever sortOption changes
+          }}
+          setItems={setItems}
+          containerStyle={styles.dropdown}
+        />
 
         {loading ? (
           <View style={styles.loadingOverlay}>
@@ -331,6 +343,13 @@ export default function PreviousPlans({ navigation }) {
           </>
         )}
       </View>
+      {isSelectionMode && selectedPlans.length > 0 && (
+        <View style={styles.fabContainer}>
+          <TouchableOpacity style={styles.fab} onPress={handleDeleteSelected}>
+            <Ionicons name="trash-bin" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
     </HomeBackground>
   );
 }
@@ -341,7 +360,7 @@ const styles = StyleSheet.create({
     padding: 20,
     top: 20,
     // marginTop: 20,
-    
+
   },
   headerContainer: {
     flexDirection: "row",
@@ -367,6 +386,12 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
     borderRadius: 5,
+  },
+  selectedItemContainer: {
+    backgroundColor: "#69b9db", // Highlight color for selected items
+  },
+ circleCheckbox: {
+    marginRight: 10,
   },
   destination: {
     fontSize: 18,
@@ -400,5 +425,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
     zIndex: 1,
+  },
+  fabContainer: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fab: {
+    backgroundColor: 'red',
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
   },
 });

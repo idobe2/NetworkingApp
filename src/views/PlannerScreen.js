@@ -13,6 +13,7 @@ import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
 import { PlansContext } from '../common/PlansContext';
+import placesApi from "../api/PlacesApi";
 
 const Planner = ({ navigation }) => {
   const [destination, setDestination] = useState("");
@@ -26,6 +27,8 @@ const Planner = ({ navigation }) => {
   const [loadLevel, setLoadLevel] = useState(2);
   const [loading, setLoading] = useState(false);
   const { setPlansChanged } = useContext(PlansContext);
+  const [screenKey, setScreenKey] = useState(0);
+
 
   const handleDayPress = (day) => {
     const { dateString } = day;
@@ -99,12 +102,12 @@ const Planner = ({ navigation }) => {
       alert("Please select a destination");
       return;
     }
-
+  
     if (!dateRange.startDate || !dateRange.endDate) {
       alert("Please select a date range");
       return;
     }
-
+  
     const today = new Date();
     const selectedStartDate = new Date(dateRange.startDate);
     const selectedEndDate = new Date(dateRange.endDate);
@@ -112,9 +115,9 @@ const Planner = ({ navigation }) => {
       alert("Please select dates later than today's date");
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
       console.log(
         "destination:",
@@ -138,26 +141,39 @@ const Planner = ({ navigation }) => {
         alert("Failed to create plan");
       } else {
         // Fetch the newly created plan details
-        console.log("Plan created111222:", response.planId);
         const newPlan = await planApi.getPlans(response.planId);
-        console.log("newPlan:", newPlan);
         if (newPlan) {
-          setDestination("");
-          setSocial("");
-          setDateRange({});
-          setLoadLevel(2);
+          // Fetch destination image
+          const destinationImageResponse = await placesApi.fetchImages([newPlan]);
+          const destinationImage = destinationImageResponse[newPlan.destination] || null;
+  
+          // Ensure the newPlan object has id and planId fields
+          const enrichedPlan = {
+            ...newPlan,
+            id: response.id, // Assuming the response from addPlan has the id
+            planId: response.planId // Assuming the response from addPlan has the planId
+          };
+  
+      
           setPlansChanged(true);
-          navigation.navigate("PlanDetails", { trip: newPlan });
+          navigation.navigate("PlanDetails", { trip: enrichedPlan, image: destinationImage });
           ToastAndroid.show("Plan created successfully", ToastAndroid.SHORT);
         } else {
           alert("Failed to fetch the created plan details");
         }
       }
+    } catch (error) {
+      console.error("Error creating plan:", error);
+      alert("An error occurred while creating the plan. Please try again.");
     } finally {
-      console.log("Plan created in finally");
       setLoading(false);
+      setScreenKey(prevKey => prevKey + 1); // Add this line
     }
   };
+  
+
+  
+  
 
   const data = [
     { key: 'header' },
@@ -258,7 +274,7 @@ const Planner = ({ navigation }) => {
 
   return (
     <>
-      <HomeBackground>
+      <HomeBackground key={screenKey}>
         <KeyboardAwareFlatList
           data={data}
           renderItem={renderItem}

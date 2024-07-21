@@ -184,6 +184,12 @@ export default function PlanDetailsScreen({ route, navigation }) {
               const updatedTravelPlan = [...trip.travelPlan];
               updatedTravelPlan[dayIndex].activities.splice(activityIndex, 1);
 
+              // Remove the day if it has no activities
+              if (updatedTravelPlan[dayIndex].activities.length === 0){
+                updatedTravelPlan.splice(dayIndex, 1);
+                setActivitiesDetails(activitiesDetails.filter((detail) => detail.place_id !== activity.place_id));
+              }
+                
               // Rebuild the activitiesDetails array based on updated travelPlan
               const newActivitiesDetails = [];
               for (const day of updatedTravelPlan) {
@@ -281,8 +287,11 @@ export default function PlanDetailsScreen({ route, navigation }) {
   };
 
   const fixedDate = (date) => {
-    const [day, month, year] = date.split("/");
-    const newDate = new Date(`20${year}-${month}-${day}T00:00:00.000Z`);
+    let [day, month, year] = date.split("/");
+    if (year.length === 2) {
+      year = `20${year}`;
+    } 
+    const newDate = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
     const options = { year: "numeric", month: "long", day: "numeric" };
     const formattedDate = newDate.toLocaleDateString("en-US", options);
     return formattedDate;

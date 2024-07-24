@@ -167,7 +167,7 @@ const Planner = ({ navigation }) => {
       alert("An error occurred while creating the plan. Please try again.");
     } finally {
       setLoading(false);
-      setScreenKey(prevKey => prevKey + 1); // Add this line
+      setScreenKey(prevKey => prevKey + 1);
     }
   };
   

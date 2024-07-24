@@ -128,6 +128,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
         {
           text: "OK",
           onPress: async () => {
+            setLoading(true);
             console.log("Generate activity:", activity);
             const response = await PlanApi.generateActivities(
               trip.planId,
@@ -149,6 +150,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
               dayIndex,
               tripId: trip.planId,
             });
+            setLoading(false);
             setBottomSheetVisible(true);
             setPlansChanged(true);
           },
@@ -171,6 +173,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
         {
           text: "OK",
           onPress: async () => {
+            setLoading(true);
             console.log("Delete activity:", activity);
             try {
               const response = await PlanApi.deleteActivity(
@@ -228,6 +231,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
                 ToastAndroid.SHORT
               );
             }
+            setLoading(false);
             setPlansChanged(true);
           },
         },
@@ -243,6 +247,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
   };
 
   const onMealSelect = async (mealType) => {
+    setLoading(true);
     setMealModalVisible(false);
     const { activity, activityIndex, dayIndex } = mealDetails;
     console.log("Add meal to activity:", activity, "Meal Type:", mealType);
@@ -264,6 +269,7 @@ export default function PlanDetailsScreen({ route, navigation }) {
       dayIndex,
       tripId: trip.planId,
     });
+    setLoading(false);
     setBottomSheetVisible(true);
   };
 
@@ -591,11 +597,6 @@ export default function PlanDetailsScreen({ route, navigation }) {
             renderItem={renderDay}
             keyExtractor={(day, index) => index.toString()}
           />
-          {loading && (
-            <View style={styles.loadingOverlay}>
-              <ActivityIndicator size="large" color="#0000ff" />
-            </View>
-          )}
           <ActivityBottomSheet
             visible={bottomSheetVisible}
             onClose={() => setBottomSheetVisible(false)}
@@ -611,6 +612,11 @@ export default function PlanDetailsScreen({ route, navigation }) {
           onSelect={onMealSelect}
         />
       </HomeBackground>
+      {loading && (
+        <View style={styles.loadingOverlay}>
+          <AnimatedLogo />
+        </View>
+      )}
     </Provider>
   );
 }

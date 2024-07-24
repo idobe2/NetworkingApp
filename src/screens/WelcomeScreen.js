@@ -17,6 +17,7 @@ import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -75,13 +76,6 @@ const WelcomeScreen = ({ navigation }) => {
   return (
     <HomeBackground>
       <View style={styles.outerContainer}>
-       
-        <TouchableOpacity
-          style={styles.leftButton}
-          onPress={() => navigateToPage(Math.max(currentPage.value - 1, 0))}
-        >
-          <Header>{"⬅️"}</Header>
-        </TouchableOpacity>
         <GestureDetector gesture={panGesture}>
           <Animated.View style={[styles.container, animatedStyle]}>
             {pages.map((page, index) => (
@@ -103,23 +97,31 @@ const WelcomeScreen = ({ navigation }) => {
             ))}
           </Animated.View>
         </GestureDetector>
-        <TouchableOpacity
-          style={styles.rightButton}
-          onPress={() =>
-            navigateToPage(Math.min(currentPage.value + 1, pages.length - 1))
-          }
-        >
-          <Header>{"➡️"}</Header>
-        </TouchableOpacity>
         <View style={styles.pagination}>
           {pages.map((_, index) => {
             const dotStyle = useAnimatedStyle(() => {
               return {
-                opacity: currentPage.value === index ? 1 : 0.5,
+                backgroundColor: currentPage.value === index ? "#000" : "#aaa",
               };
             });
             return <Animated.View key={index} style={[styles.dot, dotStyle]} />;
           })}
+        </View>
+        <View style={styles.navigationButtons}>
+          <TouchableOpacity
+            style={styles.navButton}
+            onPress={() => navigateToPage(Math.max(currentPage.value - 1, 0))}
+          >
+            <MaterialIcons name="chevron-left" size={30} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.navButton}
+            onPress={() =>
+              navigateToPage(Math.min(currentPage.value + 1, pages.length - 1))
+            }
+          >
+            <MaterialIcons name="chevron-right" size={30} color="black" />
+          </TouchableOpacity>
         </View>
       </View>
       <BackButton goBack={navigation.goBack} />
@@ -161,25 +163,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     margin: 8,
   },
-  leftButton: {
+  navigationButtons: {
     position: "absolute",
-    left: 20,
-    top: "50%",
-    transform: [{ translateY: -25 }],
-    zIndex: 1,
+    bottom: 70,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
   },
-  rightButton: {
-    position: "absolute",
-    right: 20,
-    top: "50%",
-    transform: [{ translateY: -25 }],
-    zIndex: 1,
+  navButton: {
+    padding: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
+    borderRadius: 50,
   },
   startButtonContainer: {
     position: "absolute",
     bottom: 60,
-    left: 150,
-    right: 150,
     justifyContent: "center",
     alignItems: "center",
   },

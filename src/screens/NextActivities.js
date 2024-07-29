@@ -158,7 +158,7 @@ const NextActivities = ({ navigation }) => {
       <View style={{ flex: 1 }}>
         <Header style={styles.placeName}>{truncateText(item.name, 25) || 'Unknown Activity'}</Header>
         <RatingStars rating={item.rank} />
-        <Paragraph style={styles.placeAddress}>{truncateText(item.address, 35) || 'Unknown Address'}</Paragraph>
+        <Paragraph style={styles.placeAddress}>{item.address || 'Unknown Address'}</Paragraph>
       </View>
       {item.photo_reference && (
         <Image
@@ -289,6 +289,7 @@ const styles = StyleSheet.create({
   },
   placeAddress: {
     marginTop: 5,
+    marginRight: 5,
   },
   activityImage: {
     width: 80,

@@ -32,10 +32,9 @@ import CalendarPicker from "react-native-calendar-picker";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Dropdown } from "react-native-element-dropdown";
 import NetInfo from "@react-native-community/netinfo";
-import CheckBox from "@react-native-community/checkbox"; // Add this import
-import { Linking } from "react-native"; // Add this import
-import PrivacyModal from "../components/privacyModal"; // Add this import
-import TermsModal from "../components/termsModal"; // Add this import
+import CheckBox from "@react-native-community/checkbox";
+import PrivacyModal from "../components/PrivacyModal";
+import TermsModal from "../components/TermsModal";
 
 export default function RegisterScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -408,9 +407,7 @@ export default function RegisterScreen({ navigation }) {
                     onPress={openPrivacyPolicy}
                   >
                     Privacy Policy
-                  </Text>
-                </Text>
-                <Text>
+                  </Text>{" "}
                   and{" "}
                   <Text
                     style={{
@@ -496,6 +493,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
     justifyContent: "center",
+    paddingHorizontal: 10,
   },
   container: {
     flex: 1,

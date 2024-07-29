@@ -9,7 +9,6 @@ import {
   RefreshControl,
   TextInput,
   ToastAndroid,
-  Text,
 } from "react-native";
 import { MaterialIcons, Ionicons } from "@expo/vector-icons";
 import Header from "../components/Header";
@@ -269,7 +268,7 @@ export default function PreviousPlans({ navigation }) {
         )}
         <View style={{ flex: 1 }}>
           <Paragraph style={styles.destination}>{item.destination} <Paragraph style={styles.social}>{item.social}</Paragraph></Paragraph>
-          <Paragraph>{formatDateRange(item.arrivalDate, item.departureDate)}</Paragraph>
+          <Paragraph style={{}}>{formatDateRange(item.arrivalDate, item.departureDate)}</Paragraph>
         </View>
         {destinationImages[item.destination] && (
           <Image
@@ -359,8 +358,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     top: 20,
-    // marginTop: 20,
-
   },
   headerContainer: {
     flexDirection: "row",

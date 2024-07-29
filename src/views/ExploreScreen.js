@@ -5,6 +5,7 @@ import Banners from "../components/Banners";
 import InfoModal from "../components/InfoModal";
 import HomeBackground from "../components/HomeBackground";
 import ConfettiCannon from 'react-native-confetti-cannon';
+import TravelQuote from "../components/TravelQuote";
 
 export default function Explore({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
@@ -28,6 +29,7 @@ export default function Explore({ navigation }) {
           {/* <SearchPlacesBar onPlaceSelect={handlePlaceSelect} /> */}
           <Banners onBannerPress={handleBannerPress} />
         </View>
+        <TravelQuote />
         <InfoModal
           visible={modalVisible}
           onClose={() => setModalVisible(false)}

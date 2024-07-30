@@ -24,7 +24,6 @@ import AboutScreen from './src/views/AboutScreen';
 enableLatestRenderer();
 
 const Stack = createStackNavigator();
-const Drawer = createDrawerNavigator();
 const NewStack = createStackNavigator();
 
 NativeWindStyleSheet.setOutput({

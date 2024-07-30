@@ -4,8 +4,9 @@ import { View, StyleSheet, SafeAreaView } from "react-native";
 import Banners from "../components/Banners";
 import InfoModal from "../components/InfoModal";
 import HomeBackground from "../components/HomeBackground";
-import ConfettiCannon from 'react-native-confetti-cannon';
-import TravelQuote from "../components/TravelQuote";
+// import ConfettiCannon from 'react-native-confetti-cannon';
+// import TravelQuote from "../components/TravelQuote";
+import TravelPosts from "../components/TravelPosts";
 
 export default function Explore({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false); // State to control modal visibility
@@ -29,7 +30,8 @@ export default function Explore({ navigation }) {
           {/* <SearchPlacesBar onPlaceSelect={handlePlaceSelect} /> */}
           <Banners onBannerPress={handleBannerPress} />
         </View>
-        <TravelQuote />
+        {/* <TravelQuote /> */}
+        <TravelPosts />
         <InfoModal
           visible={modalVisible}
           onClose={() => setModalVisible(false)}

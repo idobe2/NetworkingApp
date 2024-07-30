@@ -1,16 +1,16 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ImageBackground } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Banners = ({ onBannerPress }) => {
   const banners = [
-    { id: 1, text: "Getting Started", image: require('../assets/get_started.png'), icon: "rocket" },
+    { id: 1, text: "Getting Started", image: require('../assets/start.png'), icon: "rocket" },
     { id: 2, text: "Next Activities", image: require('../assets/next_activities.png'), icon: "calendar" },
     // { id: 3, text: "Information", image: require('./assets/information.jpg'), icon: "info-circle" },
   ];
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       {/* <Text style={styles.welcomeText}>Welcome to Your Dashboard</Text> */}
       {banners.map((banner) => (
         <TouchableOpacity
@@ -30,7 +30,7 @@ const Banners = ({ onBannerPress }) => {
           </ImageBackground>
         </TouchableOpacity>
       ))}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
     fontWeight: 'bold',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 5,

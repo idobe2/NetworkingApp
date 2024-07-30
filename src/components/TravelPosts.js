@@ -1,18 +1,19 @@
 import React from "react";
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity, Alert } from "react-native";
+import { View, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated";
-import * as Linking from 'expo-linking';
 import Header from "./Header";
 import Paragraph from "./Paragraph";
+import { useNavigation } from '@react-navigation/native';
 
 const { width: screenWidth } = Dimensions.get("window");
 
 const TravelPosts = () => {
+  const navigation = useNavigation();
   const posts = [
     {
       title: "Discover Hidden Gems",
@@ -57,22 +58,8 @@ const TravelPosts = () => {
     };
   });
 
-  const handlePress = (url) => {
-    Alert.alert(
-      "Open Link",
-      "Would you like to open this link?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Open",
-          onPress: () => Linking.openURL(url),
-        },
-      ],
-      { cancelable: true }
-    );
+  const handlePress = (url, title) => {
+    navigation.navigate("WebViewScreen", { url, title });
   };
 
   return (
@@ -83,7 +70,7 @@ const TravelPosts = () => {
             <TouchableOpacity
               key={index}
               style={[styles.post, { width: screenWidth }]}
-              onPress={() => handlePress(post.url)}
+              onPress={() => handlePress(post.url, post.title)}
             >
               <Header style={styles.title}>{post.title}</Header>
               <Image source={post.image} style={styles.image} />
@@ -126,7 +113,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 20,
   },

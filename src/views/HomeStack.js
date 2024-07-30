@@ -15,6 +15,7 @@ import SettingsScreen from './SettingsScreen';
 import PreferencesScreen from './PreferencesScreen';
 import NextActivities from '../screens/NextActivities';
 import clientApi from '../api/ClientApi';
+import WebViewScreen from '../screens/WebViewScreen';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -105,6 +106,11 @@ const Explore = () => {
       <Stack.Screen
         name="NextActivities"
         component={NextActivities}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="WebViewScreen"
+        component={WebViewScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

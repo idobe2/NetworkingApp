@@ -5,6 +5,7 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  runOnJS,
 } from "react-native-reanimated";
 import Header from "./Header";
 import Paragraph from "./Paragraph";
@@ -35,8 +36,11 @@ const TravelPosts = () => {
     },
   ];
 
-  const translateX = useSharedValue(0);
-  const currentPage = useSharedValue(0);
+  // Create a loopable posts array by duplicating the first and last posts
+  const loopedPosts = [posts[posts.length - 1], ...posts, posts[0]];
+
+  const translateX = useSharedValue(-screenWidth); // Start at the first actual post
+  const currentPage = useSharedValue(1); // Adjusted for the looped posts
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
@@ -46,10 +50,20 @@ const TravelPosts = () => {
       const offset = event.translationX;
       if (offset > 0 && currentPage.value > 0) {
         currentPage.value -= 1;
-      } else if (offset < 0 && currentPage.value < posts.length - 1) {
+      } else if (offset < 0 && currentPage.value < loopedPosts.length - 1) {
         currentPage.value += 1;
       }
-      translateX.value = withSpring(currentPage.value * -screenWidth);
+
+      // Smooth transition and boundary adjustment
+      translateX.value = withSpring(currentPage.value * -screenWidth, {}, () => {
+        if (currentPage.value === 0) {
+          currentPage.value = loopedPosts.length - 2;
+          translateX.value = (currentPage.value * -screenWidth);
+        } else if (currentPage.value === loopedPosts.length - 1) {
+          currentPage.value = 1;
+          translateX.value = (currentPage.value * -screenWidth);
+        }
+      });
     });
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -66,14 +80,16 @@ const TravelPosts = () => {
     <View style={styles.outerContainer}>
       <GestureDetector gesture={panGesture}>
         <Animated.View style={[styles.container, animatedStyle]}>
-          {posts.map((post, index) => (
+          {loopedPosts.map((post, index) => (
             <TouchableOpacity
               key={index}
               style={[styles.post, { width: screenWidth }]}
               onPress={() => handlePress(post.url, post.title)}
             >
               <Header style={styles.title}>{post.title}</Header>
-              <Image source={post.image} style={styles.image} />
+              <View style={styles.imageContainer}>
+                <Image source={post.image} style={styles.image} />
+              </View>
               <Paragraph style={styles.description}>{post.description}</Paragraph>
             </TouchableOpacity>
           ))}
@@ -83,7 +99,7 @@ const TravelPosts = () => {
         {posts.map((_, index) => {
           const dotStyle = useAnimatedStyle(() => {
             return {
-              backgroundColor: currentPage.value === index ? "#000" : "#aaa",
+              backgroundColor: currentPage.value === index + 1 ? "#000" : "#aaa",
             };
           });
           return <Animated.View key={index} style={[styles.dot, dotStyle]} />;
@@ -96,8 +112,8 @@ const TravelPosts = () => {
 const styles = StyleSheet.create({
   outerContainer: {
     flex: 1,
-    marginTop: 100,
- },
+    marginTop: 50,
+  },
   container: {
     flexDirection: "row",
   },
@@ -106,11 +122,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
+  imageContainer: {
+    borderRadius: 10,
+    overflow: 'hidden',
+    elevation: 5, // Android elevation for shadow
+    shadowColor: "#000", // iOS shadow properties
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    marginBottom: 20,
+  },
   image: {
     width: 300,
     height: 150,
-    marginBottom: 20,
-    borderRadius: 10,
   },
   title: {
     fontSize: 20,

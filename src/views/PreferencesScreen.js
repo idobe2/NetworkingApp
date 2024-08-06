@@ -6,16 +6,19 @@ import {
   StyleSheet,
   ScrollView,
   ToastAndroid,
+  BackHandler,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Button from "../components/Button";
 import { theme } from "../core/theme";
 import userApi from "../api/UserApi";
-import AnimatedLogo from "../common/AnimatedLogo"
+import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
 import Paragraph from "../components/Paragraph";
+import { useFocusEffect } from '@react-navigation/native';
 
-const Preferences = ({ navigation }) => {
+const Preferences = ({ route, navigation }) => {
+  const { screenType } = route.params;
   const [selectedPreferences, setSelectedPreferences] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,6 +39,22 @@ const Preferences = ({ navigation }) => {
     fetchPreferences();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        if (screenType === "login") {
+          return true;
+        }
+        return false;
+      };
+
+      BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+      return () =>
+        BackHandler.removeEventListener("hardwareBackPress", onBackPress);
+    }, [screenType])
+  );
+
   const handlePreferencePress = (preference) => {
     if (selectedPreferences.includes(preference)) {
       setSelectedPreferences(
@@ -50,16 +69,13 @@ const Preferences = ({ navigation }) => {
     try {
       setIsLoading(true);
       await userApi.addUserPreferences(selectedPreferences);
-      //check where the user to change navigation
       if (navigation.canGoBack()) {
         navigation.goBack();
-      }
-      else{
+      } else {
         navigation.navigate("Root", {
           screen: "Tripy",
         });
       }
-      
     } catch (err) {
       console.log(err);
     } finally {
@@ -76,72 +92,91 @@ const Preferences = ({ navigation }) => {
     );
   }
 
+
   const preferenceIcons = {
-    Beach: "sunny",
-    Mountains: "trail-sign",
-    City: "business",
-    Nature: "leaf",
-    History: "book",
-    Adventure: "airplane",
-    Relaxation: "bed",
-    "Food and Drinks": "restaurant",
+    Beach: "sunny-outline",
+    Mountains: "trail-sign-outline",
+    City: "business-outline",
+    Nature: "leaf-outline",
+    History: "book-outline",
+    Adventure: "airplane-outline",
+    Relaxation: "bed-outline",
+    "Food and Drinks": "restaurant-outline",
+    Art: "color-palette-outline",
+    Music: "musical-notes-outline",
+    Shopping: "cart-outline",
+    Sports: "football-outline",
+    Technology: "laptop-outline",
+    Wildlife: "paw-outline",
+    Nightlife: "moon-outline",
+    Wellness: "fitness-outline",
+    Photography: "camera-outline",
+    Theater: "film-outline",
+    Literature: "bookmarks-outline",
   };
 
   return (
     <HomeBackground>
-    <View style={styles.container}>
-      {/* <Image
-        source={{ uri: "https://example.com/header-image.jpg" }} // Replace with your image URL
-        style={styles.headerImage}
-      /> */}
-      {/* <Text style={styles.title}>Welcome to Tripy!</Text> */}
-      <Paragraph style={{marginTop: 20, bottom: 20}}>To tailor the best trip for you,{'\n'}we'd love to know more about you 😊{'\n'}What do you like?</Paragraph>
-      {/* <Text style={styles.instruction}>Please select your preferences:</Text> */}
-      <ScrollView style={styles.scrollView}>
-        {[
-          "Beach",
-          "Mountains",
-          "City",
-          "Nature",
-          "History",
-          "Adventure",
-          "Relaxation",
-          "Food and Drinks",
-        ].map((preference, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.button,
-              selectedPreferences.includes(preference) && styles.selectedButton,
-            ]}
-            onPress={() => handlePreferencePress(preference)}
-          >
-            <Ionicons
-              name={preferenceIcons[preference]}
-              size={24}
-              color="white"
-              style={styles.icon}
-            />
-            <Text style={styles.buttonText}>{preference}</Text>
-            {selectedPreferences.includes(preference) && (
+      <View style={styles.container}>
+        <Paragraph style={{ marginTop: 20, bottom: 20 }}>
+          To tailor the best trip for you,{"\n"}we'd love to know more about you 😊{"\n"}What do you like?
+        </Paragraph>
+        <ScrollView style={styles.scrollView}>
+          {[
+             "Beach",
+             "Mountains",
+             "City",
+             "Nature",
+             "History",
+             "Adventure",
+             "Relaxation",
+             "Food and Drinks",
+             "Art",
+             "Music",
+             "Shopping",
+             "Sports",
+             "Technology",
+             "Wildlife",
+             "Nightlife",
+             "Wellness",
+             "Photography",
+             "Theater",
+             "Literature",
+          ].map((preference, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.button,
+                selectedPreferences.includes(preference) && styles.selectedButton,
+              ]}
+              onPress={() => handlePreferencePress(preference)}
+            >
               <Ionicons
-                name="checkmark-circle"
+                name={preferenceIcons[preference]}
                 size={24}
                 color="white"
-                style={styles.checkmark}
+                style={styles.icon}
               />
-            )}
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      <Button
-        mode="contained"
-        style={styles.continueButton}
-        onPress={handleContinuePress}
-      >
-        Save Preferences
-      </Button>
-    </View>
+              <Text style={styles.buttonText}>{preference}</Text>
+              {selectedPreferences.includes(preference) && (
+                <Ionicons
+                  name="checkmark-circle"
+                  size={24}
+                  color="white"
+                  style={styles.checkmark}
+                />
+              )}
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        <Button
+          mode="contained"
+          style={styles.continueButton}
+          onPress={handleContinuePress}
+        >
+          Save Preferences
+        </Button>
+      </View>
     </HomeBackground>
   );
 };
@@ -150,30 +185,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    // backgroundColor: "#f7f7f7",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  headerImage: {
-    width: "100%",
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 10,
-    color: theme.colors.primary,
-    textAlign: "center",
-  },
-  instruction: {
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: "center",
-    color: "#666",
   },
   scrollView: {
     marginBottom: 10,
@@ -210,17 +226,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     backgroundColor: theme.colors.primary,
-  },
-  loadingOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
-    zIndex: 1,
   },
 });
 

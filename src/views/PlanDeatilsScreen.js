@@ -294,9 +294,10 @@ export default function PlanDetailsScreen({ route, navigation }) {
 
   const fixedDate = (date) => {
     let [day, month, year] = date.split("/");
-    if (year.length === 2) {
-      year = `20${year}`;
-    } 
+    if (year.length === 2) year = `20${year}`;
+    else if (year.length === 4) year = `${year}`;
+    else if (year.length === 3) year = `2${year}`;
+    else if (year.length === 1) year = `200${year}`;
     const newDate = new Date(`${year}-${month}-${day}T00:00:00.000Z`);
     const options = { year: "numeric", month: "long", day: "numeric" };
     const formattedDate = newDate.toLocaleDateString("en-US", options);

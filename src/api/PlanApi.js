@@ -185,5 +185,5 @@ export default {
   generateMeals,
   addMeal,
   getPlans,
-  // checkSelectedDates
+  // checkSelectedDates,
 };

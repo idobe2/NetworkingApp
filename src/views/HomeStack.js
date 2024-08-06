@@ -23,8 +23,8 @@ const Drawer = createDrawerNavigator();
 const DrawerList = () => {
   return (
     <Drawer.Navigator>
-      <Drawer.Screen name="Explore" component={ExploreScreen} />
-      <Drawer.Screen name="Preferences" component={PreferencesScreen} />
+      <Drawer.Screen name="Explore" component={ExploreScreen} options={{title: 'Home'}} />
+      <Drawer.Screen name="Preferences" initialParams={{'screenType': 'home'}} component={PreferencesScreen} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
       <Drawer.Screen name="About" component={AboutScreen} />
     </Drawer.Navigator>

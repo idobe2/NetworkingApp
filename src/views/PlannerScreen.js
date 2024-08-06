@@ -154,7 +154,10 @@ const Planner = ({ navigation }) => {
             planId: response.planId // Assuming the response from addPlan has the planId
           };
   
-      
+          setDestination("");
+          setSocial("");
+          setDateRange({});
+          setLoadLevel(2);
           setPlansChanged(true);
           navigation.navigate("PlanDetails", { trip: enrichedPlan, image: destinationImage });
           ToastAndroid.show("Plan created successfully", ToastAndroid.SHORT);
@@ -170,10 +173,6 @@ const Planner = ({ navigation }) => {
       setScreenKey(prevKey => prevKey + 1);
     }
   };
-  
-
-  
-  
 
   const data = [
     { key: 'header' },

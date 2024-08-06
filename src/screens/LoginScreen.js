@@ -56,7 +56,8 @@ export default function LoginScreen({ navigation }) {
         console.log("targetScreen:", targetScreen);
         if (targetScreen === "Preferences") {
           setIsAuthenticated(true);
-          navigation.navigate("Root", { screen: targetScreen });
+            const screenType = "login";
+            navigation.navigate("Root", { screen: targetScreen, params: { screenType } });
         }
       }
     } catch (error) {

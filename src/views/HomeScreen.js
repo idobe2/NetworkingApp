@@ -70,12 +70,12 @@ export default function HomeScreen({ navigation }) {
             }}
           >
             <Tab.Screen
-              name="Explore"
+              name="Home"
               component={HomeStack.Explore}
               options={{
                 headerShown: false,
                 tabBarIcon: ({ color, size }) => (
-                  <Ionicons name="search-outline" color={color} size={size} />
+                  <Ionicons name="home-outline" color={color} size={size} />
                 ),
               }}
             />

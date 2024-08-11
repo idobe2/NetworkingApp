@@ -177,11 +177,13 @@ export default function RegisterScreen({ navigation }) {
   ];
 
   return (
+    <ScrollView >
     <Background>
       <BackButton goBack={navigation.goBack} />
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      
         <KeyboardAvoidingView>
-          <View>
+          
+          
             <View style={styles.logo}>
               <Logo />
               <Header>Create Account</Header>
@@ -387,7 +389,10 @@ export default function RegisterScreen({ navigation }) {
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                marginTop: 12,
+                marginBottom: 10,
+                flexGrow: 1,
+                justifyContent: "center",
+                width: "100%",
               }}
             >
               <CheckBox
@@ -449,9 +454,10 @@ export default function RegisterScreen({ navigation }) {
                 <Text style={styles.link}>Login</Text>
               </TouchableOpacity>
             </View>
-          </View>
+           
+          
         </KeyboardAvoidingView>
-      </ScrollView>
+      
       <Modal
         visible={showModal}
         animationType="slide"
@@ -482,7 +488,10 @@ export default function RegisterScreen({ navigation }) {
           </View>
         </View>
       </Modal>
+      
+
     </Background>
+    </ScrollView>
   );
 }
 
@@ -493,7 +502,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 1,
     justifyContent: "center",
-    paddingHorizontal: 10,
+    width: "100%",
   },
   container: {
     flex: 1,
@@ -553,7 +562,9 @@ const styles = StyleSheet.create({
     top: 60,
   },
   button: {
-    marginTop: 24,
+    alignContent:"center",
+    width: "100",
+    
   },
   logo: {
     alignItems: "center",

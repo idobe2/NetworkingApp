@@ -124,7 +124,8 @@ const GoogleLogin = ({ setLoading }) => {
         ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
       } else if (!response.data.success) {
         setIsAuthenticated(true);
-        navigation.navigate("Root", { screen: "Preferences" });
+        const screenType = "login";
+        navigation.navigate("Root", { screen: "Preferences" , params: { screenType } });
         ToastAndroid.show("Welcome Back", ToastAndroid.TOP);
       } else {
         console.log("Google login failed:", response.error);

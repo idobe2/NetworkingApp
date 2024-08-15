@@ -10,6 +10,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Button as RNButton,
+  ImageBackground,
 } from "react-native";
 import { Text, IconButton } from "react-native-paper";
 import Background from "../components/Background";
@@ -177,11 +178,16 @@ export default function RegisterScreen({ navigation }) {
   ];
 
   return (
-    <ScrollView >
-    <Background>
+    
+    <ImageBackground
+      source={require('../assets/background_dot.png')}
+      resizeMode="repeat"
+      style={styles.background}
+    >
+      <ScrollView >
       <BackButton goBack={navigation.goBack} />
       
-        <KeyboardAvoidingView>
+        <KeyboardAvoidingView style={styles.container} >
           
           
             <View style={styles.logo}>
@@ -372,7 +378,7 @@ export default function RegisterScreen({ navigation }) {
                   setConfirmPasswordTouched(true);
                 }}
                 secureTextEntry={!showConfirmPassword}
-                style={styles.textInputWithIcon}
+                style={[styles.textInputWithIcon, {marginBottom: 10}]}
                 error={confirmPasswordError}
               />
               <IconButton
@@ -399,7 +405,7 @@ export default function RegisterScreen({ navigation }) {
                 value={privacyChecked}
                 onValueChange={setPrivacyChecked}
                 tintColors={{ true: theme.colors.primary, false: "grey" }}
-                style={{ marginBottom: 10 }}
+                style={{ marginLeft: 15 }}
               />
               <View>
                 <Text>
@@ -418,6 +424,7 @@ export default function RegisterScreen({ navigation }) {
                     style={{
                       color: theme.colors.primary,
                       textDecorationLine: "underline",
+                      marginBottom: 10,
                     }}
                     onPress={openTermsConditions}
                   >
@@ -490,14 +497,20 @@ export default function RegisterScreen({ navigation }) {
       </Modal>
       
 
-    </Background>
+      
     </ScrollView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   keyboardAvoidingView: {
     flex: 1,
+  },
+  background: {
+    flex: 1,
+    width: '100%',
+    backgroundColor: theme.colors.surface,
   },
   scrollViewContent: {
     flexGrow: 1,
@@ -531,6 +544,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.surface,
     paddingRight: 50, // Space for the icon
+    
+
   },
   iconButton: {
     position: "absolute",
@@ -568,7 +583,8 @@ const styles = StyleSheet.create({
   },
   logo: {
     alignItems: "center",
-    top: 20,
+    // top: 35,
+    marginTop: 35,
     marginBottom: 20,
   },
   input: {

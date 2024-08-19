@@ -7,7 +7,8 @@ import {
   ActivityIndicator,
   ToastAndroid,
   Alert,
-  Linking, // Import Linking
+  Linking,
+  TouchableOpacity,
 } from "react-native";
 import React from "react";
 import Button from "../components/Button";
@@ -17,18 +18,23 @@ import { useAuth } from "../common/AuthContext";
 import DrawerContent from "../components/DrawerContent";
 import HomeBackground from "../components/HomeBackground";
 import ChangePasswordModal from "../components/ChangePasswordModal";
-import VerificationCodeModal from "../components/VerificationCodeModal"; // New component for verification code
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage
+import VerificationCodeModal from "../components/VerificationCodeModal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import  Icon  from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Settings = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isLogoutLoading, setIsLogoutLoading] = useState(false);
+  const [isDeleteAccountLoading, setIsDeleteAccountLoading] = useState(false);
+  const [isChangePasswordLoading, setIsChangePasswordLoading] = useState(false);
+  const [isResetCacheLoading, setIsResetCacheLoading] = useState(false);
   const { setIsAuthenticated } = useAuth();
   const [userType, setUserType] = useState("");
   const [isChangePasswordModalVisible, setIsChangePasswordModalVisible] =
     useState(false);
   const [isVerificationCodeModalVisible, setIsVerificationCodeModalVisible] =
     useState(false);
-  const [email, setEmail] = useState(""); // New state for email
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const fetchUserType = async () => {
@@ -36,7 +42,7 @@ const Settings = ({ navigation }) => {
         const response = await userApi.getUserDetails();
         if (response) {
           setUserType(response.userType);
-          setEmail(response.email); // Set email from user details
+          setEmail(response.email);
         }
       } catch (error) {
         console.error("Error fetching user type:", error);
@@ -48,7 +54,7 @@ const Settings = ({ navigation }) => {
   const handleLogout = async () => {
     console.log("Logout Button Pressed");
     try {
-      setIsLoading(true);
+      setIsLogoutLoading(true);
       await userApi.check();
       const response = await userApi.userLogout();
       if (response === "logout successful") {
@@ -62,7 +68,7 @@ const Settings = ({ navigation }) => {
     } catch (err) {
       console.log("Logout failed " + err);
     } finally {
-      setIsLoading(false);
+      setIsLogoutLoading(false);
     }
   };
 
@@ -78,9 +84,9 @@ const Settings = ({ navigation }) => {
   };
 
   const handleSendVerificationCode = async () => {
-    setIsLoading(true);
+    setIsDeleteAccountLoading(true);
     try {
-      const response = await userApi.sendVerificationCode(email); // Pass email to sendVerificationCode
+      const response = await userApi.sendVerificationCode(email);
       console.log("response: ", response)
       if (response  === 'Verification email sent') {
         ToastAndroid.show("Verification code sent", ToastAndroid.TOP);
@@ -91,7 +97,7 @@ const Settings = ({ navigation }) => {
     } catch (error) {
       console.error("Error sending verification code:", error);
     } finally {
-      setIsLoading(false);
+      setIsDeleteAccountLoading(false);
     }
   };
 
@@ -100,7 +106,7 @@ const Settings = ({ navigation }) => {
   };
 
   const handleConfirmVerificationCode = async (verificationCode) => {
-    setIsLoading(true);
+    setIsDeleteAccountLoading(true);
     try {
       const response = await userApi.verifyAndDeleteAccount(verificationCode);
       if (response === 'User data, plans, preferences, and authentication deleted successfully') {
@@ -113,14 +119,14 @@ const Settings = ({ navigation }) => {
     } catch (error) {
       console.error("Error deleting account:", error);
     } finally {
-      setIsLoading(false);
+      setIsDeleteAccountLoading(false);
       setIsVerificationCodeModalVisible(false);
     }
   };
 
   const handleConfirmChangePassword = async (currentPassword, newPassword) => {
     console.log("Changing password...");
-    setIsLoading(true);
+    setIsChangePasswordLoading(true);
     try {
       const response = await userApi.userChangePassword(
         currentPassword,
@@ -135,7 +141,7 @@ const Settings = ({ navigation }) => {
     } catch (error) {
       console.error("Error changing password:", error);
     } finally {
-      setIsLoading(false);
+      setIsChangePasswordLoading(false);
     }
   };
 
@@ -147,12 +153,15 @@ const Settings = ({ navigation }) => {
   };
 
   const handleResetCache = async () => {
+    setIsResetCacheLoading(true);
     try {
       await AsyncStorage.clear();
       ToastAndroid.show("Cache has been reset", ToastAndroid.SHORT);
     } catch (error) {
       console.error("Error resetting cache:", error);
       ToastAndroid.show("Failed to reset cache", ToastAndroid.SHORT);
+    } finally {
+      setIsResetCacheLoading(false);
     }
   };
 
@@ -170,28 +179,36 @@ const Settings = ({ navigation }) => {
             <Text style={styles.sectionTitle}>Security</Text>
             {userType === "local" && (
               <View style={styles.setting}>
-                <Text style={styles.settingText}>Change Password</Text>
-                <Button
-                  mode="contained"
-                  onPress={handleChangePassword}
-                  style={styles.verifyButton}
-                >
-                  Verify
-                </Button>
+                {isChangePasswordLoading ? (
+                  <ActivityIndicator size="small" color={theme.colors.primary} />
+                ) : (
+                  <Button
+                     mode="outlined"
+                    icon={() => <Icon name="lock-reset" size={25} color="#6d11ef"  />}
+                    onPress={handleChangePassword}
+                    style={styles.roundedButton}
+                  >
+                    Change Password
+                  </Button>
+                )}
               </View>
             )}
             <View style={styles.setting}>
-              <Text style={styles.settingText}>Delete Account</Text>
-              <Button
-                mode="contained"
-                onPress={handleDeleteAccount}
-                style={styles.verifyButton}
-              >
-                Verify
-              </Button>
+              {isDeleteAccountLoading ? (
+                <ActivityIndicator size="small" color={theme.colors.primary} />
+              ) : (
+                <Button
+                   mode="outlined"
+                  icon={() => <Icon name="delete-forever" size={25} color="#6d11ef" style={{right: 10}}  />}
+                  onPress={handleDeleteAccount}
+                  style={styles.roundedButton}
+                >
+                  Delete Account
+                </Button>
+              )}
             </View>
           </View>
-          {isLoading ? (
+          {isLogoutLoading ? (
             <ActivityIndicator size="large" color={theme.colors.primary} />
           ) : (
             <Button
@@ -209,13 +226,17 @@ const Settings = ({ navigation }) => {
           >
             Support
           </Button>
-          <Button
-            mode="outlined"
-            onPress={handleResetCache}
-            style={styles.button}
-          >
-            Reset Cache
-          </Button>
+          {isResetCacheLoading ? (
+            <ActivityIndicator size="small" color={theme.colors.primary} />
+          ) : (
+            <Button
+              mode="outlined"
+              onPress={handleResetCache}
+              style={styles.button}
+            >
+              Reset Cache
+            </Button>
+          )}
         </View>
         <ChangePasswordModal
           visible={isChangePasswordModalVisible}
@@ -267,7 +288,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 10,
+    // paddingVertical: 10,
   },
   settingText: {
     fontSize: 16,
@@ -276,8 +297,17 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   verifyButton: {
-    width: 100,
+    width: '60%',
     backgroundColor: "#FFD580",
+  },
+  roundedButton: {
+    width: '100%',
+    borderRadius: 35, // Adjust as needed for roundness
+    flexDirection: 'row', // Align icon and text horizontally
+    justifyContent: 'center', // Center the content
+    alignItems: 'center', // Vertically center
+    paddingHorizontal: 30, // Padding for aesthetics
+    opacity: 0.95, // Slightly transparent
   },
 });
 

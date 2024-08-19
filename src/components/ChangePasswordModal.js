@@ -32,6 +32,15 @@ const ChangePasswordModal = ({ visible, onClose, onConfirm }) => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  const resetFields = () => {
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+  };
+
   const handleConfirm = () => {
     if (!currentPassword || !newPassword || !confirmPassword) {
       alert("Please fill all fields!");
@@ -44,6 +53,12 @@ const ChangePasswordModal = ({ visible, onClose, onConfirm }) => {
     setIsLoading(true);
     onConfirm(currentPassword, newPassword);
     setIsLoading(false);
+    resetFields();
+    onClose();
+  };
+
+  const handleClose = () => {
+    resetFields();
     onClose();
   };
 
@@ -100,7 +115,7 @@ const ChangePasswordModal = ({ visible, onClose, onConfirm }) => {
               Confirm
             </Button>
           )}
-          <Button mode="contained" onPress={onClose} style={[styles.button, { backgroundColor: 'red' }]}>
+          <Button mode="contained" onPress={handleClose} style={[styles.button, { backgroundColor: 'red' }]}>
             Cancel
           </Button>
         </View>

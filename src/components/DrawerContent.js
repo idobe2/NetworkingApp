@@ -69,40 +69,7 @@ const DrawerContent = () => {
          
           <Title style={styles.title}>{userDetails.name}</Title>
           <Caption style={styles.caption}>{userDetails.email}</Caption>
-          {/* <View style={styles.row}>
-            <View style={styles.section}>
-              <Paragraph style={[styles.paragraph, styles.caption]}>
-                54
-              </Paragraph>
-              <Caption style={styles.caption}>Following</Caption>
-            </View>
-            <View style={styles.section}>
-              <Paragraph style={[styles.paragraph, styles.caption]}>
-                199
-              </Paragraph>
-              <Caption style={styles.caption}>Followers</Caption>
-            </View>
-          </View> */}
         </View>
-        {/* <Drawer.Section style={styles.drawerSection}>
-          <DrawerItem
-            label="Settings"
-            icon={({ color }) => <SettingsIcon fill={color} />}
-            onPress={() => {}}
-          />
-        </Drawer.Section> */}
-
-        {/* <Drawer.Section title="Preferences">
-          <TouchableRipple onPress={() => {}}>
-            <View style={styles.preference}>
-              <Text>Notifications</Text>
-              <View pointerEvents="none">
-                <Switch value={false} />
-              </View>
-            </View>
-          </TouchableRipple>
-        </Drawer.Section> */}
-
       </View>
     </DrawerContentScrollView>
   );

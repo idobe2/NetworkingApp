@@ -97,6 +97,10 @@ const Planner = ({ navigation }) => {
       alert("Please select a destination");
       return;
     }
+    if (!social) {
+      alert("Please select who you are traveling with");
+      return;
+    }
     if (!dateRange.startDate || !dateRange.endDate) {
       alert("Please select a date range");
       return;

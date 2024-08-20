@@ -182,8 +182,6 @@ export default function RegisterScreen({ navigation }) {
       style={styles.background}
     >
       <ScrollView>
-        <BackButton goBack={navigation.goBack} />
-
         <KeyboardAvoidingView style={styles.container}>
           <View style={styles.logo}>
             <Logo />
@@ -487,6 +485,7 @@ export default function RegisterScreen({ navigation }) {
           </View>
         </Modal>
       </ScrollView>
+      <BackButton goBack={navigation.goBack} />
     </ImageBackground>
   );
 }

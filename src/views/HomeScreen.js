@@ -4,11 +4,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import NetInfo from '@react-native-community/netinfo';
-import { useAuth } from '../common/AuthContext'; // Ensure correct import
+import { useAuth } from '../common/AuthContext';
 import Planner from './PlannerScreen';
 import HomeStack from './HomeStack';
 import HomeBackground from '../components/HomeBackground';
-import clientApi from '../api/ClientApi'; // Ensure correct import
+import clientApi from '../api/ClientApi';
 
 const Tab = createBottomTabNavigator();
 

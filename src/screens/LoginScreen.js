@@ -49,6 +49,7 @@ export default function LoginScreen({ navigation }) {
       if (response.success) {
         setIsAuthenticated(true);
         navigation.navigate("Root", { screen: "Home" });
+        console.log("User has authenticated");
         ToastAndroid.show("Welcome Back", ToastAndroid.SHORT);
       } else {
         const targetScreen = response.tranferTo;

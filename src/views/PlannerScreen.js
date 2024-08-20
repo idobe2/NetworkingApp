@@ -3,7 +3,7 @@ import { View, StyleSheet, ToastAndroid, Text } from "react-native";
 import Button from "../components/Button";
 import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
-import { Dropdown } from 'react-native-element-dropdown';
+import { Dropdown } from "react-native-element-dropdown";
 import planApi from "../api/PlanApi";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { API_KEY } from "../core/config";
@@ -12,7 +12,7 @@ import SelectDatesModal from "../components/SelectDatesModal";
 import { KeyboardAwareFlatList } from "react-native-keyboard-aware-scroll-view";
 import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
-import { PlansContext } from '../common/PlansContext';
+import { PlansContext } from "../common/PlansContext";
 import placesApi from "../api/PlacesApi";
 
 const Planner = ({ navigation }) => {
@@ -29,11 +29,9 @@ const Planner = ({ navigation }) => {
   const { setPlansChanged } = useContext(PlansContext);
   const [screenKey, setScreenKey] = useState(0);
 
-
   const handleDayPress = (day) => {
     const { dateString } = day;
     const { startDate, endDate } = dateRange;
-
     if (!startDate || (startDate && endDate)) {
       const newMarkedDates = {
         [dateString]: {
@@ -52,7 +50,6 @@ const Planner = ({ navigation }) => {
       let newMarkedDates = { ...dateRange.markedDates };
       const start = new Date(startDate);
       const end = new Date(dateString);
-
       if (end < start) {
         newMarkedDates = {
           [dateString]: {
@@ -69,7 +66,6 @@ const Planner = ({ navigation }) => {
         });
         return;
       }
-
       for (let d = new Date(startDate); d <= end; d.setDate(d.getDate() + 1)) {
         const key = d.toISOString().split("T")[0];
         if (key === startDate) {
@@ -88,7 +84,6 @@ const Planner = ({ navigation }) => {
           newMarkedDates[key] = { color: "blue", textColor: "white" };
         }
       }
-
       setDateRange({
         startDate,
         endDate: dateString,
@@ -102,12 +97,10 @@ const Planner = ({ navigation }) => {
       alert("Please select a destination");
       return;
     }
-  
     if (!dateRange.startDate || !dateRange.endDate) {
       alert("Please select a date range");
       return;
     }
-  
     const today = new Date();
     const selectedStartDate = new Date(dateRange.startDate);
     const selectedEndDate = new Date(dateRange.endDate);
@@ -115,9 +108,7 @@ const Planner = ({ navigation }) => {
       alert("Please select dates later than today's date");
       return;
     }
-  
     setLoading(true);
-  
     try {
       console.log(
         "destination:",
@@ -144,22 +135,25 @@ const Planner = ({ navigation }) => {
         const newPlan = await planApi.getPlans(response.planId);
         if (newPlan) {
           // Fetch destination image
-          const destinationImageResponse = await placesApi.fetchImages([newPlan]);
-          const destinationImage = destinationImageResponse[newPlan.destination] || null;
-  
-          // Ensure the newPlan object has id and planId fields
+          const destinationImageResponse = await placesApi.fetchImages([
+            newPlan,
+          ]);
+          const destinationImage =
+            destinationImageResponse[newPlan.destination] || null;
           const enrichedPlan = {
             ...newPlan,
-            id: response.id, // Assuming the response from addPlan has the id
-            planId: response.planId // Assuming the response from addPlan has the planId
+            id: response.id,
+            planId: response.planId,
           };
-  
           setDestination("");
           setSocial("");
           setDateRange({});
           setLoadLevel(2);
           setPlansChanged(true);
-          navigation.navigate("PlanDetails", { trip: enrichedPlan, image: destinationImage });
+          navigation.navigate("PlanDetails", {
+            trip: enrichedPlan,
+            image: destinationImage,
+          });
           ToastAndroid.show("Plan created successfully", ToastAndroid.SHORT);
         } else {
           alert("Failed to fetch the created plan details");
@@ -170,26 +164,26 @@ const Planner = ({ navigation }) => {
       alert("An error occurred while creating the plan. Please try again.");
     } finally {
       setLoading(false);
-      setScreenKey(prevKey => prevKey + 1);
+      setScreenKey((prevKey) => prevKey + 1);
     }
   };
 
   const data = [
-    { key: 'header' },
-    { key: 'paragraph' },
-    { key: 'googlePlacesAutocomplete' },
-    { key: 'dropdown' },
-    { key: 'loadLevelSlider' },
-    { key: 'selectDatesButton' },
-    { key: 'dateRange' },
-    { key: 'continueButton' },
+    { key: "header" },
+    { key: "paragraph" },
+    { key: "googlePlacesAutocomplete" },
+    { key: "dropdown" },
+    { key: "loadLevelSlider" },
+    { key: "selectDatesButton" },
+    { key: "dateRange" },
+    { key: "continueButton" },
   ];
 
   const renderItem = ({ item }) => {
     switch (item.key) {
-      case 'header':
+      case "header":
         return <Header>Create Plan</Header>;
-      case 'paragraph':
+      case "paragraph":
         return (
           <Paragraph>
             The magic starts here ✨{"\n"}
@@ -197,7 +191,7 @@ const Planner = ({ navigation }) => {
             trip.{"\n"}
           </Paragraph>
         );
-      case 'googlePlacesAutocomplete':
+      case "googlePlacesAutocomplete":
         return (
           <View style={styles.searchContainer}>
             <View style={styles.labelContainer}>
@@ -219,11 +213,13 @@ const Planner = ({ navigation }) => {
             </View>
           </View>
         );
-      case 'dropdown':
+      case "dropdown":
         return (
           <View style={styles.dropdownContainer}>
             <View style={styles.labelContainer}>
-              <Text style={styles.headerLabel}>Who are you traveling with?</Text>
+              <Text style={styles.headerLabel}>
+                Who are you traveling with?
+              </Text>
               <Dropdown
                 data={[
                   { label: "Myself", value: "Solo" },
@@ -235,7 +231,7 @@ const Planner = ({ navigation }) => {
                 valueField="value"
                 placeholder="Select one"
                 value={social}
-                onChange={item => {
+                onChange={(item) => {
                   setSocial(item.value);
                 }}
                 style={styles.dropdown}
@@ -244,23 +240,23 @@ const Planner = ({ navigation }) => {
             </View>
           </View>
         );
-      case 'loadLevelSlider':
+      case "loadLevelSlider":
         return (
           <LoadLevelSlider value={loadLevel} onValueChange={setLoadLevel} />
         );
-      case 'selectDatesButton':
+      case "selectDatesButton":
         return (
           <Button mode="contained" onPress={() => setShowCalendar(true)}>
             Select Dates
           </Button>
         );
-      case 'dateRange':
+      case "dateRange":
         return dateRange.startDate && dateRange.endDate ? (
           <Paragraph style={{ textAlign: "center" }}>
             {dateRange.startDate} - {dateRange.endDate}
           </Paragraph>
         ) : null;
-      case 'continueButton':
+      case "continueButton":
         return (
           <Button mode="outlined" onPress={handleContinue}>
             Create Plan
@@ -307,28 +303,28 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   pickerContainer: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 20,
   },
   dropdownContainer: {
     paddingHorizontal: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     borderRadius: 10,
     elevation: 3,
     padding: 10,
   },
   dropdown: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 12,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderWidth: 1,
     marginBottom: 20,
     marginTop: 10,
   },
   dropdownContainerStyle: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -337,32 +333,32 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   loadingOverlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
     zIndex: 1,
   },
   searchContainer: {
     marginBottom: 20,
     paddingHorizontal: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     borderRadius: 10,
     elevation: 3,
     padding: 10,
   },
   labelContainer: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   headerLabel: {
     fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'left',
-    color: '#333',
+    fontWeight: "600",
+    textAlign: "left",
+    color: "#333",
     marginBottom: 10,
   },
 });

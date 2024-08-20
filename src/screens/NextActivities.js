@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import {
   View,
   StyleSheet,
@@ -8,59 +8,62 @@ import {
   ToastAndroid,
   Linking,
   Alert,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import placesApi from '../api/PlacesApi';
-import plansApi from '../api/PlanApi';
-import HomeBackground from '../components/HomeBackground';
-import { format, parse } from 'date-fns';
-import { API_KEY } from '../core/config';
-import RatingStars from '../components/RatingStars';
-import Header from '../components/Header';
-import Paragraph from '../components/Paragraph';
-import Button from '../components/Button';
-import { PlansContext } from '../common/PlansContext';
-import NoPlansMessage from '../components/NoPlansMessage';
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import placesApi from "../api/PlacesApi";
+import plansApi from "../api/PlanApi";
+import HomeBackground from "../components/HomeBackground";
+import { format, parse } from "date-fns";
+import { API_KEY } from "../core/config";
+import RatingStars from "../components/RatingStars";
+import Header from "../components/Header";
+import Paragraph from "../components/Paragraph";
+import Button from "../components/Button";
+import { PlansContext } from "../common/PlansContext";
+import NoPlansMessage from "../components/NoPlansMessage";
 import BackButton from "../components/BackButton";
 
 const NextActivities = ({ navigation }) => {
-  const { plansChanged, setPlansChanged } = useContext(PlansContext); 
+  const { plansChanged, setPlansChanged } = useContext(PlansContext);
 
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [city, setCity] = useState('');
-  const [date, setDate] = useState('');
+  const [city, setCity] = useState("");
+  const [date, setDate] = useState("");
   const [currentPlan, setCurrentPlan] = useState(null);
   const [apiError, setApiError] = useState(false);
 
   const fetchNextActivities = useCallback(async () => {
     setLoading(true);
-    console.log('Fetching next activities...');
+    console.log("Fetching next activities...");
 
     try {
       // Invalidate the cache if plans have changed
       if (plansChanged) {
-        console.log('Invalidating cache due to plan changes');
-        await AsyncStorage.removeItem('nextActivities');
+        console.log("Invalidating cache due to plan changes");
+        await AsyncStorage.removeItem("nextActivities");
         setPlansChanged(false);
       }
 
       // Try to get cached plans
       let cachedPlans = [];
       try {
-        const cachedData = await AsyncStorage.getItem('nextActivities');
+        const cachedData = await AsyncStorage.getItem("nextActivities");
         if (cachedData !== null) {
           cachedPlans = JSON.parse(cachedData);
-          // console.log('Cached data:', cachedPlans);
         } else {
-          console.log('No cached data found');
+          console.log("No cached data found");
         }
       } catch (error) {
-        console.error('Failed to load cached plans:', error);
+        console.error("Failed to load cached plans:", error);
       }
 
-      if (cachedPlans && cachedPlans.activities && cachedPlans.activities.length > 0) {
-        console.log('Using cached data');
+      if (
+        cachedPlans &&
+        cachedPlans.activities &&
+        cachedPlans.activities.length > 0
+      ) {
+        console.log("Using cached data");
         setActivities(cachedPlans.activities);
         setCity(cachedPlans.city);
         setDate(cachedPlans.date);
@@ -70,11 +73,12 @@ const NextActivities = ({ navigation }) => {
       }
 
       // Fetch plans from API
-      console.log('Fetching new data from API');
+      console.log("Fetching new data from API");
       const fetchedPlans = await plansApi.fetchPlans();
       if (fetchedPlans && fetchedPlans.length > 0) {
         const now = new Date();
-        now.setHours(0, 0, 0, 0); // Resetting time part for comparison
+        // Resetting time part for comparison
+        now.setHours(0, 0, 0, 0);
         let nextActivities = [];
         for (const plan of fetchedPlans) {
           for (const day of plan.travelPlan) {
@@ -84,8 +88,9 @@ const NextActivities = ({ navigation }) => {
               destination: plan.destination,
               plan: plan,
             }));
-            const activityDate = parse(day.day, 'dd/MM/yy', new Date());
-            activityDate.setHours(0, 0, 0, 0); // Resetting time part for comparison
+            const activityDate = parse(day.day, "dd/MM/yy", new Date());
+            // Resetting time part for comparison
+            activityDate.setHours(0, 0, 0, 0);
             if (activityDate >= now) {
               nextActivities = [...nextActivities, ...activitiesToday];
             }
@@ -93,8 +98,8 @@ const NextActivities = ({ navigation }) => {
         }
         nextActivities.sort(
           (a, b) =>
-            parse(a.day, 'dd/MM/yy', new Date()).getTime() -
-            parse(b.day, 'dd/MM/yy', new Date()).getTime()
+            parse(a.day, "dd/MM/yy", new Date()).getTime() -
+            parse(b.day, "dd/MM/yy", new Date()).getTime()
         );
         const closestDay = nextActivities.length ? nextActivities[0].day : null;
         if (closestDay) {
@@ -104,10 +109,12 @@ const NextActivities = ({ navigation }) => {
           const detailedActivities = await Promise.all(
             filteredActivities.map(async (activity) => {
               try {
-                const details = await placesApi.getPlaceDetails(activity.activityId);
+                const details = await placesApi.getPlaceDetails(
+                  activity.activityId
+                );
                 return { ...activity, ...details };
               } catch (error) {
-                console.error('Error fetching place details:', error);
+                console.error("Error fetching place details:", error);
                 return { ...activity, error: true };
               }
             })
@@ -117,20 +124,35 @@ const NextActivities = ({ navigation }) => {
           );
           if (validDetailedActivities.length > 0) {
             setCity(validDetailedActivities[0].destination);
-            setDate(format(parse(validDetailedActivities[0].day, 'dd/MM/yy', new Date()), 'MMMM dd, yyyy'));
+            setDate(
+              format(
+                parse(validDetailedActivities[0].day, "dd/MM/yy", new Date()),
+                "MMMM dd, yyyy"
+              )
+            );
             setCurrentPlan(validDetailedActivities[0].plan);
 
             // Cache the activities
             try {
-              await AsyncStorage.setItem('nextActivities', JSON.stringify({
-                activities: validDetailedActivities,
-                city: validDetailedActivities[0].destination,
-                date: format(parse(validDetailedActivities[0].day, 'dd/MM/yy', new Date()), 'MMMM dd, yyyy'),
-                currentPlan: validDetailedActivities[0].plan,
-              }));
-              console.log('Data cached successfully');
+              await AsyncStorage.setItem(
+                "nextActivities",
+                JSON.stringify({
+                  activities: validDetailedActivities,
+                  city: validDetailedActivities[0].destination,
+                  date: format(
+                    parse(
+                      validDetailedActivities[0].day,
+                      "dd/MM/yy",
+                      new Date()
+                    ),
+                    "MMMM dd, yyyy"
+                  ),
+                  currentPlan: validDetailedActivities[0].plan,
+                })
+              );
+              console.log("Data cached successfully");
             } catch (error) {
-              console.error('Failed to save activities to cache:', error);
+              console.error("Failed to save activities to cache:", error);
             }
           }
           setActivities(validDetailedActivities);
@@ -142,23 +164,27 @@ const NextActivities = ({ navigation }) => {
       if (error.response && error.response.status === 404) {
         setApiError(true);
       }
-      ToastAndroid.show('Failed to fetch activities', ToastAndroid.SHORT);
-      console.error('Error fetching next activities:', error);
+      ToastAndroid.show("Failed to fetch activities", ToastAndroid.SHORT);
+      console.error("Error fetching next activities:", error);
     }
     setLoading(false);
   }, [plansChanged, setPlansChanged]);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', fetchNextActivities);
+    const unsubscribe = navigation.addListener("focus", fetchNextActivities);
     return unsubscribe;
   }, [navigation, fetchNextActivities]);
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <View style={{ flex: 1 }}>
-        <Header style={styles.placeName}>{truncateText(item.name, 25) || 'Unknown Activity'}</Header>
+        <Header style={styles.placeName}>
+          {truncateText(item.name, 25) || "Unknown Activity"}
+        </Header>
         <RatingStars rating={item.rank} />
-        <Paragraph style={styles.placeAddress}>{item.address || 'Unknown Address'}</Paragraph>
+        <Paragraph style={styles.placeAddress}>
+          {item.address || "Unknown Address"}
+        </Paragraph>
       </View>
       {item.photo_reference && (
         <Image
@@ -173,19 +199,31 @@ const NextActivities = ({ navigation }) => {
 
   const openGoogleMapsRoute = () => {
     if (activities.length === 0) {
-      ToastAndroid.show('No activities to show in Google Maps', ToastAndroid.SHORT);
+      ToastAndroid.show(
+        "No activities to show in Google Maps",
+        ToastAndroid.SHORT
+      );
       return;
     }
-    const baseUrl = 'https://www.google.com/maps/dir/?api=1&travelmode=driving';
-    const origin = `&origin=${encodeURIComponent(activities[0].name + ', ' + activities[0].address)}`;
-    const waypoints = activities.slice(1).map((activity) =>
-      encodeURIComponent(activity.name + ', ' + activity.address)
-    ).join('|');
-    const destination = `&destination=${encodeURIComponent(activities[activities.length - 1].name + ', ' + activities[activities.length - 1].address)}`;
-    const waypointsParam = waypoints ? `&waypoints=${waypoints}` : '';
+    const baseUrl = "https://www.google.com/maps/dir/?api=1&travelmode=driving";
+    const origin = `&origin=${encodeURIComponent(
+      activities[0].name + ", " + activities[0].address
+    )}`;
+    const waypoints = activities
+      .slice(1)
+      .map((activity) =>
+        encodeURIComponent(activity.name + ", " + activity.address)
+      )
+      .join("|");
+    const destination = `&destination=${encodeURIComponent(
+      activities[activities.length - 1].name +
+        ", " +
+        activities[activities.length - 1].address
+    )}`;
+    const waypointsParam = waypoints ? `&waypoints=${waypoints}` : "";
     const url = baseUrl + origin + destination + waypointsParam;
     Linking.openURL(url).catch((err) =>
-      console.error('An error occurred while opening Google Maps', err)
+      console.error("An error occurred while opening Google Maps", err)
     );
   };
 
@@ -230,23 +268,24 @@ const NextActivities = ({ navigation }) => {
                 keyExtractor={(item, index) => index.toString()}
               />
             ) : (
-              <NoPlansMessage onGetStarted={() => navigation.navigate('Welcome')} />
+              <NoPlansMessage
+                onGetStarted={() => navigation.navigate("Welcome")}
+              />
             )}
             {currentPlan && (
               <View style={styles.buttonsContainer}>
                 <Button
                   mode="contained"
-                  onPress={() => navigation.navigate('PlanDetails', {
-                    trip: currentPlan,
-                    image: null,
-                  })}
+                  onPress={() =>
+                    navigation.navigate("PlanDetails", {
+                      trip: currentPlan,
+                      image: null,
+                    })
+                  }
                 >
                   View Plan Details
                 </Button>
-                <Button
-                  mode="outlined"
-                  onPress={handleOpenGoogleMaps}
-                >
+                <Button mode="outlined" onPress={handleOpenGoogleMaps}>
                   Open in Google Maps
                 </Button>
               </View>
@@ -265,27 +304,27 @@ const styles = StyleSheet.create({
   },
   city: {
     fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginVertical: 10,
   },
   date: {
     fontSize: 20,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20,
   },
   itemContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#add8e6',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#add8e6",
     padding: 15,
     marginBottom: 10,
     borderRadius: 5,
   },
   placeName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   placeAddress: {
     marginTop: 5,
@@ -298,9 +337,9 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     marginTop: 20,
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

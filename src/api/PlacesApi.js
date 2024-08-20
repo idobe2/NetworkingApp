@@ -32,7 +32,7 @@ const getPlaceDetails = async (place_id) => {
         name: data?.result?.name,
         address: data?.result?.formatted_address,
         rank: data?.result?.rating,
-        photo_reference: data?.result?.photos?.[0]?.photo_reference, // Get the reference to the first photo
+        photo_reference: data?.result?.photos?.[0]?.photo_reference, // first photo
       };
       return details;
     }

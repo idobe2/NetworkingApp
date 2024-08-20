@@ -147,7 +147,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     height: 90,
-    // marginVertical: 10,
   },
   input: {
     backgroundColor: theme.colors.surface,

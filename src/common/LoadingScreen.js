@@ -36,13 +36,13 @@ const LoadingScreen = () => {
     const timer = setTimeout(() => {
       Animated.timing(progress, {
         toValue: 1,
-        duration: 3000, // Modify duration according to your needs
+        duration: 3000,
         useNativeDriver: false,
         easing: Easing.linear
       }).start();
-    }, 500);  // Start after 500 milliseconds
+    }, 500);
 
-    return () => clearTimeout(timer); // Clean up the timer when component unmounts or re-renders
+    return () => clearTimeout(timer);
   }, []);
 
   const progressBarWidth = progress.interpolate({

@@ -18,8 +18,14 @@ const userResetPassword = async (email) => {
   }
 };
 
-const userSignup = async (email, password, confirmPassword, name, formattedDateString, gender ) => {
-  
+const userSignup = async (
+  email,
+  password,
+  confirmPassword,
+  name,
+  formattedDateString,
+  gender
+) => {
   if (password !== confirmPassword) {
     return { success: false, message: "Passwords do not match" };
   }
@@ -32,20 +38,25 @@ const userSignup = async (email, password, confirmPassword, name, formattedDateS
 
     if (response_mail.data !== "Email is available") {
       return {
-      success: false,
-      message: response_mail.data,
+        success: false,
+        message: response_mail.data,
       };
     }
 
     if (response_password.data !== "Password received") {
       return {
-      success: false,
-      message: response_password.data,
+        success: false,
+        message: response_password.data,
       };
     }
 
-    const post_response = await clientApi.post(`/signup`, { email, password, name, gender, birthday: formattedDateString });
-
+    const post_response = await clientApi.post(`/signup`, {
+      email,
+      password,
+      name,
+      gender,
+      birthday: formattedDateString,
+    });
 
     if (post_response.data.success) {
       return {
@@ -71,15 +82,13 @@ const userGoogleLogin = async () => {
     console.log("Sign-in successful");
 
     const credentialResponse = userInfo.idToken;
-    let googleToken = userInfo.accessToken; // Use let instead of const for potential reassignment
-    // console.log("credentialResponse:", credentialResponse);
-    // console.log("accessToken:", googleToken);
+    // Use let instead of const for potential reassignment
+    let googleToken = userInfo.accessToken;
 
     if (!googleToken) {
       // If accessToken is still undefined, manually get the accessToken
       const tokens = await GoogleSignin.getTokens();
       googleToken = tokens.accessToken;
-      // console.log("Manually obtained accessToken:", googleToken);
     }
 
     // Sign in with Firebase using the Google credentials
@@ -92,7 +101,6 @@ const userGoogleLogin = async () => {
       googleToken,
     });
     await setToken(response.data.accessToken, response.data.refreshToken);
-    console.log("getToken", await getToken());
     return response;
   } catch (error) {
     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -132,7 +140,6 @@ const userLogin = async (email, password) => {
       Alert.alert(response.data);
       return null;
     }
-    //TODO: fix the reponse from server
     const responseToFix1 = "Incorrect details " + password;
     const responseToFix2 = " and url: " + email;
     const responseToFix = responseToFix1 + responseToFix2;
@@ -141,7 +148,6 @@ const userLogin = async (email, password) => {
       return null;
     }
     await setToken(response.data.accessToken, response.data.refreshToken);
-    console.log("getToken", await getToken());
     console.log("User logged in successfully");
     return response.data;
   } catch (error) {
@@ -196,7 +202,7 @@ const userLogout = async () => {
     }
   } catch (err) {
     console.log("Logout fail " + err);
-    throw err; // Rethrow the error to handle it in UserModel
+    throw err;
   }
 };
 
@@ -230,10 +236,10 @@ const userChangePassword = async (currentPassword, newPassword) => {
       currentPassword,
       newPassword,
     });
-    return response.data;  // Returns the success message and data from the server
+    // Returns the success message and data from the server
+    return response.data;
   } catch (error) {
     console.log("Error changing password:", error);
-
     // Check if the error response has data and a message
     if (error.response && error.response.data) {
       // Display the specific error message received from the server
@@ -242,11 +248,16 @@ const userChangePassword = async (currentPassword, newPassword) => {
       // Generic error message if response data is not available
       Alert.alert("Error changing password. Please try again.");
     }
-    
-    return { success: false, message: (error.response && error.response.data.message) ? error.response.data.message : "Error changing password. Please try again." };
+
+    return {
+      success: false,
+      message:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : "Error changing password. Please try again.",
+    };
   }
 };
-
 
 const userDeleteAccount = async (currentPassword) => {
   try {
@@ -259,11 +270,11 @@ const userDeleteAccount = async (currentPassword) => {
     Alert.alert("Error deleting account. Please try again.");
   }
   return null;
-}
+};
 
 const sendVerificationCode = async (email) => {
   try {
-    const response = await clientApi.post("/SendMail", {email});
+    const response = await clientApi.post("/SendMail", { email });
     return response.data;
   } catch (error) {
     console.error("Error sending verification code:", error);
@@ -276,11 +287,11 @@ const verifyAndDeleteAccount = async (verificationCode) => {
     const response = await clientApi.post("/deleteUserData", {
       verifynumber: verificationCode,
     });
-     if (await GoogleSignin.isSignedIn()) {
-        console.log("Google sign out");
-        await GoogleSignin.signOut();
-      }
-      await removeToken();
+    if (await GoogleSignin.isSignedIn()) {
+      console.log("Google sign out");
+      await GoogleSignin.signOut();
+    }
+    await removeToken();
     return response.data;
   } catch (error) {
     console.error("Error verifying and deleting account:", error);
@@ -303,5 +314,5 @@ export default {
   userChangePassword,
   userDeleteAccount,
   sendVerificationCode,
-  verifyAndDeleteAccount
+  verifyAndDeleteAccount,
 };

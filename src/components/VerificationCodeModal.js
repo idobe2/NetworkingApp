@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import Button from "../components/Button";
 import { theme } from "../core/theme";
-import userApi from "../api/UserApi"; // Ensure this import is added
+import userApi from "../api/UserApi";
 
 const VerificationCodeModal = ({ visible, onClose, onConfirm, email }) => {
   const [code, setCode] = useState(["", "", "", "", ""]);
@@ -28,7 +28,7 @@ const VerificationCodeModal = ({ visible, onClose, onConfirm, email }) => {
   };
 
   const handleKeyPress = ({ nativeEvent }, index) => {
-    if (nativeEvent.key === 'Backspace' && code[index] === "" && index > 0) {
+    if (nativeEvent.key === "Backspace" && code[index] === "" && index > 0) {
       inputs.current[index - 1].focus();
     }
   };
@@ -36,6 +36,7 @@ const VerificationCodeModal = ({ visible, onClose, onConfirm, email }) => {
   const handleConfirm = () => {
     const verificationCode = code.join("");
     onConfirm(verificationCode);
+    setCode(["", "", "", "", ""]);
     onClose();
   };
 
@@ -79,10 +80,18 @@ const VerificationCodeModal = ({ visible, onClose, onConfirm, email }) => {
               />
             ))}
           </View>
-          <Button mode="contained" onPress={handleConfirm} style={styles.button}>
+          <Button
+            mode="contained"
+            onPress={handleConfirm}
+            style={styles.button}
+          >
             Confirm
           </Button>
-          <Button mode="contained" onPress={handleCancel} style={[styles.button, { backgroundColor: 'red' }]}>
+          <Button
+            mode="contained"
+            onPress={handleCancel}
+            style={[styles.button, { backgroundColor: "red" }]}
+          >
             Cancel
           </Button>
           <View style={styles.resendContainer}>

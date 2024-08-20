@@ -13,7 +13,6 @@ import {
   ImageBackground,
 } from "react-native";
 import { Text, IconButton } from "react-native-paper";
-import Background from "../components/Background";
 import Logo from "../components/Logo";
 import Header from "../components/Header";
 import Button from "../components/Button";
@@ -26,7 +25,7 @@ import {
   confirmValidator,
 } from "../helpers/passwordValidator";
 import { nameValidator } from "../helpers/nameValidator";
-import { ageValidator } from "../helpers/ageValidator"; // Import ageValidator
+import { ageValidator } from "../helpers/ageValidator";
 import { Ionicons } from "@expo/vector-icons";
 import TextInput from "../components/TextInput";
 import CalendarPicker from "react-native-calendar-picker";
@@ -50,19 +49,18 @@ export default function RegisterScreen({ navigation }) {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [nameError, setNameError] = useState("");
-  const [ageError, setAgeError] = useState(""); // State for age error
+  const [ageError, setAgeError] = useState("");
   const [emailTouched, setEmailTouched] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
   const [nameTouched, setNameTouched] = useState(false);
-  const [selectedDateTouched, setSelectedDateTouched] = useState(false); // State for date touched
+  const [selectedDateTouched, setSelectedDateTouched] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [privacyChecked, setPrivacyChecked] = useState(false);
   const [privacyModalVisible, setPrivacyModalVisible] = useState(false);
   const [termsModalVisible, setTermsModalVisible] = useState(false);
 
-  // Add this function
   const openPrivacyPolicy = () => {
     setPrivacyModalVisible(true);
   };
@@ -111,7 +109,7 @@ export default function RegisterScreen({ navigation }) {
 
   const onDateChange = (date) => {
     setSelectedDate(date);
-    setSelectedDateTouched(true); // Mark date as touched
+    setSelectedDateTouched(true);
     setShowModal(false);
   };
 
@@ -151,7 +149,7 @@ export default function RegisterScreen({ navigation }) {
     } else {
       Alert.alert("Error", response.message);
     }
-    setIsLoading(false); // Stop loading
+    setIsLoading(false);
   };
 
   const isEmailValid = emailValidator(email) === "";
@@ -178,327 +176,317 @@ export default function RegisterScreen({ navigation }) {
   ];
 
   return (
-    
     <ImageBackground
-      source={require('../assets/background_dot.png')}
+      source={require("../assets/background_dot.png")}
       resizeMode="repeat"
       style={styles.background}
     >
-      <ScrollView >
-      <BackButton goBack={navigation.goBack} />
-      
-        <KeyboardAvoidingView style={styles.container} >
-          
-          
-            <View style={styles.logo}>
-              <Logo />
-              <Header>Create Account</Header>
-            </View>
-            <View style={styles.inputContainer}>
-              {emailTouched && emailError ? (
-                <Ionicons
-                  name="close-circle"
-                  size={25}
-                  color="#b22222"
-                  style={styles.iconLeft}
-                />
-              ) : isEmailValid && email.length > 0 ? (
-                <Ionicons
-                  name="checkmark-circle"
-                  size={25}
-                  color="green"
-                  style={styles.iconLeft}
-                />
-              ) : null}
-              <TextInput
-                label="Email"
-                returnKeyType="next"
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  setEmailTouched(true);
-                }}
-                autoCapitalize="none"
-                autoCompleteType="email"
-                textContentType="emailAddress"
-                keyboardType="email-address"
-                error={emailError}
-                style={styles.textInput}
-              />
-            </View>
-            {emailTouched && emailError ? (
-              <Text style={styles.errorText}>{emailError}</Text>
-            ) : null}
-            <View style={styles.inputContainer}>
-              {nameTouched && nameError ? (
-                <Ionicons
-                  name="close-circle"
-                  size={25}
-                  color="#b22222"
-                  style={styles.iconLeft}
-                />
-              ) : isNameValid && name.length > 0 ? (
-                <Ionicons
-                  name="checkmark-circle"
-                  size={25}
-                  color="green"
-                  style={styles.iconLeft}
-                />
-              ) : null}
-              <TextInput
-                label="Name"
-                returnKeyType="next"
-                value={name}
-                onChangeText={(text) => {
-                  setName(text);
-                  setNameTouched(true);
-                }}
-                style={styles.textInput}
-              />
-            </View>
-            {nameTouched && nameError ? (
-              <Text style={styles.errorText}>{nameError}</Text>
-            ) : null}
-            <View style={{ marginVertical: 12 }}>
-              <Dropdown
-                data={genderOptions}
-                labelField="label"
-                valueField="value"
-                placeholder="Select gender"
-                value={gender}
-                onChange={(item) => {
-                  setGender(item.value);
-                }}
-                style={[
-                  styles.dropdown,
-                  isGenderSelected ? styles.selectedDropdown : null,
-                ]}
-                selectedTextStyle={styles.selectedText}
-              />
-              {isGenderSelected && (
-                <Ionicons
-                  name="checkmark-circle"
-                  size={25}
-                  color="green"
-                  style={styles.genderIcon}
-                />
-              )}
-            </View>
-            <TouchableOpacity
-              onPress={() => setShowModal(true)}
-              style={styles.input}
-            >
-              {selectedDateTouched && ageError ? (
-                <Ionicons
-                  name="close-circle"
-                  size={25}
-                  color="#b22222"
-                  style={styles.ageIconLeft}
-                />
-              ) : isBirthDateSelected && isAgeValid ? (
-                <Ionicons
-                  name="checkmark-circle"
-                  size={25}
-                  color="green"
-                  style={styles.ageIconLeft}
-                />
-              ) : null}
-              <Text style={styles.inputText}>
-                {selectedDate ? formatDate(selectedDate) : "Birth date"}
-              </Text>
-              <FontAwesome
-                name="calendar"
-                size={24}
-                color={theme.colors.primary}
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-            {selectedDateTouched && ageError ? (
-              <Text style={styles.ageErrorText}>{ageError}</Text>
-            ) : null}
-            <View style={styles.inputContainer}>
-              {passwordTouched && passwordError ? (
-                <Ionicons
-                  name="close-circle"
-                  size={25}
-                  color="#b22222"
-                  style={styles.iconLeft}
-                />
-              ) : isPasswordValid && password.length > 0 ? (
-                <Ionicons
-                  name="checkmark-circle"
-                  size={25}
-                  color="green"
-                  style={styles.iconLeft}
-                />
-              ) : null}
-              <TextInput
-                label="Password"
-                returnKeyType="done"
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  setPasswordTouched(true);
-                }}
-                secureTextEntry={!showPassword}
-                style={styles.textInputWithIcon}
-                error={passwordError}
-              />
-              <IconButton
-                icon={showPassword ? "eye-off" : "eye"}
-                onPress={handleTogglePasswordVisibility}
-                style={styles.iconButton}
-              />
-            </View>
-            {passwordTouched && passwordError ? (
-              <Text style={styles.errorText}>{passwordError}</Text>
-            ) : null}
-            <View style={styles.inputContainer}>
-              {confirmPasswordTouched && confirmPasswordError ? (
-                <Ionicons
-                  name="close-circle"
-                  size={25}
-                  color="#b22222"
-                  style={styles.iconLeft}
-                />
-              ) : isConfirmPasswordValid && confirmPassword.length > 0 ? (
-                <Ionicons
-                  name="checkmark-circle"
-                  size={25}
-                  color="green"
-                  style={styles.iconLeft}
-                />
-              ) : null}
-              <TextInput
-                label="Confirm Password"
-                returnKeyType="done"
-                value={confirmPassword}
-                onChangeText={(text) => {
-                  setConfirmPassword(text);
-                  setConfirmPasswordTouched(true);
-                }}
-                secureTextEntry={!showConfirmPassword}
-                style={[styles.textInputWithIcon, {marginBottom: 10}]}
-                error={confirmPasswordError}
-              />
-              <IconButton
-                icon={showConfirmPassword ? "eye-off" : "eye"}
-                onPress={handleToggleConfirmPasswordVisibility}
-                style={styles.iconButton}
-              />
-            </View>
+      <ScrollView>
+        <BackButton goBack={navigation.goBack} />
 
-            {confirmPasswordTouched && confirmPasswordError ? (
-              <Text style={styles.errorText}>{confirmPasswordError}</Text>
-            ) : null}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 10,
-                flexGrow: 1,
-                justifyContent: "center",
-                width: "100%",
-              }}
-            >
-              <CheckBox
-                value={privacyChecked}
-                onValueChange={setPrivacyChecked}
-                tintColors={{ true: theme.colors.primary, false: "grey" }}
-                style={{ marginLeft: 15 }}
+        <KeyboardAvoidingView style={styles.container}>
+          <View style={styles.logo}>
+            <Logo />
+            <Header>Create Account</Header>
+          </View>
+          <View style={styles.inputContainer}>
+            {emailTouched && emailError ? (
+              <Ionicons
+                name="close-circle"
+                size={25}
+                color="#b22222"
+                style={styles.iconLeft}
               />
-              <View>
-                <Text>
-                  Confirm you agree to our{" "}
-                  <Text
-                    style={{
-                      color: theme.colors.primary,
-                      textDecorationLine: "underline",
-                    }}
-                    onPress={openPrivacyPolicy}
-                  >
-                    Privacy Policy
-                  </Text>{" "}
-                  and{" "}
-                  <Text
-                    style={{
-                      color: theme.colors.primary,
-                      textDecorationLine: "underline",
-                      marginBottom: 10,
-                    }}
-                    onPress={openTermsConditions}
-                  >
-                    Terms & Conditions
-                  </Text>
-                </Text>
-              </View>
-            </View>
-            <PrivacyModal
-              visible={privacyModalVisible}
-              onClose={() => setPrivacyModalVisible(false)}
-            />
-            <TermsModal
-              visible={termsModalVisible}
-              onClose={() => setTermsModalVisible(false)}
-            />
-            {isLoading ? (
-              <ActivityIndicator size="large" color={theme.colors.primary} />
-            ) : (
-              <Button
-                mode="contained"
-                onPress={handleSignup}
-                style={styles.button}
-                disabled={!isFormValid}
-              >
-                Sign Up
-              </Button>
-            )}
-            <View style={styles.row}>
-              <Text>Already have an account? </Text>
-              <TouchableOpacity
-                onPress={() => navigation.replace("LoginScreen")}
-              >
-                <Text style={styles.link}>Login</Text>
-              </TouchableOpacity>
-            </View>
-           
-          
-        </KeyboardAvoidingView>
-      
-      <Modal
-        visible={showModal}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowModal(false)}
-      >
-        <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
-          <View style={styles.overlay} />
-        </TouchableWithoutFeedback>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <CalendarPicker
-              onDateChange={onDateChange}
-              selectedStartDate={selectedDate}
-              previousTitle="Previous"
-              nextTitle="Next"
-              selectedDayTextColor={theme.colors.primary}
-              selectedDayBackgroundColor={theme.colors.accent}
-              todayBackgroundColor={theme.colors.background}
-              selectedDayStyle={styles.selectedDayStyle}
-              selectedDayTextStyles={styles.selectedDayText}
-            />
-            <RNButton
-              title="Close"
-              onPress={() => setShowModal(false)}
-              color={theme.colors.primary}
+            ) : isEmailValid && email.length > 0 ? (
+              <Ionicons
+                name="checkmark-circle"
+                size={25}
+                color="green"
+                style={styles.iconLeft}
+              />
+            ) : null}
+            <TextInput
+              label="Email"
+              returnKeyType="next"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                setEmailTouched(true);
+              }}
+              autoCapitalize="none"
+              autoCompleteType="email"
+              textContentType="emailAddress"
+              keyboardType="email-address"
+              error={emailError}
+              style={styles.textInput}
             />
           </View>
-        </View>
-      </Modal>
-      
+          {emailTouched && emailError ? (
+            <Text style={styles.errorText}>{emailError}</Text>
+          ) : null}
+          <View style={styles.inputContainer}>
+            {nameTouched && nameError ? (
+              <Ionicons
+                name="close-circle"
+                size={25}
+                color="#b22222"
+                style={styles.iconLeft}
+              />
+            ) : isNameValid && name.length > 0 ? (
+              <Ionicons
+                name="checkmark-circle"
+                size={25}
+                color="green"
+                style={styles.iconLeft}
+              />
+            ) : null}
+            <TextInput
+              label="Name"
+              returnKeyType="next"
+              value={name}
+              onChangeText={(text) => {
+                setName(text);
+                setNameTouched(true);
+              }}
+              style={styles.textInput}
+            />
+          </View>
+          {nameTouched && nameError ? (
+            <Text style={styles.errorText}>{nameError}</Text>
+          ) : null}
+          <View style={{ marginVertical: 12 }}>
+            <Dropdown
+              data={genderOptions}
+              labelField="label"
+              valueField="value"
+              placeholder="Select gender"
+              value={gender}
+              onChange={(item) => {
+                setGender(item.value);
+              }}
+              style={[
+                styles.dropdown,
+                isGenderSelected ? styles.selectedDropdown : null,
+              ]}
+              selectedTextStyle={styles.selectedText}
+            />
+            {isGenderSelected && (
+              <Ionicons
+                name="checkmark-circle"
+                size={25}
+                color="green"
+                style={styles.genderIcon}
+              />
+            )}
+          </View>
+          <TouchableOpacity
+            onPress={() => setShowModal(true)}
+            style={styles.input}
+          >
+            {selectedDateTouched && ageError ? (
+              <Ionicons
+                name="close-circle"
+                size={25}
+                color="#b22222"
+                style={styles.ageIconLeft}
+              />
+            ) : isBirthDateSelected && isAgeValid ? (
+              <Ionicons
+                name="checkmark-circle"
+                size={25}
+                color="green"
+                style={styles.ageIconLeft}
+              />
+            ) : null}
+            <Text style={styles.inputText}>
+              {selectedDate ? formatDate(selectedDate) : "Birth date"}
+            </Text>
+            <FontAwesome
+              name="calendar"
+              size={24}
+              color={theme.colors.primary}
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+          {selectedDateTouched && ageError ? (
+            <Text style={styles.ageErrorText}>{ageError}</Text>
+          ) : null}
+          <View style={styles.inputContainer}>
+            {passwordTouched && passwordError ? (
+              <Ionicons
+                name="close-circle"
+                size={25}
+                color="#b22222"
+                style={styles.iconLeft}
+              />
+            ) : isPasswordValid && password.length > 0 ? (
+              <Ionicons
+                name="checkmark-circle"
+                size={25}
+                color="green"
+                style={styles.iconLeft}
+              />
+            ) : null}
+            <TextInput
+              label="Password"
+              returnKeyType="done"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                setPasswordTouched(true);
+              }}
+              secureTextEntry={!showPassword}
+              style={styles.textInputWithIcon}
+              error={passwordError}
+            />
+            <IconButton
+              icon={showPassword ? "eye-off" : "eye"}
+              onPress={handleTogglePasswordVisibility}
+              style={styles.iconButton}
+            />
+          </View>
+          {passwordTouched && passwordError ? (
+            <Text style={styles.errorText}>{passwordError}</Text>
+          ) : null}
+          <View style={styles.inputContainer}>
+            {confirmPasswordTouched && confirmPasswordError ? (
+              <Ionicons
+                name="close-circle"
+                size={25}
+                color="#b22222"
+                style={styles.iconLeft}
+              />
+            ) : isConfirmPasswordValid && confirmPassword.length > 0 ? (
+              <Ionicons
+                name="checkmark-circle"
+                size={25}
+                color="green"
+                style={styles.iconLeft}
+              />
+            ) : null}
+            <TextInput
+              label="Confirm Password"
+              returnKeyType="done"
+              value={confirmPassword}
+              onChangeText={(text) => {
+                setConfirmPassword(text);
+                setConfirmPasswordTouched(true);
+              }}
+              secureTextEntry={!showConfirmPassword}
+              style={[styles.textInputWithIcon, { marginBottom: 10 }]}
+              error={confirmPasswordError}
+            />
+            <IconButton
+              icon={showConfirmPassword ? "eye-off" : "eye"}
+              onPress={handleToggleConfirmPasswordVisibility}
+              style={styles.iconButton}
+            />
+          </View>
 
-      
-    </ScrollView>
+          {confirmPasswordTouched && confirmPasswordError ? (
+            <Text style={styles.errorText}>{confirmPasswordError}</Text>
+          ) : null}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginBottom: 10,
+              flexGrow: 1,
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <CheckBox
+              value={privacyChecked}
+              onValueChange={setPrivacyChecked}
+              tintColors={{ true: theme.colors.primary, false: "grey" }}
+              style={{ marginLeft: 15 }}
+            />
+            <View>
+              <Text>
+                Confirm you agree to our{" "}
+                <Text
+                  style={{
+                    color: theme.colors.primary,
+                    textDecorationLine: "underline",
+                  }}
+                  onPress={openPrivacyPolicy}
+                >
+                  Privacy Policy
+                </Text>{" "}
+                and{" "}
+                <Text
+                  style={{
+                    color: theme.colors.primary,
+                    textDecorationLine: "underline",
+                    marginBottom: 10,
+                  }}
+                  onPress={openTermsConditions}
+                >
+                  Terms & Conditions
+                </Text>
+              </Text>
+            </View>
+          </View>
+          <PrivacyModal
+            visible={privacyModalVisible}
+            onClose={() => setPrivacyModalVisible(false)}
+          />
+          <TermsModal
+            visible={termsModalVisible}
+            onClose={() => setTermsModalVisible(false)}
+          />
+          {isLoading ? (
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+          ) : (
+            <Button
+              mode="contained"
+              onPress={handleSignup}
+              style={styles.button}
+              disabled={!isFormValid}
+            >
+              Sign Up
+            </Button>
+          )}
+          <View style={styles.row}>
+            <Text>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.replace("LoginScreen")}>
+              <Text style={styles.link}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+
+        <Modal
+          visible={showModal}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={() => setShowModal(false)}
+        >
+          <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
+            <View style={styles.overlay} />
+          </TouchableWithoutFeedback>
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <CalendarPicker
+                onDateChange={onDateChange}
+                selectedStartDate={selectedDate}
+                previousTitle="Previous"
+                nextTitle="Next"
+                selectedDayTextColor={theme.colors.primary}
+                selectedDayBackgroundColor={theme.colors.accent}
+                todayBackgroundColor={theme.colors.background}
+                selectedDayStyle={styles.selectedDayStyle}
+                selectedDayTextStyles={styles.selectedDayText}
+              />
+              <RNButton
+                title="Close"
+                onPress={() => setShowModal(false)}
+                color={theme.colors.primary}
+              />
+            </View>
+          </View>
+        </Modal>
+      </ScrollView>
     </ImageBackground>
   );
 }
@@ -509,7 +497,7 @@ const styles = StyleSheet.create({
   },
   background: {
     flex: 1,
-    width: '100%',
+    width: "100%",
     backgroundColor: theme.colors.surface,
   },
   scrollViewContent: {
@@ -543,9 +531,7 @@ const styles = StyleSheet.create({
   textInputWithIcon: {
     flex: 1,
     backgroundColor: theme.colors.surface,
-    paddingRight: 50, // Space for the icon
-    
-
+    paddingRight: 50,
   },
   iconButton: {
     position: "absolute",
@@ -577,13 +563,11 @@ const styles = StyleSheet.create({
     top: 60,
   },
   button: {
-    alignContent:"center",
+    alignContent: "center",
     width: "100",
-    
   },
   logo: {
     alignItems: "center",
-    // top: 35,
     marginTop: 35,
     marginBottom: 20,
   },

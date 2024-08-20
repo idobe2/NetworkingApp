@@ -15,13 +15,13 @@ import Header from "../components/Header";
 import Paragraph from "../components/Paragraph";
 import placesApi from "../api/PlacesApi";
 import plansApi from "../api/PlanApi";
-import { format, isSameYear } from 'date-fns';
+import { format, isSameYear } from "date-fns";
 import DropDownPicker from "react-native-dropdown-picker";
-import { Swipeable } from 'react-native-gesture-handler';
+import { Swipeable } from "react-native-gesture-handler";
 import AnimatedLogo from "../common/AnimatedLogo";
 import HomeBackground from "../components/HomeBackground";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PlansContext } from '../common/PlansContext';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { PlansContext } from "../common/PlansContext";
 import NoPlansMessage from "../components/NoPlansMessage";
 
 export default function PreviousPlans({ navigation }) {
@@ -38,13 +38,12 @@ export default function PreviousPlans({ navigation }) {
   const [sortOption, setSortOption] = useState("date");
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([
-    { label: 'Sort by Date', value: 'date' },
-    { label: 'Sort by Destination', value: 'destination' },
-    { label: 'Sort by Social', value: 'social' }
+    { label: "Sort by Date", value: "date" },
+    { label: "Sort by Destination", value: "destination" },
+    { label: "Sort by Social", value: "social" },
   ]);
   const [hasFetchedData, setHasFetchedData] = useState(false);
   const [apiError, setApiError] = useState(false);
-
 
   const fetchData = useCallback(async () => {
     if (loading) return;
@@ -71,27 +70,21 @@ export default function PreviousPlans({ navigation }) {
       if (error.response && error.response.status === 404) {
         setApiError(true);
       }
-      ToastAndroid.show('Failed to fetch plans', ToastAndroid.SHORT);
-      console.error('Error fetching plans:', error);
+      ToastAndroid.show("Failed to fetch plans", ToastAndroid.SHORT);
+      console.error("Error fetching plans:", error);
     }
-
     setLoading(false);
     setHasFetchedData(true);
   }, [loading]);
-
-
-
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
       console.log("Plans changed:", plansChanged);
       if (!hasFetchedData) {
         fetchData();
-      }
-      else if (plansChanged) {
+      } else if (plansChanged) {
         setPlansChanged(false);
         fetchData();
-
       }
     });
     return () => unsubscribe();
@@ -106,28 +99,31 @@ export default function PreviousPlans({ navigation }) {
     if (loading) {
       timeout = setTimeout(() => {
         if (loading) {
-          ToastAndroid.show("Server is taking too long to respond", ToastAndroid.SHORT);
+          ToastAndroid.show(
+            "Server is taking too long to respond",
+            ToastAndroid.SHORT
+          );
           setLoading(false);
         }
-      }, 20000); // 20 seconds timeout
+      }, 20000);
     }
     return () => clearTimeout(timeout);
   }, [loading]);
 
   const applyFilters = useCallback(() => {
     let updatedPlans = [...plans];
-
     // Apply search filter
     if (searchQuery) {
       updatedPlans = updatedPlans.filter((plan) =>
         plan.destination.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-
     // Apply sorting
     switch (sortOption) {
       case "date":
-        updatedPlans.sort((a, b) => new Date(a.arrivalDate) - new Date(b.arrivalDate));
+        updatedPlans.sort(
+          (a, b) => new Date(a.arrivalDate) - new Date(b.arrivalDate)
+        );
         break;
       case "destination":
         updatedPlans.sort((a, b) => a.destination.localeCompare(b.destination));
@@ -138,10 +134,8 @@ export default function PreviousPlans({ navigation }) {
       default:
         break;
     }
-
     setFilteredPlans(updatedPlans);
   }, [searchQuery, sortOption, plans]);
-
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -166,10 +160,16 @@ export default function PreviousPlans({ navigation }) {
               setPlansChanged(true);
               const updatedPlans = plans.filter((plan) => plan.id !== item.id);
               setPlans(updatedPlans);
-              await AsyncStorage.setItem('travelPlans', JSON.stringify(updatedPlans)); // Update cache
+              // Update cached plans
+              await AsyncStorage.setItem(
+                "travelPlans",
+                JSON.stringify(updatedPlans)
+              );
               fetchData();
-              ToastAndroid.show("Plan deleted successfully", ToastAndroid.SHORT);
-
+              ToastAndroid.show(
+                "Plan deleted successfully",
+                ToastAndroid.SHORT
+              );
             }
           },
         },
@@ -190,7 +190,9 @@ export default function PreviousPlans({ navigation }) {
         {
           text: "Delete",
           onPress: async () => {
-            const promises = selectedPlans.map((item) => plansApi.deletePlan(item.planId));
+            const promises = selectedPlans.map((item) =>
+              plansApi.deletePlan(item.planId)
+            );
             await Promise.all(promises);
             setPlansChanged(true);
             setSelectedPlans([]);
@@ -221,9 +223,12 @@ export default function PreviousPlans({ navigation }) {
     const start = new Date(startDate);
     const end = new Date(endDate);
     if (isSameYear(start, end)) {
-      return `${format(start, 'MMMM dd')} - ${format(end, 'MMMM dd, yyyy')}`;
+      return `${format(start, "MMMM dd")} - ${format(end, "MMMM dd, yyyy")}`;
     } else {
-      return `${format(start, 'MMMM dd, yyyy')} - ${format(end, 'MMMM dd, yyyy')}`;
+      return `${format(start, "MMMM dd, yyyy")} - ${format(
+        end,
+        "MMMM dd, yyyy"
+      )}`;
     }
   };
 
@@ -241,7 +246,7 @@ export default function PreviousPlans({ navigation }) {
       <TouchableOpacity
         style={[
           styles.itemContainer,
-          selectedPlans.includes(item) && styles.selectedItemContainer
+          selectedPlans.includes(item) && styles.selectedItemContainer,
         ]}
         onPress={() => {
           if (isSelectionMode) {
@@ -260,15 +265,24 @@ export default function PreviousPlans({ navigation }) {
             onPress={() => toggleSelectPlan(item)}
           >
             <Ionicons
-              name={selectedPlans.includes(item) ? "checkmark-circle" : "ellipse-outline"}
+              name={
+                selectedPlans.includes(item)
+                  ? "checkmark-circle"
+                  : "ellipse-outline"
+              }
               size={24}
               color={selectedPlans.includes(item) ? "green" : "black"}
             />
           </TouchableOpacity>
         )}
         <View style={{ flex: 1 }}>
-          <Paragraph style={styles.destination}>{item.destination} <Paragraph style={styles.social}>{item.social}</Paragraph></Paragraph>
-          <Paragraph style={{}}>{formatDateRange(item.arrivalDate, item.departureDate)}</Paragraph>
+          <Paragraph style={styles.destination}>
+            {item.destination}{" "}
+            <Paragraph style={styles.social}>{item.social}</Paragraph>
+          </Paragraph>
+          <Paragraph style={{}}>
+            {formatDateRange(item.arrivalDate, item.departureDate)}
+          </Paragraph>
         </View>
         {destinationImages[item.destination] && (
           <Image
@@ -285,13 +299,15 @@ export default function PreviousPlans({ navigation }) {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <Header>Previous Plans</Header>
-          <TouchableOpacity onPress={() => {
-            if (isSelectionMode) {
-              cancelSelectionMode();
-            } else {
-              setIsSelectionMode(true);
-            }
-          }}>
+          <TouchableOpacity
+            onPress={() => {
+              if (isSelectionMode) {
+                cancelSelectionMode();
+              } else {
+                setIsSelectionMode(true);
+              }
+            }}
+          >
             <MaterialIcons
               name={isSelectionMode ? "cancel" : "select-all"}
               size={28}
@@ -315,7 +331,7 @@ export default function PreviousPlans({ navigation }) {
               const newSortOption = callback(currentSortOption);
               return newSortOption;
             });
-            applyFilters(); // Apply filters whenever sortOption changes
+            applyFilters();
           }}
           setItems={setItems}
           containerStyle={styles.dropdown}
@@ -333,11 +349,16 @@ export default function PreviousPlans({ navigation }) {
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
                 refreshControl={
-                  <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                  />
                 }
               />
             ) : (
-              <NoPlansMessage onGetStarted={() => navigation.navigate('Welcome')} />
+              <NoPlansMessage
+                onGetStarted={() => navigation.navigate("Welcome")}
+              />
             )}
           </>
         )}
@@ -385,9 +406,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   selectedItemContainer: {
-    backgroundColor: "#69b9db", // Highlight color for selected items
+    backgroundColor: "#69b9db",
   },
- circleCheckbox: {
+  circleCheckbox: {
     marginRight: 10,
   },
   destination: {
@@ -413,30 +434,30 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   loadingOverlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.7)",
     zIndex: 1,
   },
   fabContainer: {
-    position: 'absolute',
+    position: "absolute",
     right: 20,
     bottom: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   fab: {
-    backgroundColor: 'red',
+    backgroundColor: "red",
     width: 56,
     height: 56,
     borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     elevation: 5,
   },
 });

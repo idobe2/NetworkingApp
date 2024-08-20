@@ -36,7 +36,6 @@ const fetchPlans = async () => {
         plans.push({ ...plan, planId });
       }
     }
-    // console.log("Plans:", plans);
     return plans;
   } catch (error) {
     console.log("Api error fetch:", error);
@@ -47,7 +46,6 @@ const fetchPlans = async () => {
 const getPlans = async (planId) => {
   try {
     const response = await clientApi.post("/getPlanById", { planId });
-    // console.log("get plan by id:", response.data);
     return response.data;
   } catch (error) {
     console.log("Api error get:", error);
@@ -59,7 +57,7 @@ const deletePlan = async (planId) => {
   console.log("Delete Plan:", planId);
   try {
     const response = await clientApi.post("/deletePlan", { planId });
-    // console.log("Plan deleted successfully");
+    console.log("Plan deleted successfully");
     return response.data;
   } catch (error) {
     console.log("Api delete error:", error);
@@ -98,36 +96,6 @@ const replaceActivity = async (planId, day, activity, newActivity) => {
     console.log("Api error:", error);
   }
 };
-
-// const checkSelectedDates = async (arrivalDate, departureDate) => {
-//   try {
-//     const plans = await fetchPlans();
-//     if (!plans) {
-//       return false;
-//     }
-//     const newArrivalDate = new Date(arrivalDate);
-//     const newDepartureDate = new Date(departureDate);
-
-//     for (let plan of plans) {
-//       const planArrivalDate = new Date(plan.arrivalDate);
-//       const planDepartureDate = new Date(plan.departureDate);
-
-//       // Check if the new dates overlap with any existing plan dates
-//       if (
-//         (newArrivalDate >= planArrivalDate && newArrivalDate <= planDepartureDate) ||
-//         (newDepartureDate >= planArrivalDate && newDepartureDate <= planDepartureDate) ||
-//         (newArrivalDate <= planArrivalDate && newDepartureDate >= planDepartureDate)
-//       ) {
-//         console.log("Dates overlap with existing plan");
-//         return true; // Overlap found
-//       }
-//     }
-//     return false; // No overlap found
-//   } catch (error) {
-//     console.log("Api error:", error);
-//     return false;
-//   }
-// };
 
 const generateMeals = async (planId, day, activity, mealType) => {
   console.log("Generate Meals:", planId, day, activity, mealType);
@@ -185,5 +153,4 @@ export default {
   generateMeals,
   addMeal,
   getPlans,
-  // checkSelectedDates,
 };

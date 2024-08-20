@@ -1,15 +1,20 @@
 import React from "react";
-import { View, StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  runOnJS,
 } from "react-native-reanimated";
 import Header from "./Header";
 import Paragraph from "./Paragraph";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -18,29 +23,32 @@ const TravelPosts = () => {
   const posts = [
     {
       title: "Discover Hidden Gems",
-      description: "Explore the lesser-known destinations for a unique experience.",
-      image: require("../assets/hidden_gems.png"), // Placeholder image path
-      url: "https://medium.com/@positiveaffirmations91/uncovering-the-hidden-gems-exploring-lesser-known-tourist-destinations-b253078a9780", // Placeholder URL
+      description:
+        "Explore the lesser-known destinations for a unique experience.",
+      image: require("../assets/hidden_gems.png"),
+      url: "https://medium.com/@positiveaffirmations91/uncovering-the-hidden-gems-exploring-lesser-known-tourist-destinations-b253078a9780",
     },
     {
       title: "Best Techno Festivals in 2024",
-      description: "Festivals are a great way to have more memorable experiences.",
-      image: require("../assets/music_festivals.png"), // Placeholder image path
-      url: "https://medium.com/clubnight/best-techno-festivals-2024-in-europe-electronic-music-657d0031e562", // Placeholder URL
+      description:
+        "Festivals are a great way to have more memorable experiences.",
+      image: require("../assets/music_festivals.png"),
+      url: "https://medium.com/clubnight/best-techno-festivals-2024-in-europe-electronic-music-657d0031e562",
     },
     {
       title: "Exploring the Culinary Delights",
-      description: "Taste the exquisite cuisines from different cultures around the world.",
-      image: require("../assets/culinary_delights.png"), // Placeholder image path
-      url: "https://medium.com/@armaanakhan91/exploring-the-culinary-delights-9948bb0b3f6b", // Placeholder URL
+      description:
+        "Taste the exquisite cuisines from different cultures around the world.",
+      image: require("../assets/culinary_delights.png"),
+      url: "https://medium.com/@armaanakhan91/exploring-the-culinary-delights-9948bb0b3f6b",
     },
   ];
 
   // Create a loopable posts array by duplicating the first and last posts
   const loopedPosts = [posts[posts.length - 1], ...posts, posts[0]];
 
-  const translateX = useSharedValue(-screenWidth); // Start at the first actual post
-  const currentPage = useSharedValue(1); // Adjusted for the looped posts
+  const translateX = useSharedValue(-screenWidth);
+  const currentPage = useSharedValue(1);
 
   const panGesture = Gesture.Pan()
     .onUpdate((event) => {
@@ -55,15 +63,19 @@ const TravelPosts = () => {
       }
 
       // Smooth transition and boundary adjustment
-      translateX.value = withSpring(currentPage.value * -screenWidth, {}, () => {
-        if (currentPage.value === 0) {
-          currentPage.value = loopedPosts.length - 2;
-          translateX.value = (currentPage.value * -screenWidth);
-        } else if (currentPage.value === loopedPosts.length - 1) {
-          currentPage.value = 1;
-          translateX.value = (currentPage.value * -screenWidth);
+      translateX.value = withSpring(
+        currentPage.value * -screenWidth,
+        {},
+        () => {
+          if (currentPage.value === 0) {
+            currentPage.value = loopedPosts.length - 2;
+            translateX.value = currentPage.value * -screenWidth;
+          } else if (currentPage.value === loopedPosts.length - 1) {
+            currentPage.value = 1;
+            translateX.value = currentPage.value * -screenWidth;
+          }
         }
-      });
+      );
     });
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -90,7 +102,9 @@ const TravelPosts = () => {
               <View style={styles.imageContainer}>
                 <Image source={post.image} style={styles.image} />
               </View>
-              <Paragraph style={styles.description}>{post.description}</Paragraph>
+              <Paragraph style={styles.description}>
+                {post.description}
+              </Paragraph>
             </TouchableOpacity>
           ))}
         </Animated.View>
@@ -99,7 +113,8 @@ const TravelPosts = () => {
         {posts.map((_, index) => {
           const dotStyle = useAnimatedStyle(() => {
             return {
-              backgroundColor: currentPage.value === index + 1 ? "#000" : "#aaa",
+              backgroundColor:
+                currentPage.value === index + 1 ? "#000" : "#aaa",
             };
           });
           return <Animated.View key={index} style={[styles.dot, dotStyle]} />;
@@ -124,9 +139,9 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     borderRadius: 10,
-    overflow: 'hidden',
-    elevation: 5, // Android elevation for shadow
-    shadowColor: "#000", // iOS shadow properties
+    overflow: "hidden",
+    elevation: 5,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,

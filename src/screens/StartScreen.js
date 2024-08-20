@@ -48,7 +48,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Semi-transparent background
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
     zIndex: 1,
   },
 })

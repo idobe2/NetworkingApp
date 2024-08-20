@@ -6,12 +6,10 @@ const Banners = ({ onBannerPress }) => {
   const banners = [
     { id: 1, text: "Getting Started", image: require('../assets/start.png'), icon: "rocket" },
     { id: 2, text: "Next Activities", image: require('../assets/next_activities.png'), icon: "calendar" },
-    // { id: 3, text: "Information", image: require('./assets/information.jpg'), icon: "info-circle" },
   ];
 
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.welcomeText}>Welcome to Your Dashboard</Text> */}
       {banners.map((banner) => (
         <TouchableOpacity
           key={banner.id}

@@ -29,7 +29,6 @@ const ActivityBottomSheet = ({
   const snapPoints = useMemo(() => ["50%", "90%"], []);
 
   const handleSheetChange = useCallback((index) => {
-    // console.log("handleSheetChange", index);
   }, []);
 
   const handleClosePress = useCallback(() => {
@@ -118,7 +117,7 @@ const ActivityBottomSheet = ({
         onConfirm={handleConfirmSelect}
         onGoogleMaps={handleGoogleMaps}
         selectedActivity={selectedActivity}
-        caller={caller} // Pass the caller prop to the ConfirmationModal
+        caller={caller}
       />
     </>
   );

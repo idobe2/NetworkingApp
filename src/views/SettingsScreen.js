@@ -20,10 +20,9 @@ import HomeBackground from "../components/HomeBackground";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 import VerificationCodeModal from "../components/VerificationCodeModal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import  Icon  from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
 const Settings = ({ navigation }) => {
-  const [isLoading, setIsLoading] = useState(false);
   const [isLogoutLoading, setIsLogoutLoading] = useState(false);
   const [isDeleteAccountLoading, setIsDeleteAccountLoading] = useState(false);
   const [isChangePasswordLoading, setIsChangePasswordLoading] = useState(false);
@@ -78,7 +77,10 @@ const Settings = ({ navigation }) => {
       "Are you sure you want to delete your account?",
       [
         { text: "Cancel", style: "cancel" },
-        { text: "Send Verification Code", onPress: () => handleSendVerificationCode() },
+        {
+          text: "Send Verification Code",
+          onPress: () => handleSendVerificationCode(),
+        },
       ]
     );
   };
@@ -87,8 +89,8 @@ const Settings = ({ navigation }) => {
     setIsDeleteAccountLoading(true);
     try {
       const response = await userApi.sendVerificationCode(email);
-      console.log("response: ", response)
-      if (response  === 'Verification email sent') {
+      console.log("response: ", response);
+      if (response === "Verification email sent") {
         ToastAndroid.show("Verification code sent", ToastAndroid.TOP);
         setIsVerificationCodeModalVisible(true);
       } else {
@@ -109,15 +111,19 @@ const Settings = ({ navigation }) => {
     setIsDeleteAccountLoading(true);
     try {
       const response = await userApi.verifyAndDeleteAccount(verificationCode);
-      if (response === 'User data, plans, preferences, and authentication deleted successfully') {
+      if (
+        response ===
+        "User data, plans, preferences, and authentication deleted successfully"
+      ) {
         console.log("Account deleted successfully");
         ToastAndroid.show("Account deleted successfully", ToastAndroid.TOP);
         setIsAuthenticated(false);
       } else {
+        Alert.alert("The code you entered is incorrect. Please try again.");
         console.log("Account deletion failed:", response.error);
       }
     } catch (error) {
-      console.error("Error deleting account:", error);
+      console.log("Error deleting account:", error);
     } finally {
       setIsDeleteAccountLoading(false);
       setIsVerificationCodeModalVisible(false);
@@ -146,9 +152,12 @@ const Settings = ({ navigation }) => {
   };
 
   const handleSupportPress = () => {
-    const subject = 'Support Request';
-    const body = 'Hello,\n\nI need help with the Tripy app. Here are the details of my issue:\n\n[Describe your issue here]\n\nThank you,\n[Your Name]';
-    const mailto = `mailto:tripy@tech-center.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const subject = "Support Request";
+    const body =
+      "Hello,\n\nI need help with the Tripy app. Here are the details of my issue:\n\n[Describe your issue here]\n\nThank you,\n[Your Name]";
+    const mailto = `mailto:tripy@tech-center.com?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
     Linking.openURL(mailto);
   };
 
@@ -180,11 +189,16 @@ const Settings = ({ navigation }) => {
             {userType === "local" && (
               <View style={styles.setting}>
                 {isChangePasswordLoading ? (
-                  <ActivityIndicator size="small" color={theme.colors.primary} />
+                  <ActivityIndicator
+                    size="small"
+                    color={theme.colors.primary}
+                  />
                 ) : (
                   <Button
-                     mode="outlined"
-                    icon={() => <Icon name="lock-reset" size={25} color="#6d11ef"  />}
+                    mode="outlined"
+                    icon={() => (
+                      <Icon name="lock-reset" size={25} color="#6d11ef" />
+                    )}
                     onPress={handleChangePassword}
                     style={styles.roundedButton}
                   >
@@ -198,8 +212,15 @@ const Settings = ({ navigation }) => {
                 <ActivityIndicator size="small" color={theme.colors.primary} />
               ) : (
                 <Button
-                   mode="outlined"
-                  icon={() => <Icon name="delete-forever" size={25} color="#6d11ef" style={{right: 10}}  />}
+                  mode="outlined"
+                  icon={() => (
+                    <Icon
+                      name="delete-forever"
+                      size={25}
+                      color="#6d11ef"
+                      style={{ right: 10 }}
+                    />
+                  )}
                   onPress={handleDeleteAccount}
                   style={styles.roundedButton}
                 >
@@ -288,7 +309,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // paddingVertical: 10,
   },
   settingText: {
     fontSize: 16,
@@ -297,17 +317,17 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   verifyButton: {
-    width: '60%',
+    width: "60%",
     backgroundColor: "#FFD580",
   },
   roundedButton: {
-    width: '100%',
-    borderRadius: 35, // Adjust as needed for roundness
-    flexDirection: 'row', // Align icon and text horizontally
-    justifyContent: 'center', // Center the content
-    alignItems: 'center', // Vertically center
-    paddingHorizontal: 30, // Padding for aesthetics
-    opacity: 0.95, // Slightly transparent
+    width: "100%",
+    borderRadius: 35,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 30,
+    opacity: 0.95,
   },
 });
 

@@ -166,6 +166,8 @@ const Planner = ({ navigation }) => {
     } catch (error) {
       console.error("Error creating plan:", error);
       alert("An error occurred while creating the plan. Please try again.");
+      // When an error occurs, we need to reset the screen key to re-render the screen
+      setScreenKey((prevKey) => prevKey + 1);
     } finally {
       setLoading(false);
       setScreenKey((prevKey) => prevKey + 1);

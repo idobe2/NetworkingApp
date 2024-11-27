@@ -46,7 +46,8 @@ const fetchPlans = async () => {
 const getPlans = async (planId) => {
   try {
     const response = await clientApi.post("/getPlanById", { planId });
-    return response.data;
+    const plan = await verifyPlan(response.data);
+    return plan;
   } catch (error) {
     console.log("Api error get:", error);
   }
@@ -143,6 +144,33 @@ const deleteActivity = async (planId, day, activity) => {
   }
 }
 
+const verifyPlan = async (plan) => {
+  if (!plan) {
+    return null;
+  }
+  if (!plan.destination) {
+    return null;
+  }
+  if (!plan.arrivalDate) {
+    return null;
+  }
+  if (!plan.departureDate) {
+    return null;
+  }
+  if (!plan.social) {
+    return null;
+  }
+  if (plan.travelPlan[0].day.includes("-")) {
+    console.log("Bad date format, changing to correct format...");
+  for (let i = 0; i < plan.travelPlan.length; i++) {
+    const day = plan.travelPlan[i].day;
+    const date = day.split("-");
+    plan.travelPlan[i].day = date[2] + "/" + date[1] + "/" + date[0].slice(2);
+  }
+}
+  return plan;
+}
+
 export default {
   addPlan,
   fetchPlans,
@@ -153,4 +181,5 @@ export default {
   generateMeals,
   addMeal,
   getPlans,
+  verifyPlan,
 };
